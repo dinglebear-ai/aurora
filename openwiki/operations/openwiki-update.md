@@ -21,7 +21,12 @@ The PR creation step includes:
 
 ## Historical note
 
-This workflow used to rely on a self-hosted `openai-compatible` endpoint plus Tailscale bootstrap; those preflight/login steps were removed in favor of direct OpenRouter credentials and tracing.
+This workflow previously used a two-job structure:
+
+- A read-only generation job that ran OpenWiki through a self-hosted `openai-compatible` endpoint behind Tailscale.
+- A separate propose job that created the PR from generated artifacts.
+
+That approach was replaced with a single `update` job using direct OpenRouter execution and inline OpenWiki installation in place of pnpm workspace setup and Tailscale bootstrap.
 
 ## Why this matters for future updates
 

@@ -6,7 +6,7 @@ This repository now has a minimal OpenWiki reference for maintaining `aurora` do
 
 - Repository context: `Aurora Design System` is a Next.js 16 / React 19 codebase with a shadcn-compatible registry and Android/theme/tooling companions. Start with [`README.md`](../README.md) for the full product description.
 - OpenWiki maintenance: current workflow and command/credential model used by scheduled updates.
-- What was changed in this maintenance run: OpenWiki workflow moved to `openrouter` execution and PR scope now includes OpenWiki metadata/config files.
+- What was changed in this maintenance run: OpenWiki workflow migrated to OpenRouter with a single PR workflow that writes updated wiki files and selected repository metadata (`AGENTS.md`, `CLAUDE.md`, `openwiki` workflow).
 
 ## Primary navigation
 
@@ -14,7 +14,7 @@ This repository now has a minimal OpenWiki reference for maintaining `aurora` do
 
 ## Current maintenance state
 
-- `.last-update.json` is present and currently records the last successful OpenWiki update at `2026-07-16T08:51:06.974Z` (`4d8fbe390f847e43141a9e2dac928dca7dd6bf06`).
+- `.last-update.json` is present and currently records the last successful OpenWiki update at `2026-07-26T09:54:55.883Z` (`3ead1ccf2cc3ebf52c3dd0375eebdb774588e78a`).
 - This maintenance refresh tracks these source changes:
   - `.github/workflows/openwiki-update.yml` (single-job OpenRouter-based automation)
   - `CLAUDE.md` (new repository OpenWiki handoff note)
