@@ -16,6 +16,7 @@ import { LabbyMark, AuroraWordmark } from "@/components/labby-brand"
 import { SiteCommandPalette } from "@/components/site/site-command-palette"
 import { useCommandPalette } from "@/registry/aurora/blocks/workspace/command-palette/command-palette"
 import { tint } from "@/components/site/style-tokens"
+import { readBrowserStorage, writeBrowserStorage } from "@/lib/browser-storage"
 
 const NAV = [
   { label: "Components", href: "/components" },
@@ -65,7 +66,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
   // SSR hydration.
   React.useEffect(() => {
     /* eslint-disable react-hooks/set-state-in-effect */
-    const stored = window.localStorage.getItem("aurora-site-theme")
+    const stored = readBrowserStorage(() => window.localStorage, "aurora-site-theme")
     if (stored === "light") setLight(true)
     const p = new URLSearchParams(window.location.search)
     if (p.get("still") === "1") setStill(true)
@@ -78,7 +79,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
     document.documentElement.classList.toggle("light", light)
     document.documentElement.classList.toggle("dark", !light)
     document.documentElement.style.colorScheme = light ? "light" : "dark"
-    window.localStorage.setItem("aurora-site-theme", light ? "light" : "dark")
+    writeBrowserStorage(() => window.localStorage, "aurora-site-theme", light ? "light" : "dark")
   }, [light])
 
   return (

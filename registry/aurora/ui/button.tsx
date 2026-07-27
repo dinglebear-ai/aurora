@@ -141,12 +141,12 @@ function Button({
       <Slot
         ref={ref}
         className={cls}
+        {...props}
         aria-busy={loading ? "true" : undefined}
         onClick={handleClick}
-        // asChild renders a non-<button>, which ignores `disabled`; expose
-        // disabled state to AT and drop it from the tab order instead.
+        // Enforced accessibility state must come after consumer props so a
+        // disabled/loading link cannot be made focusable or reported enabled.
         {...(isDisabled ? { "aria-disabled": true, tabIndex: -1 } : {})}
-        {...props}
       >
         {children}
       </Slot>

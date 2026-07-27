@@ -19,6 +19,9 @@ logs
 .broadcastr
 # testing
 /coverage
+/test-results/
+/playwright-report/
+/blob-report/
 /android/aurora/src/test/snapshots/images/*_actual.png
 /android/aurora/src/test/snapshots/images/*_compare.png
 

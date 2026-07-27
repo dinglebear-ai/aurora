@@ -48,6 +48,8 @@ jobs:
       # onlyBuiltDependencies allowlist in pnpm-workspace.yaml, so this runs
       # exclusively its script (prebuild-install fetches a prebuilt binary),
       # keeping the guard for everything else.
+      - name: Verify the reviewed OpenWiki dependency graph
+        run: pnpm run openwiki:graph:check
       - name: Compile the native SQLite binding OpenWiki needs
         run: pnpm rebuild better-sqlite3
       - name: Preflight OpenWiki API

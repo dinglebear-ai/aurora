@@ -20,7 +20,7 @@ class CodexClientInputTest {
 
     @Test
     fun `startTurn with no attachments emits single text item`() {
-        val client = CodexClient("ws://localhost:0", null)
+        val client = CodexClient("ws://localhost:1", null)
         val (frame, id) = client.buildTurnFrame(
             threadId = "t1",
             text = "hello",
@@ -39,7 +39,7 @@ class CodexClientInputTest {
 
     @Test
     fun `startTurn with skill attachment emits skill item after text`() {
-        val client = CodexClient("ws://localhost:0", null)
+        val client = CodexClient("ws://localhost:1", null)
         val (frame) = client.buildTurnFrame(
             threadId = "t1",
             text = "run this",
@@ -58,7 +58,7 @@ class CodexClientInputTest {
 
     @Test
     fun `startTurn with mention attachment emits mention item after text`() {
-        val client = CodexClient("ws://localhost:0", null)
+        val client = CodexClient("ws://localhost:1", null)
         val (frame) = client.buildTurnFrame(
             threadId = "t1",
             text = "hey @jacob",
@@ -76,7 +76,7 @@ class CodexClientInputTest {
 
     @Test
     fun `startTurn with mixed attachments preserves order`() {
-        val client = CodexClient("ws://localhost:0", null)
+        val client = CodexClient("ws://localhost:1", null)
         val (frame) = client.buildTurnFrame(
             threadId = "t1",
             text = "multi",

@@ -9,7 +9,7 @@ Operator-first design system for [Labby](https://github.com/jmagar/labby) — an
 Aurora is a shadcn-compatible registry for agent products and operator-grade application workflows.
 
 It is a dark-first, operator-grade design system featuring:
-- **175 registry items** — 79 UI primitives + 73 composed blocks + 23 supporting styles, themes, pages, and registry utilities
+- **176 registry items** — 79 UI primitives + 73 composed blocks + 24 supporting styles, themes, pages, and registry utilities
 - **CSS custom properties** — compatible with both dark and light themes
 - **shadcn registry** — install any component with one command
 - **Manrope + Inter + JetBrains Mono** font stack
@@ -190,8 +190,10 @@ pnpm registry:graph
 pnpm generated:check
 pnpm tokens:generate
 
-# Unit tests (Node test runner — no framework required)
+# Unit, coverage, and Storybook runtime/accessibility gates
 pnpm test:unit
+pnpm test:coverage
+pnpm test:storybook
 
 # Android gates
 cd android
@@ -228,8 +230,12 @@ serves the source bind mount or a mutable image tag.
 ## Security
 
 The web app sets a baseline of HTTP security headers (CSP, HSTS, `X-Frame-Options`,
-and more). See [`docs/security.md`](docs/security.md) for the full security posture
-and known limitations.
+and more), and optional browser preferences degrade safely when storage is blocked
+or unavailable. The Android client applies one fail-closed WebSocket URL policy
+across stored settings, Settings validation, reconnects, and client construction:
+remote endpoints require `wss://`, while `ws://` is limited to emulator and
+loopback hosts. See [`docs/security.md`](docs/security.md) for the full security
+posture and known limitations.
 
 ## License
 

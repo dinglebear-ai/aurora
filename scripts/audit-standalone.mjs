@@ -11,7 +11,6 @@ if (!existsSync(standalone)) {
 }
 
 const forbidden = [
-  ".env",
   ".worktrees",
   "android",
   "registry",
@@ -20,7 +19,8 @@ const forbidden = [
 ]
 
 const entries = new Set(readdirSync(standalone))
-const findings = forbidden.filter((entry) => entries.has(entry))
+const envFindings = [...entries].filter((entry) => entry === ".env" || entry.startsWith(".env."))
+const findings = [...envFindings, ...forbidden.filter((entry) => entries.has(entry))]
 const allowedDocsFiles = new Set(["docs/component-kotlin-map.md"])
 
 function listFiles(dir) {

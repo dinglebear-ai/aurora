@@ -5,7 +5,7 @@ import type { ReactNode } from "react"
 import { Button } from "@/registry/aurora/ui/button"
 import { Input } from "@/registry/aurora/ui/input"
 import { Label } from "@/registry/aurora/ui/label"
-import { PillGroup, PillTrigger } from "@/registry/aurora/ui/tabs"
+import { PillGroup, PillTrigger, TabsContent } from "@/registry/aurora/ui/tabs"
 import { Switch } from "@/registry/aurora/ui/switch"
 import { Textarea } from "@/registry/aurora/ui/textarea"
 
@@ -35,9 +35,9 @@ export const Inputs: Story = {
         <Input size="lg" placeholder="Large" />
       </div>
       <div className="grid grid-cols-3 gap-3">
-        <Input state="success" defaultValue="Published" />
-        <Input state="warn" defaultValue="Needs review" />
-        <Input state="error" defaultValue="Invalid token" />
+        <Input aria-label="Success state" state="success" defaultValue="Published" />
+        <Input aria-label="Warning state" state="warn" defaultValue="Needs review" />
+        <Input aria-label="Error state" state="error" defaultValue="Invalid token" />
       </div>
       <Field label="Release notes">
         <Textarea defaultValue="Adds Storybook coverage for the core Aurora primitives." />
@@ -61,7 +61,16 @@ export const SettingsPanel: Story = {
         <Label htmlFor="a11y-checks">Accessibility checks</Label>
         <Switch id="a11y-checks" />
       </div>
-      <PillGroup defaultValue="registry">
+      <PillGroup
+        defaultValue="registry"
+        panels={
+          <>
+            <TabsContent value="registry">Registry previews</TabsContent>
+            <TabsContent value="site">Site previews</TabsContent>
+            <TabsContent value="themes">Theme previews</TabsContent>
+          </>
+        }
+      >
         <PillTrigger value="registry">Registry</PillTrigger>
         <PillTrigger value="site">Site</PillTrigger>
         <PillTrigger value="themes">Themes</PillTrigger>
@@ -76,9 +85,9 @@ export const SettingsPanel: Story = {
 
 function Field({ label, children }: { label: string; children: ReactNode }) {
   return (
-    <div className="grid gap-2">
-      <Label>{label}</Label>
+    <Label className="grid gap-2">
+      <span>{label}</span>
       {children}
-    </div>
+    </Label>
   )
 }

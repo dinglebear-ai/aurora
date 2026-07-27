@@ -19,6 +19,9 @@ import javax.crypto.SecretKey
 import javax.crypto.spec.GCMParameterSpec
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import tv.tootie.aurora.app.net.DEFAULT_SERVER_URL
+import tv.tootie.aurora.app.net.isAllowedServerUrl
+import tv.tootie.aurora.app.net.requireAllowedServerUrl
 
 private val Context.store: DataStore<Preferences> by preferencesDataStore("settings")
 
@@ -153,8 +156,13 @@ private object SecretCrypto {
 }
 
 class AppSettings(private val ctx: Context) {
-    // 10.0.2.2 = Android emulator alias for host machine's 127.0.0.1
-    val serverUrl: Flow<String> = ctx.store.data.map { it[Keys.SERVER_URL] ?: "ws://10.0.2.2:4500" }
+    // Invalid legacy values fall back rather than bypassing the current transport policy.
+    val serverUrl: Flow<String> = ctx.store.data.map { preferences ->
+        preferences[Keys.SERVER_URL]
+            ?.trim()
+            ?.takeIf(::isAllowedServerUrl)
+            ?: DEFAULT_SERVER_URL
+    }
     val authToken: Flow<String?> = ctx.store.data.map { SecretCrypto.decrypt(it[Keys.AUTH_TOKEN]) }
     val model: Flow<String> = ctx.store.data.map { it[Keys.MODEL] ?: "gpt-5.5" }
 
@@ -173,7 +181,10 @@ class AppSettings(private val ctx: Context) {
         prefs[Keys.AUTH_METHOD] != null
     }
 
-    suspend fun setServerUrl(v: String) = ctx.store.edit { it[Keys.SERVER_URL] = v }
+    suspend fun setServerUrl(v: String) {
+        val validated = requireAllowedServerUrl(v)
+        ctx.store.edit { it[Keys.SERVER_URL] = validated }
+    }
     suspend fun setAuthToken(v: String?) {
         if (v == null) { ctx.store.edit { it.remove(Keys.AUTH_TOKEN) }; return }
         val enc = SecretCrypto.encrypt(v)

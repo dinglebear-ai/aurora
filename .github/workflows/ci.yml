@@ -72,6 +72,8 @@ jobs:
           key: nextjs-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml', 'next.config.*', 'proxy.ts') }}
           restore-keys: nextjs-${{ runner.os }}-
       - run: pnpm install --frozen-lockfile
+      - name: Verify the installed OpenWiki dependency graph
+        run: pnpm run openwiki:graph:check
       - run: pnpm run lint
       - run: pnpm run audit:composition
       - run: pnpm exec tsc --noEmit

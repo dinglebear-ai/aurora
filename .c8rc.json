@@ -1,6 +1,7 @@
 {
   "all": true,
   "include": [
+    "lib/browser-storage.ts",
     "lib/markdown-links.ts",
     "lib/slug-map.ts",
     "registry/aurora/lib/widget-interactions.ts",

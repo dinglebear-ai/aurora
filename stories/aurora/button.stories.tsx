@@ -9,18 +9,18 @@ const meta = {
   parameters: {
     docs: {
       description: {
-        component: "Aurora's token-backed shadcn button with tone, size, loading, icon, and disabled states.",
+        component: "Aurora's token-backed shadcn button with variant, size, loading, icon, and disabled states.",
       },
     },
   },
   argTypes: {
     variant: {
       control: "select",
-      options: ["aurora", "neutral", "rose", "violet", "ghost", "destructive", "plain"],
+      options: ["aurora", "neutral", "rose", "success", "warn", "ghost", "destructive", "plain"],
     },
     size: {
       control: "select",
-      options: ["sm", "default", "lg", "icon"],
+      options: ["sm", "default", "lg", "icon", "unstyled"],
     },
   },
   args: {

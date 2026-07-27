@@ -12,7 +12,7 @@ class LoginProtocolTest {
 
     @Test
     fun `loginWithApiKey frame has correct method and type`() {
-        val client = CodexClient("ws://localhost:0", null)
+        val client = CodexClient("ws://localhost:1", null)
         val frame = client.buildLoginFrame(LoginMethodType.apiKey, "apiKey" to "sk-test-123")
         val parsed = json.parseToJsonElement(frame).jsonObject
         assertEquals("account/login/start", parsed["method"]?.jsonPrimitive?.content)
@@ -22,7 +22,7 @@ class LoginProtocolTest {
 
     @Test
     fun `loginWithDeviceCode frame has correct method and type`() {
-        val client = CodexClient("ws://localhost:0", null)
+        val client = CodexClient("ws://localhost:1", null)
         val frame = client.buildLoginFrame(LoginMethodType.chatgptDeviceCode)
         val parsed = json.parseToJsonElement(frame).jsonObject
         assertEquals("account/login/start", parsed["method"]?.jsonPrimitive?.content)
@@ -31,7 +31,7 @@ class LoginProtocolTest {
 
     @Test
     fun `loginWithAuthTokens frame includes accessToken and accountId`() {
-        val client = CodexClient("ws://localhost:0", null)
+        val client = CodexClient("ws://localhost:1", null)
         val frame = client.buildLoginFrame(
             LoginMethodType.chatgptAuthTokens,
             "accessToken" to "ey-tok",
@@ -45,7 +45,7 @@ class LoginProtocolTest {
 
     @Test
     fun `loginWithChatGpt frame has chatgpt type`() {
-        val client = CodexClient("ws://localhost:0", null)
+        val client = CodexClient("ws://localhost:1", null)
         val frame = client.buildLoginFrame(LoginMethodType.chatgpt)
         val params = json.parseToJsonElement(frame).jsonObject["params"]!!.jsonObject
         assertEquals("chatgpt", params["type"]?.jsonPrimitive?.content)

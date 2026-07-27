@@ -89,6 +89,12 @@ test("Button artifact preserves disabled/loading asChild guards", () => {
     "? { \"aria-disabled\": true, tabIndex: -1 }",
     "aria-busy={loading ? \"true\" : undefined}",
   ])
+
+  const consumerProps = content.indexOf("{...props}")
+  const enforcedBusy = content.indexOf('aria-busy={loading ? "true" : undefined}', consumerProps)
+  const enforcedDisabled = content.indexOf('? { "aria-disabled": true, tabIndex: -1 }', enforcedBusy)
+  assert.ok(consumerProps >= 0 && consumerProps < enforcedBusy)
+  assert.ok(enforcedBusy < enforcedDisabled)
 })
 
 test("migrated compound primitives preserve public aliases and refs", () => {

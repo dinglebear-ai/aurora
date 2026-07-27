@@ -27,6 +27,7 @@ import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicLong
+import tv.tootie.aurora.app.net.requireAllowedServerUrl
 
 private const val TAG = "CodexClient"
 private const val INBOUND_CAPACITY = 512
@@ -42,12 +43,13 @@ data class RpcBufferStats(
 )
 
 class CodexClient(
-    private val url: String,
+    url: String,
     private val token: String? = null,
     private val onRequestCreated: (Int, RequestKind) -> Unit = { _, _ -> },
     private val onTerminated: (CodexClient, Int, String) -> Unit = { _, _, _ -> },
 ) {
 
+    private val url = requireAllowedServerUrl(url)
     private val json = Json { ignoreUnknownKeys = true }
     private val http = OkHttpClient()
     internal val ids = AtomicInteger(0)

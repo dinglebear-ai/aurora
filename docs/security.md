@@ -102,18 +102,24 @@ cleartext, emulator-local `ws://10.0.2.2:4500` (`10.0.2.2` is the Android
 emulator alias for the host machine's loopback). Cleartext is permitted **only
 for local/dev hosts**, scoped via `network_security_config.xml`.
 
-Remote hosts are **not** auto-upgraded to TLS: for a remote connection the user
-must enter a `wss://` URL themselves, and there is **no application-level code**
-that rejects a cleartext `ws://` URL aimed at a remote host. On **API ≥ 28**
-(the platform's default), however, cleartext to any host outside the
-`network_security_config.xml` allow-list (`10.0.2.2` / `127.0.0.1` / `localhost`)
-is **blocked by the OS** — a remote `ws://` connection simply fails rather than
-silently sending in the clear. The residual window where a remote `ws://` would
-be permitted is **API 24–27** (`minSdk = 24`), where the platform default allows
-cleartext; on those versions choosing `wss://` for non-local destinations is on
-the user.
+Remote endpoints are **not** auto-upgraded to TLS. Aurora instead enforces one
+fail-closed application policy (`app/net/ServerUrlPolicy.kt`) across every
+supported Android API level:
 
-There is also currently **no certificate pinning** on that connection — this is
+- Remote endpoints must use `wss://`.
+- Cleartext `ws://` is accepted only for `10.0.2.2`, `127.0.0.1`, `localhost`,
+  and IPv6 loopback.
+- Malformed URLs, unsupported schemes, embedded credentials, missing hosts,
+  invalid ports, and fragment-bearing URLs are rejected.
+
+The same policy is applied when a stored URL is read (invalid legacy values
+fall back to the emulator-local default), when Settings validates and persists
+a URL, when reconnect flows construct a client, and again inside `CodexClient`
+before OkHttp receives the request. The platform network security configuration
+remains a second layer of defense for cleartext traffic; it is no longer relied
+on to close the API 24–27 gap.
+
+There is currently **no certificate pinning** on that connection — this remains
 a known limitation.
 
 ## Delivery and dependency controls

@@ -214,7 +214,7 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
                     }
                     onResult(flat)
                 }
-            } catch (t: Throwable) {
+            } catch (t: Exception) {
                 if (t is CancellationException && t !is TimeoutCancellationException) throw t
                 Log.w(TAG, "config/read failed: ${t.message}")
                 _state.update {
@@ -257,7 +257,7 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
                         }
                     }
                 }
-            } catch (t: Throwable) {
+            } catch (t: Exception) {
                 if (t is CancellationException && t !is TimeoutCancellationException) throw t
                 Log.w(TAG, "config/batchWrite failed: ${t.message}")
                 _state.update {
@@ -341,7 +341,7 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
                         msg.error != null
                 }
             }
-        } catch (t: Throwable) {
+        } catch (t: Exception) {
             // Swallow TimeoutCancellationException and any I/O failure from connect()/RPC.
             // Re-throw only true coroutine cancellation so the job is still cancellable.
             if (t is CancellationException && t !is TimeoutCancellationException) throw t
