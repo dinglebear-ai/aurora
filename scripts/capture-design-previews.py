@@ -13,11 +13,18 @@ Usage:
      serve_url looks like:
        https://<PID>.claudeusercontent.com/v1/design/projects/<PID>/serve/<path>?t=<TOKEN>&direct=1
      Copy everything after `t=` and before `&` into CD_TOKEN.
-  2. CD_TOKEN='<token>' python3 scratchpad-cd-screenshots.py [outdir]
+  2. CD_TOKEN='<token>' python3 scripts/capture-design-previews.py [outdir]
 
 Token TTL is ~1h; re-fetch if you get 403s.
 """
-import os, sys, json, asyncio, urllib.request, re
+import asyncio
+import json
+import os
+import re
+import sys
+import urllib.request
+from urllib.parse import quote
+
 from playwright.async_api import async_playwright
 
 PID = "a9af47aa-77b0-43ed-b4cd-5d52391528e5"
@@ -27,7 +34,17 @@ OUTDIR = sys.argv[1] if len(sys.argv) > 1 else "cd_shots"
 CONCURRENCY = int(os.environ.get("CD_CONCURRENCY", "2"))
 
 def serve_url(path: str) -> str:
-    return f"{BASE}/{path}?t={TOKEN}&direct=1"
+    normalized = path.strip().lstrip("/")
+    segments = normalized.split("/")
+    if (
+        not normalized
+        or any(segment in {"", ".", ".."} for segment in segments)
+        or "//" in normalized
+        or "?" in normalized
+        or "#" in normalized
+    ):
+        raise ValueError(f"unsafe design preview path: {path!r}")
+    return f"{BASE}/{quote(normalized, safe='/-_.')}?t={TOKEN}&direct=1"
 
 def sanitize(name: str) -> str:
     return re.sub(r"[^A-Za-z0-9._-]+", "_", name).strip("_")

@@ -26,7 +26,7 @@ class CodexClientRpcTest {
 
     @Test
     fun `buildSteerFrame emits turn steer method with text input`() {
-        val client = CodexClient("ws://localhost:0", null)
+        val client = CodexClient("ws://localhost:1", null)
         val (frame, id) = client.buildSteerFrame(
             threadId = "th-1",
             text = "stop and reconsider",
@@ -46,7 +46,7 @@ class CodexClientRpcTest {
 
     @Test
     fun `buildSteerFrame ids are monotonically increasing`() {
-        val client = CodexClient("ws://localhost:0", null)
+        val client = CodexClient("ws://localhost:1", null)
         val (_, id1) = client.buildSteerFrame("t", "a", "x")
         val (_, id2) = client.buildSteerFrame("t", "b", "y")
         assert(id2 > id1) { "Expected id2 ($id2) > id1 ($id1)" }
@@ -58,7 +58,7 @@ class CodexClientRpcTest {
 
     @Test
     fun `buildSetGoalFrame emits thread goal set with objective`() {
-        val client = CodexClient("ws://localhost:0", null)
+        val client = CodexClient("ws://localhost:1", null)
         val (frame, id) = client.buildSetGoalFrame(
             threadId = "th-2",
             objective = "deploy the stack",
@@ -75,7 +75,7 @@ class CodexClientRpcTest {
 
     @Test
     fun `buildSetGoalFrame includes tokenBudget when provided`() {
-        val client = CodexClient("ws://localhost:0", null)
+        val client = CodexClient("ws://localhost:1", null)
         val (frame) = client.buildSetGoalFrame(
             threadId = "th-2",
             objective = "run tests",
@@ -91,7 +91,7 @@ class CodexClientRpcTest {
 
     @Test
     fun `buildGetGoalFrame emits thread goal get with threadId`() {
-        val client = CodexClient("ws://localhost:0", null)
+        val client = CodexClient("ws://localhost:1", null)
         val (frame, id) = client.buildGetGoalFrame(threadId = "th-3")
         val root = json.parseToJsonElement(frame).jsonObject
         assertEquals("thread/goal/get", root["method"]?.jsonPrimitive?.content)
@@ -105,7 +105,7 @@ class CodexClientRpcTest {
 
     @Test
     fun `buildClearGoalFrame emits thread goal clear with threadId`() {
-        val client = CodexClient("ws://localhost:0", null)
+        val client = CodexClient("ws://localhost:1", null)
         val (frame, id) = client.buildClearGoalFrame(threadId = "th-4")
         val root = json.parseToJsonElement(frame).jsonObject
         assertEquals("thread/goal/clear", root["method"]?.jsonPrimitive?.content)
@@ -119,7 +119,7 @@ class CodexClientRpcTest {
 
     @Test
     fun `buildListMcpServersFrame emits mcpServerStatus list with detail field`() {
-        val client = CodexClient("ws://localhost:0", null)
+        val client = CodexClient("ws://localhost:1", null)
         val (frame, id) = client.buildListMcpServersFrame()
         val root = json.parseToJsonElement(frame).jsonObject
         assertEquals("mcpServerStatus/list", root["method"]?.jsonPrimitive?.content)

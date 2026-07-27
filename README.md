@@ -190,8 +190,10 @@ pnpm registry:graph
 pnpm generated:check
 pnpm tokens:generate
 
-# Unit tests (Node test runner — no framework required)
+# Unit, coverage, and Storybook runtime/accessibility gates
 pnpm test:unit
+pnpm test:coverage
+pnpm test:storybook
 
 # Android gates
 cd android
@@ -228,8 +230,12 @@ serves the source bind mount or a mutable image tag.
 ## Security
 
 The web app sets a baseline of HTTP security headers (CSP, HSTS, `X-Frame-Options`,
-and more). See [`docs/security.md`](docs/security.md) for the full security posture
-and known limitations.
+and more), and optional browser preferences degrade safely when storage is blocked
+or unavailable. The Android client applies one fail-closed WebSocket URL policy
+across stored settings, Settings validation, reconnects, and client construction:
+remote endpoints require `wss://`, while `ws://` is limited to emulator and
+loopback hosts. See [`docs/security.md`](docs/security.md) for the full security
+posture and known limitations.
 
 ## License
 

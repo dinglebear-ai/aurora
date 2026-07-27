@@ -45,6 +45,7 @@ import tv.tootie.aurora.app.codex.ConfigEditEntry
 import tv.tootie.aurora.app.codex.ConfigMergeStrategy
 import tv.tootie.aurora.app.data.AppSettings
 import tv.tootie.aurora.app.data.SecretPersistException
+import tv.tootie.aurora.app.net.requireAllowedServerUrl
 import tv.tootie.aurora.components.AuroraButton
 import tv.tootie.aurora.components.AuroraButtonVariant
 import tv.tootie.aurora.components.AuroraDropdownMenu
@@ -265,18 +266,28 @@ fun SettingsScreen(
             AuroraButton(
                 onClick = {
                     scope.launch {
+                        val validatedUrl = runCatching { requireAllowedServerUrl(url) }
+                            .getOrElse { error ->
+                                Toast.makeText(
+                                    ctx,
+                                    error.message ?: "Enter a valid secure WebSocket URL.",
+                                    Toast.LENGTH_LONG,
+                                ).show()
+                                return@launch
+                            }
                         try {
                             // Persist the non-secret fields first; setAuthToken (the only
                             // setter that can throw on Keystore failure) runs last, so a
                             // failure leaves every other field correctly saved and only the
                             // token unchanged — matching the error message below.
-                            settings.setServerUrl(url)
+                            settings.setServerUrl(validatedUrl)
                             settings.setModel(model)
                             settings.setApprovalPolicy(selectedApprovalPolicy.wire)
                             settings.setApprovalsReviewer(selectedReviewer.wire)
                             settings.setAuthToken(token.takeIf { it.isNotBlank() })
                             val app = ctx.applicationContext as CodexApp
-                            app.repository.reconnect(url, token.takeIf { it.isNotBlank() })
+                            app.repository.reconnect(validatedUrl, token.takeIf { it.isNotBlank() })
+                            url = validatedUrl
                             onBack()
                         } catch (e: SecretPersistException) {
                             // Keystore encryption failed — don't reconnect with a half-saved

@@ -56,7 +56,16 @@ export default function TabsDemo() {
               <CardDescription>Segmented choice for tight, operator-style toggles.</CardDescription>
             </CardHeader>
             <CardContent className="flex flex-wrap items-center gap-4">
-              <PillGroup defaultValue="preview">
+              <PillGroup
+                defaultValue="preview"
+                panels={
+                  <>
+                    <TabsContent value="preview">Preview the active component.</TabsContent>
+                    <TabsContent value="compare">Compare token and component variants.</TabsContent>
+                    <TabsContent value="export">Export the selected artifact.</TabsContent>
+                  </>
+                }
+              >
                 <PillTrigger value="preview">Preview</PillTrigger>
                 <PillTrigger value="compare">Compare</PillTrigger>
                 <PillTrigger value="export">Export</PillTrigger>

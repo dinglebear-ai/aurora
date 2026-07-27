@@ -1,5 +1,5 @@
 import AxeBuilder from "@axe-core/playwright"
-import { expect, test, type Page } from "@playwright/test"
+import { expect, test, type ConsoleMessage, type Page } from "@playwright/test"
 
 type StoryContract = {
   id: string
@@ -23,9 +23,6 @@ const stories: StoryContract[] = [
     id: "aurora-interaction-contracts--popover-focus-and-escape",
     assert: async (page) => {
       const trigger = page.getByRole("button", { name: "Open" })
-      // Storybook starts play functions after the iframe is ready. On a cold,
-      // contended runner that can outlive Playwright's default assertion
-      // timeout, so wait for a marker set only after every play assertion.
       await expect(trigger).toHaveAttribute("data-interaction-complete", "true", { timeout: 30_000 })
       await expect(trigger).toHaveAttribute("aria-expanded", "false")
       await expect(trigger).toBeFocused()
@@ -73,6 +70,8 @@ const stories: StoryContract[] = [
   },
 ]
 
+const interactionStoryIds = new Set(stories.map((story) => story.id))
+
 for (const story of stories) {
   test(`${story.id} completes its interaction and strict axe contract`, async ({ page }) => {
     const runtimeErrors: string[] = []
@@ -88,3 +87,42 @@ for (const story of stories) {
     expect(runtimeErrors).toEqual([])
   })
 }
+
+test("all remaining Aurora stories render without runtime or axe violations", async ({ page, request }) => {
+  test.setTimeout(180_000)
+  const response = await request.get("/index.json")
+  expect(response.ok()).toBe(true)
+  const index = await response.json() as {
+    entries?: Record<string, { id?: string; type?: string }>
+  }
+  const storyIds = Object.values(index.entries ?? {})
+    .filter((entry) => entry.type === "story" && typeof entry.id === "string")
+    .map((entry) => entry.id as string)
+    .filter((id) => !interactionStoryIds.has(id))
+    .sort()
+
+  expect(storyIds.length).toBeGreaterThan(0)
+
+  for (const id of storyIds) {
+    const runtimeErrors: string[] = []
+    const onPageError = (error: Error) => runtimeErrors.push(error.message)
+    const onConsole = (message: ConsoleMessage) => {
+      if (message.type() === "error") runtimeErrors.push(message.text())
+    }
+    page.on("pageerror", onPageError)
+    page.on("console", onConsole)
+
+    try {
+      await page.goto(`/iframe.html?id=${id}&viewMode=story`, { waitUntil: "networkidle" })
+      await expect(page.locator("#storybook-root")).toBeVisible()
+      const results = await new AxeBuilder({ page })
+        .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+        .analyze()
+      expect(results.violations, id + " axe violations").toEqual([])
+      expect(runtimeErrors, id + " runtime errors").toEqual([])
+    } finally {
+      page.off("pageerror", onPageError)
+      page.off("console", onConsole)
+    }
+  }
+})

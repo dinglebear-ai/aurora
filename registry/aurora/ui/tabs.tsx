@@ -72,17 +72,24 @@ function TabsContent({ ref, className, ...props }: React.ComponentProps<typeof T
  * PillGroup — a pill-shaped segmented toggle that wraps Radix Tabs.
  *
  * Usage:
- *   <PillGroup defaultValue="a">
+ *   <PillGroup
+ *     defaultValue="a"
+ *     panels={<TabsContent value="a">Option A panel</TabsContent>}
+ *   >
  *     <PillTrigger value="a">Option A</PillTrigger>
- *     <PillTrigger value="b">Option B</PillTrigger>
  *   </PillGroup>
  *
- * Note: PillGroup renders only the TabsList, not TabsContent.
- * Pair with TabsContent outside PillGroup if panel switching is needed.
+ * PillGroup is a tablist, not a standalone toggle group. Requiring panels keeps
+ * every trigger's aria-controls reference valid. Use ToggleGroup or Segmented
+ * when no corresponding panels exist.
  */
-export type PillGroupProps = React.ComponentProps<typeof TabsPrimitive.Root>
+export interface PillGroupProps
+  extends Omit<React.ComponentProps<typeof TabsPrimitive.Root>, "children"> {
+  children: React.ReactNode
+  panels: React.ReactNode
+}
 
-function PillGroup({ ref, className, children, style, ...props }: PillGroupProps & { ref?: React.Ref<React.ComponentRef<typeof TabsPrimitive.Root>> }) {
+function PillGroup({ ref, className, children, panels, style, ...props }: PillGroupProps & { ref?: React.Ref<React.ComponentRef<typeof TabsPrimitive.Root>> }) {
   return (
     <TabsPrimitive.Root ref={ref} {...props}>
       <TabsPrimitive.List
@@ -98,6 +105,7 @@ function PillGroup({ ref, className, children, style, ...props }: PillGroupProps
       >
         {children}
       </TabsPrimitive.List>
+      {panels}
     </TabsPrimitive.Root>
   )
 }
