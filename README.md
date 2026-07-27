@@ -9,7 +9,7 @@ Operator-first design system for [Labby](https://github.com/jmagar/labby) — an
 Aurora is a shadcn-compatible registry for agent products and operator-grade application workflows.
 
 It is a dark-first, operator-grade design system featuring:
-- **175 registry items** — 79 UI primitives + 73 composed blocks + 23 supporting styles, themes, pages, and registry utilities
+- **176 registry items** — 79 UI primitives + 73 composed blocks + 24 supporting styles, themes, pages, and registry utilities
 - **CSS custom properties** — compatible with both dark and light themes
 - **shadcn registry** — install any component with one command
 - **Manrope + Inter + JetBrains Mono** font stack
