@@ -41,6 +41,13 @@
     "skill:sync": "node scripts/sync-agent-skill.mjs",
     "skill:check": "node scripts/sync-agent-skill.mjs --check && ops/check-skill-sync.sh",
     "refs:check": "node scripts/migrate-react19-refs.mjs --check",
+    "catalog:device:generate": "node scripts/generate-device-catalog.mjs",
+    "catalog:device:check": "node scripts/generate-device-catalog.mjs --check",
+    "catalog:device:dev": "pnpm --dir apps/device-catalog dev",
+    "catalog:device:build": "pnpm --dir apps/device-catalog build",
+    "catalog:device:tauri": "pnpm --dir apps/device-catalog tauri",
+    "catalog:device:android": "pnpm --dir apps/device-catalog tauri:android:dev",
+    "catalog:device:android:build": "pnpm --dir apps/device-catalog tauri:android:build",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
   },

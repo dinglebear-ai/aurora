@@ -2,6 +2,8 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite"
 import { Search } from "lucide-react"
 import type { ReactNode } from "react"
 
+import { FormsFixture } from "@/catalog/fixtures"
+
 import { Button } from "@/registry/aurora/ui/button"
 import { Input } from "@/registry/aurora/ui/input"
 import { Label } from "@/registry/aurora/ui/label"
@@ -22,6 +24,8 @@ const meta = {
 
 export default meta
 type Story = StoryObj<typeof meta>
+
+export const DeviceCatalogFixture: Story = { render: () => <FormsFixture /> }
 
 export const Inputs: Story = {
   render: () => (

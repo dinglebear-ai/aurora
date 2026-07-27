@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite"
 import { expect, userEvent, waitFor, within } from "storybook/test"
 
+import { OverlaysFixture } from "@/catalog/fixtures"
+
 import { Button } from "@/registry/aurora/ui/button"
 import {
   AlertDialog,
@@ -48,6 +50,8 @@ const meta = {
 
 export default meta
 type Story = StoryObj<typeof meta>
+
+export const DeviceCatalogFixture: Story = { render: () => <OverlaysFixture /> }
 
 export const Modal: Story = {
   render: () => (

@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite"
 import { expect, userEvent, waitFor, within } from "storybook/test"
 
+import { WidgetsFixture } from "@/catalog/fixtures"
+
 import { Combobox } from "@/registry/aurora/ui/combobox"
 import { MultiSelect } from "@/registry/aurora/ui/multi-select"
 import { Popover, PopoverContent, PopoverTrigger } from "@/registry/aurora/ui/popover"
@@ -9,6 +11,8 @@ import { RadioGroup, RadioGroupItem } from "@/registry/aurora/ui/radio-group"
 const meta = { title: "Aurora/Interaction Contracts", parameters: { layout: "centered" } } satisfies Meta
 export default meta
 type Story = StoryObj<typeof meta>
+
+export const DeviceCatalogFixture: Story = { render: () => <WidgetsFixture /> }
 
 export const ComboboxKeyboard: Story = {
   render: () => <div className="w-80"><Combobox options={[{ value: "alpha", label: "Alpha" }, { value: "beta", label: "Beta" }]} /></div>,
