@@ -58,7 +58,10 @@ export function copyTokens({ tokensPkg, tokensGlob, nodeModules, out }) {
   if (tokensGlob) {
     const parts = tokensGlob.split('/');
     const pat = parts.pop();
-    const rx = new RegExp('^' + pat.replace(/\./g, '\\.').replace(/\*/g, '.*') + '$');
+    // Escape every regex metacharacter (backslash included) before turning the
+    // glob's `*` into `.*`; escaping only `.` left `\`, `+`, `(`… to be
+    // reinterpreted as regex syntax.
+    const rx = new RegExp('^' + pat.replace(/[\\^$.|?+()[\]{}]/g, '\\$&').replace(/\*/g, '.*') + '$');
     const deep = parts.includes('**');
     const base = join(tdir, ...parts.filter((p) => p !== '**'));
     (function collect(d, rel = '') {

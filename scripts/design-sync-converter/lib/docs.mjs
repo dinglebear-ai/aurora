@@ -131,10 +131,20 @@ export function ingestDoc(path) {
   // Drop noise that applies to .md and .mdx alike: HTML comments, raw
   // <style>/<script> blocks, and VuePress/dumi-style `:::tip … :::`
   // admonition fences (keep the content between the fences).
-  txt = txt
-    .replace(/<!--[\s\S]*?-->/g, '')
-    .replace(/<(style|script)\b[^>]*>[\s\S]*?<\/\1>/gi, '')
-    .replace(/^:::.*$/gm, '');
+  // Strip to a fixpoint: one pass can splice two partial constructs back into
+  // a fresh `<!--` / `<script`, so repeat until the text stops changing.
+  const stripToFixpoint = (input, re) => {
+    let out = input;
+    let prev;
+    do {
+      prev = out;
+      out = out.replace(re, '');
+    } while (out !== prev);
+    return out;
+  };
+  txt = stripToFixpoint(txt, /<!--[\s\S]*?-->/g);
+  txt = stripToFixpoint(txt, /<(style|script)\b[^>]*>[\s\S]*?<\/\1>/gi);
+  txt = txt.replace(/^:::.*$/gm, '');
   if (/\.mdx$/i.test(path)) {
     const lines = txt.split('\n');
     // Drop the leading import block. A prettier-wrapped multi-line import

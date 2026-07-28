@@ -464,7 +464,10 @@ export function smartDefaultProps(name, pb) {
     const req = !q;
     // Union of string literals, optionally with a `string & {}` escape-hatch
     // member (the "autocomplete these, accept any string" TS pattern).
-    if (/^(?:(?:"[^"]*"|\(?string\s*&\s*\{\}\)?)\s*\|?\s*)+$/.test(t)) {
+    // `member (| member)*` rather than `(member |?)+`: the old shape let the
+    // repetition match on an optional separator alone, so a long non-matching
+    // type backtracked exponentially (ReDoS).
+    if (/^\s*\|?\s*(?:"[^"]*"|\(?string\s*&\s*\{\}\)?)(?:\s*\|\s*(?:"[^"]*"|\(?string\s*&\s*\{\}\)?))*\s*$/.test(t)) {
       const lits = [...t.matchAll(/"([^"]*)"/g)].map((l) => l[1]).filter(Boolean);
       if (lits.length >= 2) {
         const rank = VARIANT_RANK.indexOf(prop.toLowerCase());
