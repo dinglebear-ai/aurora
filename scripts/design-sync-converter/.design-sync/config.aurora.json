@@ -1,0 +1,8 @@
+{
+  "projectId": "a9af47aa-77b0-43ed-b4cd-5d52391528e5",
+  "pkg": "registry",
+  "shape": "storybook",
+  "srcDir": "./registry",
+  "storybookConfigDir": "./.storybook",
+  "tsconfig": "./tsconfig.json"
+}

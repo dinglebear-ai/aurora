@@ -68,3 +68,9 @@ next-env.d.ts
 
 *storybook.log
 storybook-static
+
+# design-sync converter working dirs (generated capture/bundle output;
+# source of truth is scripts/design-sync-converter/)
+/.design-sync/
+/.ds-sync/
+/ds-bundle/
