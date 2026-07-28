@@ -10,6 +10,11 @@
 .worktrees
 node_modules
 android
+# Separate apps with their own toolchains and workspace deps (Tauri device
+# catalog). The Next image never imports them, and their node_modules are not
+# installed in the deps stage, so leaving them in only breaks the build's
+# typecheck. Same rationale as android/ above.
+apps
 coverage
 outputs
 playwright-report

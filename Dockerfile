@@ -21,7 +21,12 @@ FROM base AS deps
 RUN mkdir -p /pnpm /app && chown node:node /pnpm /app
 USER node
 
+# pnpm-workspace.yaml declares patchedDependencies, so pnpm hashes every file
+# under patches/ during install. Without them the install aborts with ENOENT
+# before it resolves anything. Copy the manifests and the patches only — not
+# the sources — so this layer still caches on dependency changes alone.
 COPY --chown=node:node package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY --chown=node:node patches ./patches
 RUN pnpm install --frozen-lockfile
 
 FROM deps AS dev
