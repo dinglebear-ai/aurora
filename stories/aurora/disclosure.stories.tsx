@@ -2,6 +2,8 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite"
 import { expect, userEvent, waitFor, within } from "storybook/test"
 import { MoreHorizontal } from "lucide-react"
 
+import { DisclosureFixture } from "@/catalog/fixtures"
+
 import { Accordion, AccordionItem } from "@/registry/aurora/ui/accordion"
 import { Button } from "@/registry/aurora/ui/button"
 import { Collapsible } from "@/registry/aurora/ui/collapsible"
@@ -29,6 +31,8 @@ const meta = {
 
 export default meta
 type Story = StoryObj<typeof meta>
+
+export const DeviceCatalogFixture: Story = { render: () => <DisclosureFixture /> }
 
 export const AccordionStates: Story = {
   render: () => (

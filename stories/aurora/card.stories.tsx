@@ -1,5 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite"
 
+import { CardFixture } from "@/catalog/fixtures"
+
 import { Badge } from "@/registry/aurora/ui/badge"
 import { Button } from "@/registry/aurora/ui/button"
 import {
@@ -26,6 +28,8 @@ const meta = {
 
 export default meta
 type Story = StoryObj<typeof meta>
+
+export const DeviceCatalogFixture: Story = { render: () => <CardFixture /> }
 
 export const ProductPanel: Story = {
   render: () => (

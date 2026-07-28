@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite"
 import { Download, Save, Settings } from "lucide-react"
 
+import { ButtonFixture } from "@/catalog/fixtures"
+
 import { Button } from "@/registry/aurora/ui/button"
 
 const meta = {
@@ -34,6 +36,8 @@ const meta = {
 
 export default meta
 type Story = StoryObj<typeof meta>
+
+export const DeviceCatalogFixture: Story = { render: () => <ButtonFixture /> }
 
 export const Playground: Story = {}
 

@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite"
 import { CircleAlert, CircleCheck, Info, Sparkles } from "lucide-react"
 
+import { FeedbackFixture } from "@/catalog/fixtures"
+
 import { Badge } from "@/registry/aurora/ui/badge"
 import { Callout } from "@/registry/aurora/ui/callout"
 import { StatusIndicator } from "@/registry/aurora/ui/status-indicator"
@@ -18,6 +20,8 @@ const meta = {
 
 export default meta
 type Story = StoryObj<typeof meta>
+
+export const DeviceCatalogFixture: Story = { render: () => <FeedbackFixture /> }
 
 export const Badges: Story = {
   render: () => (

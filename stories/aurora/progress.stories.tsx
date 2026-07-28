@@ -1,5 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite"
 
+import { ProgressFixture } from "@/catalog/fixtures"
+
 import { Badge } from "@/registry/aurora/ui/badge"
 import { DescriptionItem, DescriptionList } from "@/registry/aurora/ui/description-list"
 import { Stepper } from "@/registry/aurora/ui/stepper"
@@ -18,6 +20,8 @@ const meta = {
 
 export default meta
 type Story = StoryObj<typeof meta>
+
+export const DeviceCatalogFixture: Story = { render: () => <ProgressFixture /> }
 
 export const RegistryMetadata: Story = {
   render: () => (
