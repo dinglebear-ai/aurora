@@ -14,6 +14,11 @@ const eslintConfig = [...nextCoreWebVitals, ...nextTypescript, {
     "public/r/**",
     "public/dinglebear/**",
     "android/**/build/**",
+    // Vite build output for the apps/* workspaces. Git-ignored, but eslint has
+    // its own ignore list, so after a local `pnpm catalog:device:build` these
+    // minified bundles were linted and reported 77 errors that do not exist in
+    // CI (which lints without a prebuilt dist).
+    "apps/*/dist/**",
     "themes/**",
     "dinglebear/**",
   ],
