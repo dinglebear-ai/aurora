@@ -1,10 +1,8 @@
 /// <reference types="vite/client" />
 
-interface ImportMetaEnv {
-  // Vite env variables
-}
-
+// `vite/client` supplies ImportMetaEnv and import.meta.env. Only the glob
+// signature is restated here, because the app calls it with an array of
+// include/exclude patterns and a generic module type.
 interface ImportMeta {
-  readonly env: ImportMetaEnv
   glob<E = string>(patterns: string[], options?: { eager?: boolean }): Record<string, () => Promise<E>>
 }
