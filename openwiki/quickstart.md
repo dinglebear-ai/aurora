@@ -1,23 +1,31 @@
+---
+type: "Reference"
+title: "Quickstart"
+description: "Entry page for maintaining Aurora repository OpenWiki documentation, with canonical navigation and current maintenance scope."
+timestamp: "2026-07-28T10:31:21Z"
+tags: [openwiki, aurora, maintenance]
+---
+
 # Quickstart
 
-This repository now has a minimal OpenWiki reference for maintaining `aurora` documentation. Use this page as the entrypoint for future updates.
+This repository has a focused OpenWiki reference for maintaining `aurora` documentation. Use this as the entrypoint for future updates.
 
 ## What this wiki currently covers
 
 - Repository context: `Aurora Design System` is a Next.js 16 / React 19 codebase with a shadcn-compatible registry and Android/theme/tooling companions. Start with [`README.md`](../README.md) for the full product description.
-- OpenWiki maintenance: current workflow and command/credential model used by scheduled updates.
-- What was changed in this maintenance run: OpenWiki workflow moved to `openrouter` execution and PR scope now includes OpenWiki metadata/config files.
+- OpenWiki maintenance: how updates are generated and how agent-facing handoff guidance in [`CLAUDE.md`](../CLAUDE.md#openwiki) is kept synchronized.
+- The current maintenance state is tracked in [`.last-update.json`](./.last-update.json).
 
 ## Primary navigation
 
-- [OpenWiki Update Workflow](./operations/openwiki-update.md): details of the scheduled and manual update process and how it writes docs.
+- [OpenWiki Update Workflow](./operations/openwiki-update.md): details of the scheduled and manual update process and how generated docs are proposed.
+- [Agent handoff notes](../CLAUDE.md#openwiki): canonical `OPENWIKI` notes for local agents.
 
 ## Current maintenance state
 
-- `.last-update.json` is present and currently records the last successful OpenWiki update at `2026-07-27T11:14:48.000Z` (`3ead1ccf2cc3ebf52c3dd0375eebdb774588e78a`).
+- `.last-update.json` is present and records the last successful OpenWiki update.
 - This maintenance refresh tracks these source changes:
-  - `.github/workflows/openwiki-update.yml` (single-job OpenRouter-based automation)
-  - `CLAUDE.md` (new repository OpenWiki handoff note)
+  - `CLAUDE.md` (`<!-- OPENWIKI:START -->` handoff block)
 - Corresponding wiki updates in this run:
   - `/openwiki/quickstart.md`
   - `/openwiki/.last-update.json`
