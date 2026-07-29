@@ -1,7 +1,7 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry.json",
   "name": "aurora",
-  "homepage": "https://aurora.tootie.tv",
+  "homepage": "https://aurora.dinglebear.ai",
   "items": [
     {
       "name": "aurora-tokens",

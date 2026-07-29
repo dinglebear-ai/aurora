@@ -64,8 +64,9 @@ pnpm audit:composition    # Check registry composition rules
 
 ## Architecture Overview
 
-Aurora is a **shadcn-compatible component registry** (175 items) served as a
-Next.js 16 / React 19 / Tailwind v4 app at `aurora.tootie.tv`. The site is a
+Aurora is a **shadcn-compatible component registry** (176 items) served as a
+Next.js 16 / React 19 / Tailwind v4 app at `aurora.dinglebear.ai` (canonical
+domain; `aurora.tootie.tv` still resolves and its served URLs stay valid). The site is a
 landing page (`/`) + a component gallery + a themes hub (`/themes`), and doubles
 as a live registry endpoint — `/` content-negotiates between browser (landing)
 and shadcn CLI (registry JSON from `public/r/*.json`).
@@ -117,7 +118,8 @@ and shadcn CLI (registry JSON from `public/r/*.json`).
 - **Non-interactive shell.** Use `cp -f`, `mv -f`, `rm -f`, `rm -rf` — see `AGENTS.md`.
 - **See also:** `AGENTS.md` (agent shell rules), `SKILL.md` (Aurora usage skill),
   `docs/component-kotlin-map.md` (Kotlin/Compose parity matrix).
-- **SWAG upstream contract:** `aurora.tootie.tv`, `dinglebear.ai`, and
+- **SWAG upstream contract:** `aurora.dinglebear.ai` (canonical; `aurora.tootie.tv`
+  also matches via the wildcard `server_name aurora.*`), `dinglebear.ai`, and
   `www.dinglebear.ai` are reverse-proxied by SWAG on `squirts` to the immutable
   `aurora` production container on **dookie**, host port `50000→3000`. The
   canonical digest-only Compose overlay and SWAG templates are tracked under
