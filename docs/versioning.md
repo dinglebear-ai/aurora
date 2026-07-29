@@ -18,7 +18,7 @@ Production consumers pin the full 40-character Git commit that they reviewed:
 ```bash
 AURORA_SHA=<full-40-character-commit>
 npx shadcn@latest add \
-  "https://raw.githubusercontent.com/jmagar/aurora/${AURORA_SHA}/public/r/aurora-base.json"
+  "https://raw.githubusercontent.com/dinglebear-ai/aurora/${AURORA_SHA}/public/r/aurora-base.json"
 ```
 
 The commit URL is content-addressed by Git. Record the SHA in the consuming
@@ -27,7 +27,7 @@ repository beside the vendored component update. Do not use a branch name or
 full commit remains the authoritative pin.
 
 Container deployments use the same rule at the image layer: deploy
-`ghcr.io/jmagar/aurora@sha256:<digest>`, then verify that the served
+`ghcr.io/dinglebear-ai/aurora@sha256:<digest>`, then verify that the served
 `X-Aurora-Revision` equals the CI-tested source SHA. The publish workflow stores
 the image reference, source SHA, and SPDX SBOM together as run artifacts.
 

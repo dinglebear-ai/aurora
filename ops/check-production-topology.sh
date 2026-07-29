@@ -15,7 +15,7 @@ grep -q 'no-new-privileges:true' <<<"$rendered"
 grep -q 'name: jakenet' <<<"$rendered"
 grep -q 'host_ip: 100.88.16.79' <<<"$rendered"
 grep -q 'published: "50000"' <<<"$rendered"
-grep -Eq 'ghcr\.io/jmagar/aurora@sha256:[0-9a-f]{64}' <<<"$rendered"
+grep -Eq 'ghcr\.io/dinglebear-ai/aurora@sha256:[0-9a-f]{64}' <<<"$rendered"
 
 # Assert that templates retain literal placeholders.
 # shellcheck disable=SC2016

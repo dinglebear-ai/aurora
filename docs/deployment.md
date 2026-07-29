@@ -73,7 +73,7 @@ docker compose --env-file ~/.config/aurora/production.env \
   -f ops/compose/production.yaml config --quiet
 cosign verify \
   --certificate-identity-regexp \
-  '^https://github.com/jmagar/aurora/.github/workflows/publish.yml@refs/heads/main$' \
+  '^https://github.com/dinglebear-ai/aurora/.github/workflows/publish.yml@refs/heads/main$' \
   --certificate-oidc-issuer https://token.actions.githubusercontent.com \
   "$(sed -n 's/^AURORA_IMAGE_REF=//p' ~/.config/aurora/production.env)"
 ```

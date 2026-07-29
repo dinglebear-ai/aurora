@@ -53,7 +53,7 @@ Generate one token, set it in both places:
 ```bash
 # generate + set the GitHub Actions secret (the workflow reads this)
 TOKEN="$(openssl rand -hex 24)"
-gh secret set AURORA_SYNTHETIC_TOKEN --repo jmagar/aurora --body "$TOKEN"
+gh secret set AURORA_SYNTHETIC_TOKEN --repo dinglebear-ai/aurora --body "$TOKEN"
 echo "Cloudflare rule value: $TOKEN"   # paste into the rule below, then clear scrollback
 ```
 
@@ -78,7 +78,7 @@ it lacks firewall scope — so use the dashboard or a firewall-scoped token.)
 After both parts are in place, re-run the workflow and confirm green:
 
 ```bash
-gh workflow run synthetics.yml --repo jmagar/aurora
+gh workflow run synthetics.yml --repo dinglebear-ai/aurora
 gh run watch "$(gh run list --workflow synthetics.yml --limit 1 --json databaseId --jq '.[0].databaseId')"
 ```
 

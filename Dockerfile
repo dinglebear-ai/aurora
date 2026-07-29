@@ -72,7 +72,7 @@ ENV HOSTNAME=0.0.0.0
 ENV PORT=3000
 ENV AURORA_BUILD_SHA=$AURORA_BUILD_SHA
 
-LABEL org.opencontainers.image.source="https://github.com/jmagar/aurora" \
+LABEL org.opencontainers.image.source="https://github.com/dinglebear-ai/aurora" \
   org.opencontainers.image.revision=$AURORA_BUILD_SHA
 
 COPY --from=builder --chown=node:node /app/public ./public

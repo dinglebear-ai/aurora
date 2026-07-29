@@ -2,7 +2,7 @@ name: aurora-production
 
 services:
   aurora:
-    image: "${AURORA_IMAGE_REF:-ghcr.io/jmagar/aurora@sha256:0000000000000000000000000000000000000000000000000000000000000000}"
+    image: "${AURORA_IMAGE_REF:-ghcr.io/dinglebear-ai/aurora@sha256:0000000000000000000000000000000000000000000000000000000000000000}"
     pull_policy: always
     container_name: aurora
     ports:

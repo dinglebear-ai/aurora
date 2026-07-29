@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-repo="${AURORA_GITHUB_REPOSITORY:-jmagar/aurora}"
+repo="${AURORA_GITHUB_REPOSITORY:-dinglebear-ai/aurora}"
 name="main requires tested delivery"
 ruleset_id="$(gh api "repos/$repo/rulesets" --jq ".[] | select(.name == \"$name\") | .id" | head -1)"
 
