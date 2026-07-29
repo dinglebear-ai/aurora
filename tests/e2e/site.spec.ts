@@ -46,7 +46,7 @@ test("root content negotiation serves HTML to browsers and registry JSON to shad
   expect(registry.ok()).toBe(true)
   expect(registry.headers()["content-type"]).toContain("application/json")
   const body = await registry.json()
-  expect(body).toMatchObject({ name: "aurora", homepage: "https://aurora.tootie.tv" })
+  expect(body).toMatchObject({ name: "aurora", homepage: "https://aurora.dinglebear.ai" })
   expect(Array.isArray(body.items)).toBe(true)
 })
 
