@@ -21,8 +21,6 @@ jobs:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
       - name: Require immutable action references
         run: ops/check-action-pins.sh
-      - name: Require pinned OpenWiki artifact integrity
-        run: ops/check-openwiki-pin.sh
       - name: Validate workflow syntax
         uses: docker://rhysd/actionlint@sha256:ef8299f97635c4c30e2298f48f30763ab782a4ad2c95b744649439a039421e36 # 1.7.10
       - name: Validate Gradle wrapper
@@ -72,8 +70,6 @@ jobs:
           key: nextjs-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml', 'next.config.*', 'proxy.ts') }}
           restore-keys: nextjs-${{ runner.os }}-
       - run: pnpm install --frozen-lockfile
-      - name: Verify the installed OpenWiki dependency graph
-        run: pnpm run openwiki:graph:check
       - run: pnpm run lint
       - run: pnpm run audit:composition
       - run: pnpm exec tsc --noEmit
