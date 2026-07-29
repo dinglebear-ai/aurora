@@ -29,7 +29,7 @@ full commit remains the authoritative pin.
 Container deployments use the same rule at the image layer: deploy
 `ghcr.io/dinglebear-ai/aurora@sha256:<digest>`, then verify that the served
 `X-Aurora-Revision` equals the CI-tested source SHA. The publish workflow stores
-the image reference, source SHA, and SPDX SBOM together as run artifacts.
+the image reference and source SHA together as run artifacts.
 
 ## Upgrade procedure
 

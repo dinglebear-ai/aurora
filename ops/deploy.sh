@@ -40,15 +40,11 @@ esac
   exit 1
 }
 
-command -v cosign >/dev/null || { echo "cosign is required" >&2; exit 1; }
-# Must match the repository the publish workflow signs from — the OIDC identity
-# is derived from it. Overridable via the env file so a future move needs one
-# edit, not a code change.
-: "${AURORA_REPO:=dinglebear-ai/aurora}"
-cosign verify \
-  --certificate-identity-regexp "^https://github.com/${AURORA_REPO}/.github/workflows/publish.yml@refs/heads/main\$" \
-    --certificate-oidc-issuer 'https://token.actions.githubusercontent.com' \
-    "$AURORA_IMAGE_REF" >/dev/null
+# Integrity here comes from the immutable digest pin above: AURORA_IMAGE_REF is
+# a sha256 content address, and publish.yml only promotes a digest that passed
+# CI and a Trivy CRITICAL/HIGH scan. Signature verification was dropped — the
+# only consumer was this line, checking a signature the same pipeline had just
+# produced, which is a loop rather than a control.
 
 compose=(docker compose --env-file "$env_file" -f ops/compose/production.yaml)
 legacy_id=""

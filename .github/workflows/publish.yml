@@ -23,7 +23,6 @@ jobs:
     permissions:
       contents: read
       packages: write
-      id-token: write
     env:
       # Derived, not hard-coded: this was left pointing at ghcr.io/jmagar/aurora
       # after the repository moved to dinglebear-ai, and GITHUB_TOKEN cannot push
@@ -58,8 +57,8 @@ jobs:
             org.opencontainers.image.source=https://github.com/${{ github.repository }}
             org.opencontainers.image.revision=${{ env.TESTED_SHA }}
           build-args: AURORA_BUILD_SHA=${{ env.TESTED_SHA }}
-          provenance: mode=max
-          sbom: true
+          provenance: false
+          sbom: false
           cache-from: type=gha
           cache-to: type=gha,mode=max
       - name: Record tested image identity
@@ -69,12 +68,6 @@ jobs:
           test -n "$DIGEST"
           printf '%s\n' "$IMAGE@$DIGEST" > image-ref.txt
           printf '%s\n' "$TESTED_SHA" > source-sha.txt
-      - name: Generate downloadable SPDX SBOM
-        uses: anchore/sbom-action@e22c389904149dbc22b58101806040fa8d37a610 # v0.24.0
-        with:
-          image: ${{ env.IMAGE }}@${{ steps.build.outputs.digest }}
-          format: spdx-json
-          output-file: sbom.spdx.json
       - name: Scan the exact digest before promotion
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
@@ -84,18 +77,7 @@ jobs:
           severity: CRITICAL,HIGH
           ignore-unfixed: true
           exit-code: "1"
-      - name: Install Cosign
-        uses: sigstore/cosign-installer@398d4b0eeef1380460a10c8013a76f728fb906ac # v3
-      - name: Sign and verify the exact digest
-        env:
-          DIGEST: ${{ steps.build.outputs.digest }}
-        run: |
-          cosign sign --yes "$IMAGE@$DIGEST"
-          cosign verify \
-            --certificate-identity-regexp "^${{ github.server_url }}/${{ github.repository }}/.github/workflows/publish.yml@refs/heads/main\$" \
-            --certificate-oidc-issuer 'https://token.actions.githubusercontent.com' \
-            "$IMAGE@$DIGEST"
-      - name: Promote only the scanned and signed digest to latest
+      - name: Promote only the scanned digest to latest
         env:
           DIGEST: ${{ steps.build.outputs.digest }}
         run: docker buildx imagetools create --tag "$IMAGE:latest" "$IMAGE@$DIGEST"
@@ -106,24 +88,5 @@ jobs:
           path: |
             image-ref.txt
             source-sha.txt
-            sbom.spdx.json
           if-no-files-found: error
           retention-days: 90
-
-  alert:
-    name: Alert on publication failure
-    if: ${{ always() && needs.publish.result == 'failure' }}
-    needs: [publish]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Send optional homelab alert
-        env:
-          ALERT_WEBHOOK_URL: ${{ secrets.AURORA_ALERT_WEBHOOK_URL }}
-          RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-        run: |
-          message="Aurora image publication failed: $RUN_URL"
-          echo "::error::$message"
-          if [[ -n "$ALERT_WEBHOOK_URL" ]]; then
-            jq -n --arg message "$message" '{message: $message, service: "aurora"}' \
-              | curl --fail --silent --show-error -H 'Content-Type: application/json' --data-binary @- "$ALERT_WEBHOOK_URL"
-          fi

@@ -30,15 +30,3 @@ jobs:
           AURORA_PUBLIC_URL: ${{ vars.AURORA_TENANT_URL || 'https://dinglebear.ai' }}
           AURORA_TLS_MIN_SECONDS: ${{ vars.AURORA_TLS_MIN_SECONDS || '1209600' }}
         run: ops/synthetic-check.sh
-      - name: Alert on failure
-        if: ${{ failure() }}
-        env:
-          ALERT_WEBHOOK_URL: ${{ secrets.AURORA_ALERT_WEBHOOK_URL }}
-          RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-        run: |
-          message="Aurora public synthetic failed: $RUN_URL"
-          echo "::error::$message"
-          if [[ -n "$ALERT_WEBHOOK_URL" ]]; then
-            jq -n --arg message "$message" '{message: $message, service: "aurora"}' \
-              | curl --fail --silent --show-error -H 'Content-Type: application/json' --data-binary @- "$ALERT_WEBHOOK_URL"
-          fi

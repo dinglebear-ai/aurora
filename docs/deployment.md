@@ -28,11 +28,15 @@ push to `main`. It checks out `workflow_run.head_sha`, proves the checkout, and
 builds the image with that SHA. The workflow then:
 
 1. pushes only `sha-<full-sha>`;
-2. emits BuildKit provenance and SBOM attestations plus a downloadable SPDX SBOM;
-3. scans the exact digest for high/critical vulnerabilities;
-4. keyless-signs and verifies that digest with Cosign;
-5. points `latest` at that already-scanned/signed digest; and
-6. uploads `image-ref.txt`, `source-sha.txt`, and `sbom.spdx.json` together.
+2. scans the exact digest for high/critical vulnerabilities;
+3. points `latest` at that already-scanned digest; and
+4. uploads `image-ref.txt` and `source-sha.txt` together.
+
+Cosign signing, BuildKit provenance and the SPDX SBOM were removed. They exist so
+third parties can independently verify a published artifact; nothing outside this
+repository consumes Aurora's image, and the only verifier was `ops/deploy.sh`
+checking a signature the same pipeline had just produced. Integrity comes from
+the immutable digest pin plus the Trivy gate above.
 
 `latest` is informational. Deployment always consumes `image-ref.txt`.
 
@@ -43,11 +47,12 @@ builds the image with that SHA. The workflow then:
    app and library variants`. Do not permit direct bypass for routine releases.
    The reviewed ruleset is tracked at `ops/github/main-ruleset.json`; apply it
    deliberately with `ops/github/apply-main-ruleset.sh` after authenticating `gh`.
-2. Configure optional repository secret `AURORA_ALERT_WEBHOOK_URL` for CI,
-   publication, and synthetic failures. The workflows still fail visibly when
-   the webhook is absent.
-3. On dookie, create `jakenet` if it does not exist and install Docker Compose
-   plus Cosign. Keep the deployment env file outside the checkout.
+2. Failure notification is GitHub's own — it emails the actor when a workflow
+   fails. The `AURORA_ALERT_WEBHOOK_URL` steps were removed: the secret was
+   never set, so every "alert" was a no-op that made three workflows look
+   monitored while `publish.yml` stayed broken for a week unnoticed.
+3. On dookie, create `jakenet` if it does not exist and install Docker Compose.
+   Keep the deployment env file outside the checkout.
 4. On squirts, render the tracked SWAG templates, review the diff against the
    installed vhosts, run `nginx -t`, then atomically install/reload them. Do not
    copy an unreviewed generated file over live proxy configuration.
@@ -71,11 +76,6 @@ Validate without changing runtime state:
 ops/check-production-topology.sh
 docker compose --env-file ~/.config/aurora/production.env \
   -f ops/compose/production.yaml config --quiet
-cosign verify \
-  --certificate-identity-regexp \
-  '^https://github.com/dinglebear-ai/aurora/.github/workflows/publish.yml@refs/heads/main$' \
-  --certificate-oidc-issuer https://token.actions.githubusercontent.com \
-  "$(sed -n 's/^AURORA_IMAGE_REF=//p' ~/.config/aurora/production.env)"
 ```
 
 Deploy and verify landing HTML, shadcn content negotiation, registry schema and
@@ -108,18 +108,12 @@ against the full source revision reported by the deployed image, so an
 intentional delay between merging and manual promotion is not reported as an
 outage.
 
-On dookie, install the tracked five-minute systemd monitor from the checkout:
+The `ops/install-monitor.sh` systemd watchdog was removed. It was never
+installed on dookie — `aurora-monitor.timer` did not exist there — and its
+`AURORA_ALERT_WEBHOOK_URL` was never set, so it could not have paged anyone. CI
+was running a unit test for it. Container health is covered by the Compose
+`HEALTHCHECK` and the twice-hourly synthetics above.
 
-```bash
-sudo ops/install-monitor.sh
-systemctl status aurora-monitor.timer
-journalctl -u aurora-monitor.service --since today
-```
-
-Put `AURORA_ALERT_WEBHOOK_URL` and optional
-`AURORA_DISK_ALERT_PERCENT`/`AURORA_MEMORY_ALERT_PERCENT` overrides in
-`/etc/aurora/monitor.env` (mode 0600). The monitor discovers Docker's active
-data root, fails if metrics cannot be collected, and alerts on unhealthy,
-stopped, OOM-killed, disk-pressure, or memory-pressure states. Docker retains at most
-five 10 MiB production log files; the container is limited to 1 GiB, 2 CPUs,
-and 128 PIDs with all capabilities dropped and a read-only root filesystem.
+Docker retains at most five 10 MiB production log files; the container is
+limited to 1 GiB, 2 CPUs, and 128 PIDs with all capabilities dropped and a
+read-only root filesystem.
