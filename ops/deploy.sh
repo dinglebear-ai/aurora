@@ -41,8 +41,12 @@ esac
 }
 
 command -v cosign >/dev/null || { echo "cosign is required" >&2; exit 1; }
+# Must match the repository the publish workflow signs from — the OIDC identity
+# is derived from it. Overridable via the env file so a future move needs one
+# edit, not a code change.
+: "${AURORA_REPO:=dinglebear-ai/aurora}"
 cosign verify \
-  --certificate-identity-regexp '^https://github.com/jmagar/aurora/.github/workflows/publish.yml@refs/heads/main$' \
+  --certificate-identity-regexp "^https://github.com/${AURORA_REPO}/.github/workflows/publish.yml@refs/heads/main\$" \
     --certificate-oidc-issuer 'https://token.actions.githubusercontent.com' \
     "$AURORA_IMAGE_REF" >/dev/null
 

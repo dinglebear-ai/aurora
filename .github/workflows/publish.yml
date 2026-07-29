@@ -25,7 +25,10 @@ jobs:
       packages: write
       id-token: write
     env:
-      IMAGE: ghcr.io/jmagar/aurora
+      # Derived, not hard-coded: this was left pointing at ghcr.io/jmagar/aurora
+      # after the repository moved to dinglebear-ai, and GITHUB_TOKEN cannot push
+      # to a package in another account's namespace.
+      IMAGE: ghcr.io/${{ github.repository }}
       TESTED_SHA: ${{ github.event.workflow_run.head_sha }}
     steps:
       - name: Check out the exact tested revision
@@ -89,7 +92,7 @@ jobs:
         run: |
           cosign sign --yes "$IMAGE@$DIGEST"
           cosign verify \
-            --certificate-identity-regexp '^https://github.com/jmagar/aurora/.github/workflows/publish.yml@refs/heads/main$' \
+            --certificate-identity-regexp "^${{ github.server_url }}/${{ github.repository }}/.github/workflows/publish.yml@refs/heads/main\$" \
             --certificate-oidc-issuer 'https://token.actions.githubusercontent.com' \
             "$IMAGE@$DIGEST"
       - name: Promote only the scanned and signed digest to latest

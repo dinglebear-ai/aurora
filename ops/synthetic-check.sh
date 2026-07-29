@@ -63,7 +63,7 @@ fi
 # that is actually deployed. Comparing to the workflow checkout's current main
 # creates false outages during the intentional merge-to-deploy interval.
 artifact_sha="${expected_sha:-$served_sha}"
-artifact_url="https://raw.githubusercontent.com/jmagar/aurora/${artifact_sha}/public/r/${registry_item}"
+artifact_url="https://raw.githubusercontent.com/dinglebear-ai/aurora/${artifact_sha}/public/r/${registry_item}"
 curl --fail --silent --show-error --location --output "$tmp_dir/expected-item.json" "$artifact_url"
 expected_registry_hash="$(sha256sum "$tmp_dir/expected-item.json" | cut -d' ' -f1)"
 served_registry_hash="$(sha256sum "$tmp_dir/item.json" | cut -d' ' -f1)"
