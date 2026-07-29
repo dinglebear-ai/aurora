@@ -13,7 +13,9 @@ concurrency:
 
 jobs:
   public-path:
-    runs-on: ubuntu-latest
+    # Self-hosted (tootie runner farm): residential egress is not challenged by
+    # Cloudflare, unlike GitHub-hosted Azure IPs (see ops/synthetics-cloudflare.md).
+    runs-on: [self-hosted, unraid]
     permissions:
       contents: read
     steps:
@@ -22,10 +24,6 @@ jobs:
         env:
           AURORA_PUBLIC_URL: ${{ vars.AURORA_PUBLIC_URL || 'https://aurora.tootie.tv' }}
           AURORA_TLS_MIN_SECONDS: ${{ vars.AURORA_TLS_MIN_SECONDS || '1209600' }}
-          # Lets this monitor through Cloudflare's bot challenge on the tootie.tv
-          # zone (see ops/synthetic-check.sh). dinglebear.ai is not proxied, so
-          # its step below omits the token.
-          AURORA_SYNTHETIC_TOKEN: ${{ secrets.AURORA_SYNTHETIC_TOKEN }}
         run: ops/synthetic-check.sh
       - name: Check the co-hosted dinglebear tenant
         env:
