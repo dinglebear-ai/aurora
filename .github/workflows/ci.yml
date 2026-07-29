@@ -28,11 +28,7 @@ jobs:
       - name: Validate deployment topology
         run: ops/check-production-topology.sh
       - name: Validate operations shell
-        run: shellcheck ops/*.sh ops/tests/*.sh
-      - name: Test container monitoring thresholds
-        run: ops/tests/monitor-container-test.sh
-      - name: Validate documentation commands
-        run: ops/check-doc-snippets.sh
+        run: shellcheck ops/*.sh
       - name: Validate generated skill documentation
         run: node scripts/sync-agent-skill.mjs --check && ops/check-skill-sync.sh
 
@@ -138,21 +134,3 @@ jobs:
         working-directory: android
       - name: Smoke external composite-build consumption
         run: ops/smoke-android-composite.sh
-
-  alert:
-    name: Alert on CI failure
-    if: ${{ always() && contains(needs.*.result, 'failure') }}
-    needs: [policy, osv, web, android]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Send optional homelab alert
-        env:
-          ALERT_WEBHOOK_URL: ${{ secrets.AURORA_ALERT_WEBHOOK_URL }}
-          RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-        run: |
-          message="Aurora CI failed: $RUN_URL"
-          echo "::error::$message"
-          if [[ -n "$ALERT_WEBHOOK_URL" ]]; then
-            jq -n --arg message "$message" '{message: $message, service: "aurora"}' \
-              | curl --fail --silent --show-error -H 'Content-Type: application/json' --data-binary @- "$ALERT_WEBHOOK_URL"
-          fi

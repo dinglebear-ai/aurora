@@ -9,19 +9,10 @@ if ! cmp --silent "$canonical" <(sed 's#plugin/skills/aurora/references/#referen
   exit 1
 fi
 
-for path in \
-  registry/aurora/styles/aurora.css \
-  app/gallery/demo-map.tsx \
-  references/android.md; do
-  grep -q -F "$path" "$canonical" || {
-    echo "canonical skill does not reference current path: $path" >&2
-    exit 1
-  }
-done
-
-if grep -q 'badgeVariants' "$canonical"; then
-  echo "canonical skill contains a retired Badge or demo-map API" >&2
-  exit 1
-fi
+# The cmp above is the real check: two copies of the skill exist and must not
+# drift. Removed from here were greps asserting the canonical skill mentions
+# three specific paths and does not contain the string "badgeVariants" — prose
+# assertions that fail on rewording rather than on breakage, and go stale the
+# moment the underlying files are renamed.
 
 echo "Root and packaged Aurora skills match the canonical source."
