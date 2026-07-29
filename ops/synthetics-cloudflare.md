@@ -89,3 +89,18 @@ then the synthetic no longer tests the public edge or its TLS — the whole poin
 of a *public* synthetic. The TLS check already survives the challenge on its own
 (openssl reads the cert at handshake time, before the HTTP 403), so only the
 four HTTP checks need the header.
+
+## Resolution (2026-07-29) — self-hosted runners instead of the Skip rule
+
+The workflow now runs on the org's self-hosted runner farm
+(`runs-on: [self-hosted, unraid]`, `tootie-ci-runner-1..4`). Their egress is
+the residential ISP that Cloudflare already does not challenge, so no Skip
+rule is required and the workflow no longer sends the bypass header. This
+still tests the genuine public path: tootie resolves `aurora.tootie.tv` to
+Cloudflare anycast IPs (`104.21.x` / `172.67.x`), not a LAN rewrite, so DNS,
+the Cloudflare edge, SWAG, TLS, and the app are all in the loop.
+
+The `AURORA_SYNTHETIC_TOKEN` repository secret exists (set 2026-07-28; value
+stashed in `~/.config/aurora/synthetic-token.txt` on dookie, mode 0600) but is
+dormant. The header-matched Skip rule above remains the documented path if
+these checks ever move back to GitHub-hosted runners.
