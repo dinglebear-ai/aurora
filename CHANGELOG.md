@@ -57,6 +57,15 @@ breaking changes and will be listed here.
   v0.3.1 should rebuild vendored components, review changed component props,
   regenerate Android tokens, and verify both color modes before release.
 
+## [0.5.1](https://github.com/dinglebear-ai/aurora/compare/v0.5.0...v0.5.1) (2026-07-29)
+
+
+### Fixed
+
+* **codeql:** stop the Gradle build cache starving Kotlin extraction ([#104](https://github.com/dinglebear-ai/aurora/issues/104)) ([ec90cc2](https://github.com/dinglebear-ai/aurora/commit/ec90cc21d937a868d11cd2c955eea6ccdefb878f))
+* **eslint:** ignore apps/*/dist build output ([#98](https://github.com/dinglebear-ai/aurora/issues/98)) ([c7f7593](https://github.com/dinglebear-ai/aurora/commit/c7f7593a03bb7d4796641c9dee897a2d3b16d111))
+* **ops:** complete the jmagar -&gt; dinglebear-ai repository move ([#101](https://github.com/dinglebear-ai/aurora/issues/101)) ([1cbc8f4](https://github.com/dinglebear-ai/aurora/commit/1cbc8f428c21c6716be1c0e1f83815070c8e6f1e))
+
 ## [0.5.0](https://github.com/dinglebear-ai/aurora/compare/v0.4.3...v0.5.0) (2026-07-28)
 
 
