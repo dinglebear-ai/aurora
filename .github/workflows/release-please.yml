@@ -1,34 +1,20 @@
-name: release-please
+name: Release Please
 
 on:
-  workflow_run:
-    workflows: ["CI"]
-    types: [completed]
+  push:
     branches: [main]
   workflow_dispatch:
 
-permissions: {}
+permissions:
+  contents: write
+  pull-requests: write
 
 concurrency:
   group: release-please-main
   cancel-in-progress: false
 
 jobs:
-  release-please:
-    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      pull-requests: write
-      issues: write
-    steps:
-      - name: Require release-please token
-        env:
-          RELEASE_PLEASE_TOKEN: ${{ secrets.RELEASE_PLEASE_TOKEN }}
-        run: test -n "$RELEASE_PLEASE_TOKEN"
-      - uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7
-        id: release
-        with:
-          token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
-          config-file: release-please-config.json
-          manifest-file: .release-please-manifest.json
+  release:
+    uses: dinglebear-ai/workflows/.github/workflows/release-please.yml@eb5f36cf517ffc949aca1c81e2ccbc71b5a85267
+    secrets:
+      RELEASE_PLEASE_TOKEN: ${{ secrets.RELEASE_PLEASE_TOKEN }}

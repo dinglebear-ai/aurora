@@ -1,3 +1,9 @@
+---
+title: Aurora Gallery Complaint Matrix
+created: 2026-07-30
+updated: 2026-07-30
+---
+
 # Aurora Gallery Complaint Matrix
 
 This file captures each review comment as a chooser prompt. Each item has a blank `Answer` space for the selected direction after reviewing the gallery alternatives.
@@ -420,4 +426,3 @@ Path: `/home/jmagar/workspace/aurora/app/gallery/demos/type-demo.tsx`
 - [ ] Typography demo needs work; larger examples look better and should guide the scale.
 
 Answer:
-
