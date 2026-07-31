@@ -14,7 +14,7 @@ jobs:
   web:
     permissions:
       contents: read
-    uses: dinglebear-ai/workflows/.github/workflows/hosted-web-release.yml@542ea7b7e5ca2d4e21f3277bfcf158584fee90ec
+    uses: dinglebear-ai/workflows/.github/workflows/hosted-web-release.yml@66e64b9f31de7ac1f9aa8c9f87ede9bbec5eae1d
     with:
       checkout-ref: ${{ github.event.release.tag_name }}
       node-version: "24"
@@ -38,7 +38,7 @@ jobs:
   android:
     permissions:
       contents: read
-    uses: dinglebear-ai/workflows/.github/workflows/hosted-android-release.yml@542ea7b7e5ca2d4e21f3277bfcf158584fee90ec
+    uses: dinglebear-ai/workflows/.github/workflows/hosted-android-release.yml@66e64b9f31de7ac1f9aa8c9f87ede9bbec5eae1d
     with:
       checkout-ref: ${{ github.event.release.tag_name }}
       java-version: "21"
@@ -63,7 +63,7 @@ jobs:
       packages: write
       attestations: write
       id-token: write
-    uses: dinglebear-ai/workflows/.github/workflows/hosted-container-release.yml@542ea7b7e5ca2d4e21f3277bfcf158584fee90ec
+    uses: dinglebear-ai/workflows/.github/workflows/hosted-container-release.yml@66e64b9f31de7ac1f9aa8c9f87ede9bbec5eae1d
     with:
       checkout-ref: ${{ github.event.release.tag_name }}
       image: ghcr.io/${{ github.repository }}
