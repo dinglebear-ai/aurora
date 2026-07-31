@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
   public-path:
-    uses: dinglebear-ai/workflows/.github/workflows/synthetic-check.yml@eb5f36cf517ffc949aca1c81e2ccbc71b5a85267
+    uses: dinglebear-ai/workflows/.github/workflows/synthetic-check.yml@542ea7b7e5ca2d4e21f3277bfcf158584fee90ec
     with:
       command: >-
         AURORA_PUBLIC_URL="${{ vars.AURORA_PUBLIC_URL || 'https://aurora.tootie.tv' }}"

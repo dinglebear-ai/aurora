@@ -14,13 +14,13 @@ concurrency:
 
 jobs:
   contract:
-    uses: dinglebear-ai/workflows/.github/workflows/fleet-contract.yml@eb5f36cf517ffc949aca1c81e2ccbc71b5a85267
+    uses: dinglebear-ai/workflows/.github/workflows/fleet-contract.yml@542ea7b7e5ca2d4e21f3277bfcf158584fee90ec
     with:
       profile: node
-      implementation-ref: eb5f36cf517ffc949aca1c81e2ccbc71b5a85267
+      implementation-ref: 542ea7b7e5ca2d4e21f3277bfcf158584fee90ec
 
   policy:
-    uses: dinglebear-ai/workflows/.github/workflows/fast-ops.yml@eb5f36cf517ffc949aca1c81e2ccbc71b5a85267
+    uses: dinglebear-ai/workflows/.github/workflows/fast-ops.yml@542ea7b7e5ca2d4e21f3277bfcf158584fee90ec
     with:
       shell-globs: "ops/*.sh"
       policy-command: >-
@@ -55,7 +55,7 @@ jobs:
           scan-args: --lockfile=pnpm-lock.yaml
 
   web:
-    uses: dinglebear-ai/workflows/.github/workflows/fast-pnpm.yml@eb5f36cf517ffc949aca1c81e2ccbc71b5a85267
+    uses: dinglebear-ai/workflows/.github/workflows/fast-pnpm.yml@542ea7b7e5ca2d4e21f3277bfcf158584fee90ec
     with:
       node-version: "24"
       pnpm-version: "10.33.2"
