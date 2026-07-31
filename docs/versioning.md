@@ -1,3 +1,9 @@
+---
+title: Versioning and reproducible consumption
+created: 2026-07-30
+updated: 2026-07-30
+---
+
 # Versioning and reproducible consumption
 
 Aurora has two deliberately different registry URL contracts.

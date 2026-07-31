@@ -1,3 +1,9 @@
+---
+title: Immutable deployment and rollback
+created: 2026-07-30
+updated: 2026-07-30
+---
+
 # Immutable deployment and rollback
 
 The public Aurora path is an immutable standalone Next.js image. The writable
