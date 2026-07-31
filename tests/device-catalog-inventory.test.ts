@@ -19,7 +19,21 @@ const inventory = JSON.parse(readFileSync(new URL("../catalog/inventory.json", i
 }
 
 const readinessValues = new Set(["ready", "adaptive", "native-bridge", "desktop-first", "metadata-only"])
-const fixtureValues = new Set(["button", "card", "feedback", "forms", "progress", "disclosure", "overlays", "widgets"])
+const fixtureValues = new Set([
+  "button",
+  "card",
+  "feedback",
+  "forms",
+  "progress",
+  "disclosure",
+  "overlays",
+  "widgets",
+  "gateway-page",
+  "chat-page",
+  "log-viewer-page",
+  "palette-page",
+  "files-page",
+])
 
 test("device catalog inventory covers the complete registry", () => {
   assert.equal(inventory.schemaVersion, 1)

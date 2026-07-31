@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "counts": {
     "registryItems": 176,
-    "galleryPreviews": 153,
-    "sharedFixtures": 23,
+    "galleryPreviews": 157,
+    "sharedFixtures": 28,
     "metadataOnly": 15
   },
   "groups": [
@@ -489,7 +489,7 @@
         "@aurora/aurora-badge",
         "@aurora/aurora-button"
       ],
-      "fixtureId": null,
+      "fixtureId": "gateway-page",
       "previewSlug": null,
       "demoModule": null,
       "mobileReadiness": "adaptive",
@@ -524,7 +524,7 @@
         "@aurora/aurora-ai-message",
         "@aurora/aurora-prompt-input"
       ],
-      "fixtureId": null,
+      "fixtureId": "chat-page",
       "previewSlug": null,
       "demoModule": null,
       "mobileReadiness": "adaptive",
@@ -628,7 +628,7 @@
         "@aurora/aurora-code-block",
         "@aurora/aurora-badge"
       ],
-      "fixtureId": null,
+      "fixtureId": "log-viewer-page",
       "previewSlug": null,
       "demoModule": null,
       "mobileReadiness": "adaptive",
@@ -662,7 +662,7 @@
         "@aurora/aurora-base",
         "@aurora/aurora-badge"
       ],
-      "fixtureId": null,
+      "fixtureId": "palette-page",
       "previewSlug": null,
       "demoModule": null,
       "mobileReadiness": "adaptive",
@@ -730,7 +730,7 @@
         "@aurora/aurora-base",
         "@aurora/aurora-file-tree"
       ],
-      "fixtureId": null,
+      "fixtureId": "files-page",
       "previewSlug": null,
       "demoModule": null,
       "mobileReadiness": "adaptive",
@@ -1705,8 +1705,8 @@
         "@aurora/aurora-components"
       ],
       "fixtureId": null,
-      "previewSlug": null,
-      "demoModule": null,
+      "previewSlug": "terminal-block",
+      "demoModule": "terminal-demo",
       "mobileReadiness": "desktop-first",
       "mobileReadinessReason": "The component renders on mobile, but its dense pointer-oriented interaction needs a deliberate compact composition.",
       "capabilities": [
@@ -1741,8 +1741,8 @@
         "@aurora/aurora-input"
       ],
       "fixtureId": null,
-      "previewSlug": null,
-      "demoModule": null,
+      "previewSlug": "sidebar-block",
+      "demoModule": "sidebar-demo",
       "mobileReadiness": "desktop-first",
       "mobileReadinessReason": "The component renders on mobile, but its dense pointer-oriented interaction needs a deliberate compact composition.",
       "capabilities": [
@@ -2117,8 +2117,8 @@
         "@aurora/aurora-input-otp"
       ],
       "fixtureId": null,
-      "previewSlug": null,
-      "demoModule": null,
+      "previewSlug": "login-block",
+      "demoModule": "login-demo",
       "mobileReadiness": "adaptive",
       "mobileReadinessReason": "Shared React implementation with responsive layout or interaction changes for phone and tablet widths.",
       "capabilities": [
@@ -3116,8 +3116,8 @@
         "@aurora/aurora-status-indicator"
       ],
       "fixtureId": null,
-      "previewSlug": null,
-      "demoModule": null,
+      "previewSlug": "marketplace-block",
+      "demoModule": "marketplace-demo",
       "mobileReadiness": "adaptive",
       "mobileReadinessReason": "Shared React implementation with responsive layout or interaction changes for phone and tablet widths.",
       "capabilities": [

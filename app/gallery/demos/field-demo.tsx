@@ -30,13 +30,14 @@ export default function FieldDemo() {
         <Field
           label="Gateway URL"
           description="Host and port of the control plane."
+          htmlFor="gateway-url"
           required
         >
-          <Input defaultValue="labby.local:8765" />
+          <Input id="gateway-url" defaultValue="labby.local:8765" />
         </Field>
 
-        <Field label="API Token" error="Token is required.">
-          <Input error placeholder="ghp_…" />
+        <Field label="API Token" htmlFor="api-token" error="Token is required.">
+          <Input id="api-token" error placeholder="ghp_…" />
         </Field>
       </section>
     </div>

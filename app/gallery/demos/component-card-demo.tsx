@@ -49,8 +49,8 @@ const ENTRIES: Entry[] = [
     tags: ["shadcn", "control"],
     preview: (
       <div style={{ display: "flex", gap: 12 }}>
-        <Switch defaultChecked />
-        <Switch />
+        <Switch aria-label="Enabled preview" defaultChecked />
+        <Switch aria-label="Disabled preview" />
       </div>
     ),
   },
@@ -90,7 +90,7 @@ const ENTRIES: Entry[] = [
     tags: ["shadcn", "control"],
     preview: (
       <div style={{ width: 180 }}>
-        <Slider defaultValue={62} />
+        <Slider aria-label="Preview intensity" defaultValue={62} />
       </div>
     ),
   },

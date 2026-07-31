@@ -1,4 +1,4 @@
-import { useDeferredValue, useState } from "react"
+import { useDeferredValue } from "react"
 import type { LucideIcon } from "lucide-react"
 import { Boxes, Cable, Monitor, Moon, Search, Smartphone, Sun, Tablet } from "lucide-react"
 
@@ -12,15 +12,15 @@ import { NativeSelect } from "@/registry/aurora/ui/native-select"
 import { Segmented } from "@/registry/aurora/ui/segmented"
 import { Separator } from "@/registry/aurora/ui/separator"
 
+import { type CatalogDevicePreset, useCatalogLocation } from "./catalog-location"
 import { PlatformCapabilities } from "./PlatformCapabilities"
 import { RegistryPreview } from "./RegistryPreview"
 
-type ThemeMode = "dark" | "light"
-type DevicePresetId = "fluid" | "tablet" | "phone"
-
-interface DevicePreset { id: DevicePresetId; label: string; width: string; icon: LucideIcon }
+interface DevicePreset { id: CatalogDevicePreset; label: string; width: string; icon: LucideIcon }
 
 const inventory = inventoryData as CatalogInventory
+const VALID_IDS = new Set(inventory.items.map((item) => item.id))
+const VALID_GROUPS = new Set(inventory.groups)
 const DEVICE_PRESETS: readonly DevicePreset[] = [
   { id: "fluid", label: "Fluid", width: "100%", icon: Monitor },
   { id: "tablet", label: "Tablet", width: "820px", icon: Tablet },
@@ -29,14 +29,9 @@ const DEVICE_PRESETS: readonly DevicePreset[] = [
 const READINESS_OPTIONS: readonly MobileReadiness[] = ["ready", "adaptive", "native-bridge", "desktop-first", "metadata-only"]
 
 export function App() {
-  const [mode, setMode] = useState<CatalogMode>("registry")
-  const [query, setQuery] = useState("")
+  const { state, update } = useCatalogLocation(VALID_IDS, VALID_GROUPS)
+  const { mode, query, group, readiness, selectedId, devicePresetId, theme } = state
   const deferredQuery = useDeferredValue(query.trim().toLowerCase())
-  const [group, setGroup] = useState("all")
-  const [readiness, setReadiness] = useState("all")
-  const [selectedId, setSelectedId] = useState("aurora-button")
-  const [devicePresetId, setDevicePresetId] = useState<DevicePresetId>("fluid")
-  const [theme, setTheme] = useState<ThemeMode>("dark")
 
   const filteredItems = inventory.items.filter((item) => {
     if (group !== "all" && item.group !== group) return false
@@ -51,14 +46,20 @@ export function App() {
   if (!selectedEntry || !activeDevice) return null
 
   return (
-    <div className={theme === "dark" ? "catalog-theme dark" : "catalog-theme light"}>
+    <div
+      className={theme === "dark" ? "catalog-theme dark" : "catalog-theme light"}
+      data-catalog-root="true"
+      data-catalog-mode={mode}
+      data-catalog-selected-id={selectedEntry.id}
+      data-catalog-device={activeDevice.id}
+    >
       <div className="catalog-shell">
         <header className="catalog-header">
           <div className="catalog-brand"><div className="catalog-mark" aria-hidden="true"><span /><span /><span /></div><div><h1>Aurora Device Catalog</h1><p>{inventory.counts.registryItems} canonical registry items across browser and Tauri viewports.</p></div></div>
           <div className="catalog-header-actions">
-            <Segmented size="sm" value={mode} onValueChange={(value) => setMode(value as CatalogMode)} options={[{ value: "registry", label: <span className="flex items-center gap-2"><Boxes aria-hidden />Registry</span> }, { value: "capabilities", label: <span className="flex items-center gap-2"><Cable aria-hidden />Platform</span> }]} />
+            <Segmented size="sm" value={mode} onValueChange={(value) => update({ mode: value as CatalogMode }, "push")} options={[{ value: "registry", label: <span className="flex items-center gap-2"><Boxes aria-hidden />Registry</span> }, { value: "capabilities", label: <span className="flex items-center gap-2"><Cable aria-hidden />Platform</span> }]} />
             <Badge tone="success" dot>{runtime}</Badge>
-            <Button size="icon" variant="ghost" aria-label={theme === "dark" ? "Use light theme" : "Use dark theme"} onClick={() => setTheme((current) => current === "dark" ? "light" : "dark")}>{theme === "dark" ? <Sun aria-hidden /> : <Moon aria-hidden />}</Button>
+            <Button size="icon" variant="ghost" aria-label={theme === "dark" ? "Use light theme" : "Use dark theme"} onClick={() => update({ theme: theme === "dark" ? "light" : "dark" })}>{theme === "dark" ? <Sun aria-hidden /> : <Moon aria-hidden />}</Button>
           </div>
         </header>
 
@@ -67,12 +68,12 @@ export function App() {
             {mode === "registry" ? (
               <>
                 <div className="catalog-filters">
-                  <Input aria-label="Search catalog" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search 176 items" startAdornment={<Search aria-hidden />} />
-                  <NativeSelect aria-label="Filter by group" value={group} onChange={(event) => setGroup(event.target.value)}><option value="all">All groups</option>{inventory.groups.map((value) => <option key={value} value={value}>{value}</option>)}</NativeSelect>
-                  <NativeSelect aria-label="Filter by mobile readiness" value={readiness} onChange={(event) => setReadiness(event.target.value)}><option value="all">All readiness states</option>{READINESS_OPTIONS.map((value) => <option key={value} value={value}>{value}</option>)}</NativeSelect>
+                  <Input aria-label="Search catalog" value={query} onChange={(event) => update({ query: event.target.value })} placeholder="Search 176 items" startAdornment={<Search aria-hidden />} />
+                  <NativeSelect aria-label="Filter by group" value={group} onChange={(event) => update({ group: event.target.value })}><option value="all">All groups</option>{inventory.groups.map((value) => <option key={value} value={value}>{value}</option>)}</NativeSelect>
+                  <NativeSelect aria-label="Filter by mobile readiness" value={readiness} onChange={(event) => update({ readiness: event.target.value as "all" | MobileReadiness })}><option value="all">All readiness states</option>{READINESS_OPTIONS.map((value) => <option key={value} value={value}>{value}</option>)}</NativeSelect>
                 </div>
                 <div className="catalog-count-row"><span>{filteredItems.length} shown</span><span>{inventory.counts.galleryPreviews} live demos</span></div>
-                <div className="catalog-nav">{filteredItems.map((item) => <Button key={item.id} block variant={item.id === selectedEntry.id ? "aurora" : "ghost"} className="catalog-nav-item" aria-current={item.id === selectedEntry.id ? "page" : undefined} onClick={() => setSelectedId(item.id)}><span><strong>{item.title}</strong><small>{item.group} · {item.mobileReadiness}</small></span></Button>)}</div>
+                <div className="catalog-nav">{filteredItems.map((item) => <Button key={item.id} block variant={item.id === selectedEntry.id ? "aurora" : "ghost"} className="catalog-nav-item" data-catalog-item-id={item.id} aria-current={item.id === selectedEntry.id ? "page" : undefined} onClick={() => update({ selectedId: item.id, mode: "registry" }, "push")}><span><strong>{item.title}</strong><small>{item.group} · {item.mobileReadiness}</small></span></Button>)}</div>
                 {filteredItems.length === 0 ? <p className="catalog-empty">No registry items match these filters.</p> : null}
               </>
             ) : (
@@ -83,7 +84,7 @@ export function App() {
           <main className="catalog-main">
             <section className="catalog-preview-header">
               <div>{mode === "registry" ? <><div className="catalog-title-row"><h2>{selectedEntry.title}</h2><ReadinessBadge readiness={selectedEntry.mobileReadiness} /><Badge tone="neutral" fill="outline">{selectedEntry.registryType.replace("registry:", "")}</Badge></div><p>{selectedEntry.description}</p><div className="catalog-capability-tags">{selectedEntry.capabilities.map((capability) => <Badge key={capability} tone="neutral" fill="outline">{capability}</Badge>)}</div></> : <><div className="catalog-title-row"><h2>Platform capabilities</h2><Badge tone="info">shared UI, native bridges</Badge></div><p>Run the same checks in a browser, Tauri desktop, and the Tauri Android catalog.</p></>}</div>
-              <div className="catalog-device-switcher" aria-label="Preview viewport">{DEVICE_PRESETS.map((preset) => { const Icon = preset.icon; return <Button key={preset.id} size="sm" shape="pill" variant={preset.id === activeDevice.id ? "aurora" : "ghost"} onClick={() => setDevicePresetId(preset.id)}><Icon aria-hidden />{preset.label}</Button> })}</div>
+              <div className="catalog-device-switcher" aria-label="Preview viewport">{DEVICE_PRESETS.map((preset) => { const Icon = preset.icon; return <Button key={preset.id} size="sm" shape="pill" variant={preset.id === activeDevice.id ? "aurora" : "ghost"} onClick={() => update({ devicePresetId: preset.id })}><Icon aria-hidden />{preset.label}</Button> })}</div>
             </section>
 
             <Separator />

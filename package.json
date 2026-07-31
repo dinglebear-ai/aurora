@@ -9,7 +9,7 @@
   "packageManager": "pnpm@10.33.2",
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "pnpm run generated:check && pnpm run readmes:generate && next build && pnpm run standalone:sanitize",
+    "build": "pnpm run generated:check && pnpm run readmes:generate && pnpm run catalog:device:export && next build && pnpm run standalone:sanitize",
     "standalone:sanitize": "node scripts/sanitize-standalone.mjs",
     "start": "next start",
     "lint": "eslint .",
@@ -43,6 +43,9 @@
     "catalog:device:check": "node scripts/generate-device-catalog.mjs --check",
     "catalog:device:dev": "pnpm --dir apps/device-catalog dev",
     "catalog:device:build": "pnpm --dir apps/device-catalog build",
+    "catalog:device:export": "pnpm --dir apps/device-catalog build:hosted",
+    "catalog:device:crawl": "pnpm run catalog:device:build && playwright test --config=playwright.device-catalog.config.ts",
+    "catalog:device:android:test": "node scripts/test-device-catalog-android.mjs",
     "catalog:device:tauri": "pnpm --dir apps/device-catalog tauri",
     "catalog:device:android": "pnpm --dir apps/device-catalog tauri:android:dev",
     "catalog:device:android:build": "pnpm --dir apps/device-catalog tauri:android:build",
@@ -101,6 +104,7 @@
     "ts-morph": "^28.0.0",
     "typescript": "^5.9.3",
     "vite": "^8.1.5",
+    "ws": "^8.18.3",
     "yaml": "2.9.0"
   }
 }

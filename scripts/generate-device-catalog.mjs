@@ -32,6 +32,18 @@ const FIXTURE_BY_REGISTRY = Object.freeze({
   "aurora-multi-select": "widgets",
   "aurora-radio-group": "widgets",
   "aurora-popover": "widgets",
+  "aurora-gateway": "gateway-page",
+  "aurora-chat": "chat-page",
+  "aurora-log-viewer": "log-viewer-page",
+  "aurora-palette": "palette-page",
+  "aurora-files": "files-page",
+})
+
+const DEMO_BY_REGISTRY = Object.freeze({
+  "aurora-terminal-block": "terminal-demo",
+  "aurora-sidebar-block": "sidebar-demo",
+  "aurora-login-block": "login-demo",
+  "aurora-marketplace-block": "marketplace-demo",
 })
 
 const NATIVE_BRIDGE_NAMES = new Set([
@@ -111,6 +123,8 @@ function chooseCatalogRow(item) {
 
 function chooseDemo(item, row) {
   const direct = directSlug(item.name)
+  const override = DEMO_BY_REGISTRY[item.name]
+  if (override) return { slug: direct, moduleName: override }
   const candidates = [row?.slug, direct]
   if (direct.startsWith("ai-")) candidates.push(direct.slice(3))
   for (const slug of candidates) {

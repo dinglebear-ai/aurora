@@ -27,7 +27,7 @@ export default function NumberInputDemo() {
         }}
       >
         <div style={{ width: 260 }}>
-          <NumberInput value={value} min={0} max={16} onValueChange={setValue} />
+          <NumberInput aria-label="Worker count" value={value} min={0} max={16} onValueChange={setValue} />
         </div>
       </section>
     </div>
