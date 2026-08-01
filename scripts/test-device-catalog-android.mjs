@@ -17,8 +17,9 @@ const adb = androidHome ? resolve(androidHome, "platform-tools/adb") : "adb"
 const emulator = androidHome ? resolve(androidHome, "emulator/emulator") : "emulator"
 const packageName = "tv.tootie.aurora.catalog.debug"
 const activityName = "tv.tootie.aurora.catalog.MainActivity"
-const deviceTimeoutMs = positiveIntegerEnvironment("AURORA_ANDROID_DEVICE_TIMEOUT_MS", 240_000)
-const bootTimeoutMs = positiveIntegerEnvironment("AURORA_ANDROID_BOOT_TIMEOUT_MS", 300_000)
+const deviceTimeoutMs = positiveIntegerEnvironment("AURORA_ANDROID_DEVICE_TIMEOUT_MS", 360_000)
+const bootTimeoutMs = positiveIntegerEnvironment("AURORA_ANDROID_BOOT_TIMEOUT_MS", 420_000)
+const emulatorAcceleration = process.env.AURORA_ANDROID_ACCEL ?? (existsSync("/dev/kvm") ? "on" : "off")
 let stage = "initialize"
 let startedEmulator = false
 let emulatorProcess
@@ -62,6 +63,7 @@ async function main() {
       "-no-boot-anim",
       "-no-snapshot",
       "-no-metrics",
+      "-accel", emulatorAcceleration,
       "-gpu", process.env.AURORA_ANDROID_GPU ?? "swiftshader_indirect",
     ], { detached: false, stdio: ["ignore", "pipe", "pipe"] })
     emulatorProcess.stdout?.pipe(emulatorLogStream)
@@ -356,6 +358,7 @@ function writeFailureReport(error) {
       requestedSerial: requestedSerial ?? null,
       deviceTimeoutMs,
       bootTimeoutMs,
+      emulatorAcceleration,
     },
     diagnostics: {
       devices: diagnostic(adb, ["devices", "-l"]),

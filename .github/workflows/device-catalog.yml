@@ -120,18 +120,28 @@ jobs:
             --package "system-images;android-35;google_apis;x86_64"
           echo "NDK_HOME=$ANDROID_HOME/ndk/28.2.13676358" >> "$GITHUB_ENV"
           echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk/28.2.13676358" >> "$GITHUB_ENV"
-      - name: Enable KVM
+      - name: Configure emulator acceleration
         run: |
-          if [[ -e /dev/kvm ]]; then sudo chmod 666 /dev/kvm; fi
+          if [[ -e /dev/kvm ]]; then
+            sudo chmod 666 /dev/kvm
+            if emulator -accel-check; then
+              echo "AURORA_ANDROID_ACCEL=on" >> "$GITHUB_ENV"
+            else
+              echo "AURORA_ANDROID_ACCEL=off" >> "$GITHUB_ENV"
+            fi
+          else
+            echo "AURORA_ANDROID_ACCEL=off" >> "$GITHUB_ENV"
+          fi
       - name: Build, install, and verify the Tauri Android catalog
         env:
-          AURORA_ANDROID_DEVICE_TIMEOUT_MS: "240000"
-          AURORA_ANDROID_BOOT_TIMEOUT_MS: "300000"
+          AURORA_ANDROID_DEVICE_TIMEOUT_MS: "360000"
+          AURORA_ANDROID_BOOT_TIMEOUT_MS: "420000"
         run: |
           mkdir -p outputs/device-catalog/android
           set +e
           set -o pipefail
-          pnpm catalog:device:android:test -- --avd aurora_catalog_ci 2>&1             | tee outputs/device-catalog/android/ci.log
+          pnpm catalog:device:android:test -- --avd aurora_catalog_ci 2>&1 \
+            | tee outputs/device-catalog/android/ci.log
           status=${PIPESTATUS[0]}
           set -e
           if (( status != 0 )); then
@@ -142,15 +152,27 @@ jobs:
               stage="unknown"
               message="Android smoke exited before producing failure.json"
             fi
+            if [[ -s outputs/device-catalog/android/emulator.log ]]; then
+              diagnostic_log=outputs/device-catalog/android/emulator.log
+            else
+              diagnostic_log=outputs/device-catalog/android/ci.log
+            fi
+            diagnostic_tail=$(tail -n 20 "$diagnostic_log" 2>/dev/null || true)
+            annotation_tail=$(printf "%s" "$diagnostic_tail" | tr '\n' ' ' | cut -c1-1800)
             {
               echo "## Android catalog smoke failed"
               echo
               echo "- Stage: $stage"
               echo "- Error: $message"
               echo
+              echo "### Diagnostic log tail"
+              echo '```text'
+              printf '%s\n' "$diagnostic_tail"
+              echo '```'
+              echo
               echo "The full command log and diagnostics are attached in the Android catalog evidence artifact."
             } >> "$GITHUB_STEP_SUMMARY"
-            echo "::error title=Android catalog smoke failed::$stage: $message"
+            echo "::error title=Android catalog smoke failed::$stage: $message | $annotation_tail"
           fi
           exit "$status"
       - name: Upload Android catalog evidence
