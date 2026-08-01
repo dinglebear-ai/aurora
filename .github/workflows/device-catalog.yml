@@ -124,7 +124,35 @@ jobs:
         run: |
           if [[ -e /dev/kvm ]]; then sudo chmod 666 /dev/kvm; fi
       - name: Build, install, and verify the Tauri Android catalog
-        run: pnpm catalog:device:android:test -- --avd aurora_catalog_ci
+        env:
+          AURORA_ANDROID_DEVICE_TIMEOUT_MS: "240000"
+          AURORA_ANDROID_BOOT_TIMEOUT_MS: "300000"
+        run: |
+          mkdir -p outputs/device-catalog/android
+          set +e
+          set -o pipefail
+          pnpm catalog:device:android:test -- --avd aurora_catalog_ci 2>&1             | tee outputs/device-catalog/android/ci.log
+          status=${PIPESTATUS[0]}
+          set -e
+          if (( status != 0 )); then
+            if [[ -f outputs/device-catalog/android/failure.json ]]; then
+              stage=$(jq -r '.stage // "unknown"' outputs/device-catalog/android/failure.json)
+              message=$(jq -r '.error.message // "Unknown Android smoke failure"' outputs/device-catalog/android/failure.json | tr '\n' ' ')
+            else
+              stage="unknown"
+              message="Android smoke exited before producing failure.json"
+            fi
+            {
+              echo "## Android catalog smoke failed"
+              echo
+              echo "- Stage: $stage"
+              echo "- Error: $message"
+              echo
+              echo "The full command log and diagnostics are attached in the Android catalog evidence artifact."
+            } >> "$GITHUB_STEP_SUMMARY"
+            echo "::error title=Android catalog smoke failed::$stage: $message"
+          fi
+          exit "$status"
       - name: Upload Android catalog evidence
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1

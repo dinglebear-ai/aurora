@@ -1,5 +1,5 @@
 import { spawn, spawnSync } from "node:child_process"
-import { existsSync, mkdirSync, writeFileSync } from "node:fs"
+import { createWriteStream, existsSync, mkdirSync, rmSync, writeFileSync } from "node:fs"
 import { dirname, resolve } from "node:path"
 import { fileURLToPath } from "node:url"
 
@@ -17,16 +17,25 @@ const adb = androidHome ? resolve(androidHome, "platform-tools/adb") : "adb"
 const emulator = androidHome ? resolve(androidHome, "emulator/emulator") : "emulator"
 const packageName = "tv.tootie.aurora.catalog.debug"
 const activityName = "tv.tootie.aurora.catalog.MainActivity"
+const deviceTimeoutMs = positiveIntegerEnvironment("AURORA_ANDROID_DEVICE_TIMEOUT_MS", 240_000)
+const bootTimeoutMs = positiveIntegerEnvironment("AURORA_ANDROID_BOOT_TIMEOUT_MS", 300_000)
+let stage = "initialize"
 let startedEmulator = false
 let emulatorProcess
+let emulatorExit
+let emulatorLogStream
 let serial
 let cdp
 
-async function main() {
-  mkdirSync(outputDirectory, { recursive: true })
+mkdirSync(outputDirectory, { recursive: true })
+for (const artifact of ["failure.json", "report.json", "emulator.log", "logcat.txt", "launch.png", "platform.png", "registry.png"]) {
+  rmSync(resolve(outputDirectory, artifact), { force: true })
+}
 
+async function main() {
   try {
   if (!skipBuild) {
+    stage = "build-apk"
     runInherited(process.execPath, [
       resolve(root, "scripts/run-device-catalog-android.mjs"),
       "build",
@@ -38,36 +47,48 @@ async function main() {
     ])
   }
 
+  stage = "resolve-device"
   serial = requestedSerial ?? connectedDevices()[0]
   if (!serial) {
     const available = run(emulator, ["-list-avds"]).split(/\r?\n/).filter(Boolean)
     const avd = requestedAvd ?? (available.includes("axon_test") ? "axon_test" : available[0])
     if (!avd) throw new Error("No Android device is connected and no AVD is available")
+    stage = "start-emulator"
+    emulatorLogStream = createWriteStream(resolve(outputDirectory, "emulator.log"), { flags: "w" })
     emulatorProcess = spawn(emulator, [
       "-avd", avd,
       "-no-window",
       "-no-audio",
       "-no-boot-anim",
-      "-no-snapshot-save",
-      "-gpu", "swiftshader_indirect",
-    ], { detached: false, stdio: ["ignore", "ignore", "pipe"] })
+      "-no-snapshot",
+      "-no-metrics",
+      "-gpu", process.env.AURORA_ANDROID_GPU ?? "swiftshader_indirect",
+    ], { detached: false, stdio: ["ignore", "pipe", "pipe"] })
+    emulatorProcess.stdout?.pipe(emulatorLogStream)
     emulatorProcess.stderr?.pipe(process.stderr)
+    emulatorProcess.stderr?.pipe(emulatorLogStream)
+    emulatorProcess.once("exit", (code, signal) => { emulatorExit = { code, signal } })
     startedEmulator = true
+    stage = "wait-for-device"
     serial = await waitForAndroidDevice()
   }
 
+  stage = "wait-for-boot"
   await waitForBoot(serial)
   const apk = resolve(root, "apps/device-catalog/src-tauri/gen/android/app/build/outputs/apk/universal/debug/app-universal-debug.apk")
   if (!existsSync(apk)) throw new Error(`Android APK was not produced at ${apk}`)
 
+  stage = "install-apk"
   runAdb(["install", "-r", apk])
   runAdb(["logcat", "-c"])
   runAdb(["shell", "am", "force-stop", packageName])
+  stage = "launch-app"
   const launch = runAdb(["shell", "am", "start", "-W", "-n", `${packageName}/${activityName}`])
   const pid = await waitForValue(() => runAdb(["shell", "pidof", packageName], { allowFailure: true }).trim(), 30_000)
   await delay(1_500)
   captureScreenshot("launch.png")
 
+  stage = "attach-webview"
   runAdb(["forward", "--remove", "tcp:9223"], { allowFailure: true })
   runAdb(["forward", "tcp:9223", `localabstract:webview_devtools_remote_${pid}`])
   const target = await waitForValue(async () => {
@@ -84,6 +105,7 @@ async function main() {
   cdp = await CdpClient.connect(target.webSocketDebuggerUrl)
   await cdp.call("Runtime.enable")
   await cdp.call("Log.enable")
+  stage = "verify-initial-render"
   const initial = await waitForValue(async () => {
     const value = await cdp.evaluate(`(() => ({
       title: document.title,
@@ -92,13 +114,17 @@ async function main() {
       selectedId: document.querySelector('[data-catalog-root]')?.getAttribute('data-catalog-selected-id'),
       tauriRuntime: Boolean(window.__TAURI_INTERNALS__),
       viewport: { width: innerWidth, height: innerHeight, pixelRatio: devicePixelRatio },
-      safeAreaPadding: getComputedStyle(document.querySelector('.catalog-theme')).padding,
+      safeAreaPadding: (() => {
+        const theme = document.querySelector('.catalog-theme')
+        return theme ? getComputedStyle(theme).padding : null
+      })(),
       overflowX: document.documentElement.scrollWidth - document.documentElement.clientWidth,
       pathname: location.pathname,
     }))()`)
     return value?.registryItems === 176 ? value : null
   }, 20_000)
 
+  stage = "verify-android-back"
   const promptSelected = await cdp.evaluate(`(() => {
     const item = document.querySelector('[data-catalog-item-id="aurora-prompt-input"]')
     item?.click()
@@ -114,6 +140,7 @@ async function main() {
     return selected === "aurora-button" ? selected : null
   }, 10_000)
 
+  stage = "verify-platform-mode"
   await cdp.evaluate(`(() => {
     const button = [...document.querySelectorAll('button')].find((element) => element.textContent?.trim() === 'Platform')
     button?.click()
@@ -130,6 +157,7 @@ async function main() {
   }, 10_000)
   captureScreenshot("platform.png")
 
+  stage = "restore-registry-mode"
   await cdp.evaluate(`(() => {
     const button = [...document.querySelectorAll('button')].find((element) => element.textContent?.trim() === 'Registry')
     button?.click()
@@ -146,6 +174,7 @@ async function main() {
   }, 10_000)
   captureScreenshot("registry.png")
 
+  stage = "collect-logs"
   const logs = runAdb(["logcat", "-d", "-v", "threadtime"], { maxBuffer: 50 * 1024 * 1024 })
   writeFileSync(resolve(outputDirectory, "logcat.txt"), logs)
   const fatalLines = logs
@@ -163,10 +192,12 @@ async function main() {
   if (fatalLines.length > 0) failures.push(`Android fatal logs: ${fatalLines.join(" | ")}`)
   if (cdp.runtimeErrors.length > 0) failures.push(`WebView runtime errors: ${cdp.runtimeErrors.join(" | ")}`)
 
+  stage = "write-report"
   const report = {
     schemaVersion: 1,
     generatedAt: new Date().toISOString(),
     status: failures.length === 0 ? "passed" : "failed",
+    stage: "complete",
     device: { serial, model: runAdb(["shell", "getprop", "ro.product.model"]).trim() },
     apk: { path: apk, bytes: Number(run("stat", ["-c", "%s", apk]).trim()) },
     launch,
@@ -184,18 +215,22 @@ async function main() {
   console.log(JSON.stringify(report, null, 2))
   if (failures.length > 0) throw new Error(failures.join("\n"))
 } finally {
-  try { cdp?.close() } catch {}
-  try { runAdb(["forward", "--remove", "tcp:9223"], { allowFailure: true }) } catch {}
-    if (startedEmulator && !keepEmulator) {
-      try { runAdb(["emu", "kill"], { allowFailure: true }) } catch {}
-      emulatorProcess?.kill("SIGTERM")
-    }
+    try { cdp?.close() } catch {}
+    try { runAdb(["forward", "--remove", "tcp:9223"], { allowFailure: true, timeout: 5_000 }) } catch {}
+    await stopEmulator()
+    emulatorLogStream?.end()
   }
 }
 
 function argumentValue(name) {
   const index = args.indexOf(name)
   return index >= 0 ? args[index + 1] : undefined
+}
+
+function positiveIntegerEnvironment(name, fallback) {
+  const value = Number(process.env[name] ?? fallback)
+  if (!Number.isInteger(value) || value <= 0) throw new Error(`${name} must be a positive integer`)
+  return value
 }
 
 function connectedDevices() {
@@ -208,17 +243,52 @@ function connectedDevices() {
 }
 
 async function waitForAndroidDevice() {
-  return waitForValue(() => connectedDevices()[0] ?? null, 90_000)
+  return waitForValue(() => {
+    if (emulatorExit) {
+      throw new Error(`Android emulator exited before ADB became ready (code=${emulatorExit.code}, signal=${emulatorExit.signal})`)
+    }
+    return connectedDevices()[0] ?? null
+  }, deviceTimeoutMs)
 }
 
 async function waitForBoot(deviceSerial) {
   serial = deviceSerial
-  await waitForValue(() => runAdb(["shell", "getprop", "sys.boot_completed"], { allowFailure: true }).trim() === "1" ? "1" : null, 120_000)
+  await waitForValue(() => runAdb(["shell", "getprop", "sys.boot_completed"], { allowFailure: true }).trim() === "1" ? "1" : null, bootTimeoutMs)
 }
 
 function runAdb(commandArgs, options = {}) {
   if (!serial && !commandArgs.includes("devices")) throw new Error("Android serial is not resolved")
   return run(adb, serial ? ["-s", serial, ...commandArgs] : commandArgs, options)
+}
+
+async function stopEmulator() {
+  if (!startedEmulator || keepEmulator || !emulatorProcess) return
+
+  try { runAdb(["emu", "kill"], { allowFailure: true, timeout: 5_000 }) } catch {}
+  if (emulatorExit) return
+
+  emulatorProcess.kill("SIGTERM")
+  if (await waitForEmulatorExit(5_000)) return
+
+  emulatorProcess.kill("SIGKILL")
+  await waitForEmulatorExit(5_000)
+  emulatorProcess.stdout?.destroy()
+  emulatorProcess.stderr?.destroy()
+}
+
+function waitForEmulatorExit(timeoutMs) {
+  if (emulatorExit || !emulatorProcess) return Promise.resolve(true)
+  return new Promise((resolvePromise) => {
+    const onExit = () => {
+      clearTimeout(timer)
+      resolvePromise(true)
+    }
+    const timer = setTimeout(() => {
+      emulatorProcess?.off("exit", onExit)
+      resolvePromise(Boolean(emulatorExit))
+    }, timeoutMs)
+    emulatorProcess.once("exit", onExit)
+  })
 }
 
 function captureScreenshot(filename) {
@@ -232,6 +302,7 @@ function run(command, commandArgs, options = {}) {
     cwd: root,
     encoding: "utf8",
     maxBuffer: options.maxBuffer ?? 20 * 1024 * 1024,
+    timeout: options.timeout,
     env: process.env,
   })
   if (result.error) throw result.error
@@ -259,6 +330,41 @@ async function waitForValue(read, timeoutMs) {
 
 function delay(ms) {
   return new Promise((resolvePromise) => setTimeout(resolvePromise, ms))
+}
+
+function diagnostic(command, commandArgs) {
+  try {
+    return run(command, commandArgs, { allowFailure: true }).trim()
+  } catch (error) {
+    return `unavailable: ${error instanceof Error ? error.message : String(error)}`
+  }
+}
+
+function writeFailureReport(error) {
+  const normalized = error instanceof Error ? error : new Error(String(error))
+  const failure = {
+    schemaVersion: 1,
+    generatedAt: new Date().toISOString(),
+    status: "failed",
+    stage,
+    error: { name: normalized.name, message: normalized.message, stack: normalized.stack },
+    environment: {
+      androidHome: androidHome ?? null,
+      adb,
+      emulator,
+      requestedAvd: requestedAvd ?? null,
+      requestedSerial: requestedSerial ?? null,
+      deviceTimeoutMs,
+      bootTimeoutMs,
+    },
+    diagnostics: {
+      devices: diagnostic(adb, ["devices", "-l"]),
+      avds: diagnostic(emulator, ["-list-avds"]),
+      disk: diagnostic("df", ["-h", root]),
+    },
+  }
+  writeFileSync(resolve(outputDirectory, "failure.json"), `${JSON.stringify(failure, null, 2)}\n`)
+  console.error(`[device-catalog/android] ${stage} failed: ${normalized.stack ?? normalized.message}`)
 }
 
 class CdpClient {
@@ -305,7 +411,13 @@ class CdpClient {
 
   async evaluate(expression) {
     const result = await this.call("Runtime.evaluate", { expression, returnByValue: true, awaitPromise: true })
-    if (result.exceptionDetails) throw new Error(result.exceptionDetails.text ?? "CDP evaluation failed")
+    if (result.exceptionDetails) {
+      const detail = result.exceptionDetails.exception?.description
+        ?? result.exceptionDetails.exception?.value
+        ?? result.exceptionDetails.text
+        ?? "CDP evaluation failed"
+      throw new Error(String(detail))
+    }
     return result.result?.value
   }
 
@@ -314,4 +426,9 @@ class CdpClient {
   }
 }
 
-await main()
+try {
+  await main()
+} catch (error) {
+  writeFailureReport(error)
+  process.exitCode = 1
+}
