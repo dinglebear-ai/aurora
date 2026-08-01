@@ -6,6 +6,7 @@
 @import "tw-animate-css";
 @import "../registry/aurora/styles/aurora.css";
 @import "../registry/aurora/styles/aurora-components.css";
+@import "../catalog/gallery-shell.css";
 @import "./site-chrome.css";
 
 @custom-variant dark (&:is(.dark *));

@@ -34,39 +34,39 @@ test("browser history restores previous catalog selections and platform mode", a
   await expect(root).toHaveAttribute("data-catalog-selected-id", "aurora-button")
 })
 
-test("desktop catalog exposes independently scrollable navigation and preview panes", async ({ page }) => {
+test("desktop catalog exposes the shared Gallery navigation and content scroll panes", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 800 })
   await page.goto("/aurora-marketplace-block", { waitUntil: "domcontentloaded" })
   await page.locator("[data-catalog-preview-ready='true']").first().waitFor()
 
-  const sidebar = page.locator(".catalog-sidebar")
-  const stage = page.locator(".catalog-stage")
+  const sidebar = page.locator(".aurora-gallery-nav-body")
+  const main = page.locator(".aurora-gallery-main")
   await expect(sidebar).toBeVisible()
-  await expect(stage).toBeVisible()
+  await expect(main).toBeVisible()
 
   const before = await page.evaluate(() => ({
     bodyOverflow: getComputedStyle(document.body).overflow,
-    shellHeight: document.querySelector<HTMLElement>(".catalog-shell")?.clientHeight ?? 0,
+    shellHeight: document.querySelector<HTMLElement>(".aurora-gallery-shell")?.clientHeight ?? 0,
     viewportHeight: window.innerHeight,
     sidebar: {
-      clientHeight: document.querySelector<HTMLElement>(".catalog-sidebar")?.clientHeight ?? 0,
-      scrollHeight: document.querySelector<HTMLElement>(".catalog-sidebar")?.scrollHeight ?? 0,
+      clientHeight: document.querySelector<HTMLElement>(".aurora-gallery-nav-body")?.clientHeight ?? 0,
+      scrollHeight: document.querySelector<HTMLElement>(".aurora-gallery-nav-body")?.scrollHeight ?? 0,
     },
-    stage: {
-      clientHeight: document.querySelector<HTMLElement>(".catalog-stage")?.clientHeight ?? 0,
-      scrollHeight: document.querySelector<HTMLElement>(".catalog-stage")?.scrollHeight ?? 0,
+    main: {
+      clientHeight: document.querySelector<HTMLElement>(".aurora-gallery-main")?.clientHeight ?? 0,
+      scrollHeight: document.querySelector<HTMLElement>(".aurora-gallery-main")?.scrollHeight ?? 0,
     },
   }))
 
   expect(before.bodyOverflow).toBe("hidden")
   expect(before.shellHeight).toBe(before.viewportHeight)
   expect(before.sidebar.scrollHeight).toBeGreaterThan(before.sidebar.clientHeight)
-  expect(before.stage.scrollHeight).toBeGreaterThan(before.stage.clientHeight)
+  expect(before.main.scrollHeight).toBeGreaterThan(before.main.clientHeight)
 
   await sidebar.evaluate((element) => { element.scrollTop = 400 })
-  await stage.evaluate((element) => { element.scrollTop = 300 })
+  await main.evaluate((element) => { element.scrollTop = 300 })
   await expect.poll(() => sidebar.evaluate((element) => element.scrollTop)).toBeGreaterThan(0)
-  await expect.poll(() => stage.evaluate((element) => element.scrollTop)).toBeGreaterThan(0)
+  await expect.poll(() => main.evaluate((element) => element.scrollTop)).toBeGreaterThan(0)
 })
 
 test("mobile catalog uses document scrolling", async ({ page }) => {
