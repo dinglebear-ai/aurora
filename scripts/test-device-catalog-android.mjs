@@ -13,6 +13,7 @@ const keepEmulator = args.includes("--keep-emulator")
 const requestedAvd = argumentValue("--avd") ?? process.env.AURORA_ANDROID_AVD
 const requestedSerial = argumentValue("--serial") ?? process.env.AURORA_ANDROID_SERIAL
 const androidHome = process.env.ANDROID_HOME ?? process.env.ANDROID_SDK_ROOT
+const androidAvdHome = process.env.ANDROID_AVD_HOME
 const adb = androidHome ? resolve(androidHome, "platform-tools/adb") : "adb"
 const emulator = androidHome ? resolve(androidHome, "emulator/emulator") : "emulator"
 const packageName = "tv.tootie.aurora.catalog.debug"
@@ -54,6 +55,12 @@ async function main() {
     const available = run(emulator, ["-list-avds"]).split(/\r?\n/).filter(Boolean)
     const avd = requestedAvd ?? (available.includes("axon_test") ? "axon_test" : available[0])
     if (!avd) throw new Error("No Android device is connected and no AVD is available")
+    if (!available.includes(avd)) {
+      const listed = available.length > 0 ? available.join(", ") : "none"
+      throw new Error(
+        "Requested Android AVD \"" + avd + "\" was not found. Available AVDs: " + listed + ". ANDROID_AVD_HOME=" + (androidAvdHome ?? "unset"),
+      )
+    }
     stage = "start-emulator"
     emulatorLogStream = createWriteStream(resolve(outputDirectory, "emulator.log"), { flags: "w" })
     emulatorProcess = spawn(emulator, [
@@ -352,6 +359,7 @@ function writeFailureReport(error) {
     error: { name: normalized.name, message: normalized.message, stack: normalized.stack },
     environment: {
       androidHome: androidHome ?? null,
+      androidAvdHome: androidAvdHome ?? null,
       adb,
       emulator,
       requestedAvd: requestedAvd ?? null,

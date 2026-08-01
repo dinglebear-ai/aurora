@@ -106,6 +106,9 @@ jobs:
         run: rustup target add x86_64-linux-android
       - name: Install Android SDK, NDK, and emulator image
         run: |
+          export ANDROID_AVD_HOME="$RUNNER_TEMP/aurora-android-avd"
+          echo "ANDROID_AVD_HOME=$ANDROID_AVD_HOME" >> "$GITHUB_ENV"
+          mkdir -p "$ANDROID_AVD_HOME"
           yes | sdkmanager --licenses >/dev/null
           sdkmanager \
             "platform-tools" \
@@ -118,6 +121,8 @@ jobs:
             --force \
             --name aurora_catalog_ci \
             --package "system-images;android-35;google_apis;x86_64"
+          emulator -list-avds | grep -Fx aurora_catalog_ci
+          test -f "$ANDROID_AVD_HOME/aurora_catalog_ci.ini"
           echo "NDK_HOME=$ANDROID_HOME/ndk/28.2.13676358" >> "$GITHUB_ENV"
           echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk/28.2.13676358" >> "$GITHUB_ENV"
       - name: Configure emulator acceleration
