@@ -5,132 +5,86 @@ on:
   push:
     branches: [main]
 
-permissions: {}
+permissions:
+  contents: read
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  policy:
-    name: Workflow and dependency policy
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
-      - name: Require immutable action references
-        run: ops/check-action-pins.sh
-      - name: Validate workflow syntax
-        uses: docker://rhysd/actionlint@sha256:ef8299f97635c4c30e2298f48f30763ab782a4ad2c95b744649439a039421e36 # 1.7.10
-      - name: Validate Gradle wrapper
-        uses: gradle/actions/wrapper-validation@3f131e8634966bd73d06cc69884922b02e6faf92 # v6.2.0
-      - name: Validate deployment topology
-        run: ops/check-production-topology.sh
-      - name: Validate operations shell
-        run: shellcheck ops/*.sh
-      - name: Validate generated skill documentation
-        run: node scripts/sync-agent-skill.mjs --check && ops/check-skill-sync.sh
+  contract:
+    uses: dinglebear-ai/workflows/.github/workflows/fleet-contract.yml@66e64b9f31de7ac1f9aa8c9f87ede9bbec5eae1d
+    with:
+      profile: node
+      implementation-ref: 66e64b9f31de7ac1f9aa8c9f87ede9bbec5eae1d
 
-  osv:
+  policy:
+    uses: dinglebear-ai/workflows/.github/workflows/fast-ops.yml@66e64b9f31de7ac1f9aa8c9f87ede9bbec5eae1d
+    with:
+      shell-globs: "ops/*.sh"
+      policy-command: >-
+        ops/check-action-pins.sh &&
+        ops/check-production-topology.sh &&
+        node scripts/sync-agent-skill.mjs --check &&
+        ops/check-skill-sync.sh
+
+  gradle-wrapper:
+    name: Gradle wrapper
+    runs-on: ci-pool-ops
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+      - uses: gradle/actions/wrapper-validation@3f131e8634966bd73d06cc69884922b02e6faf92 # v6
+
+  dependencies:
     name: OSV dependency scan
-    runs-on: ubuntu-latest
+    runs-on: ci-pool-typescript
+    timeout-minutes: 10
     permissions:
       contents: read
       security-events: write
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
-      - uses: google/osv-scanner-action/osv-scanner-action@9a498708959aeaef5ef730655706c5a1df1edbc2 # v2.3.8
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
         with:
-          scan-args: |-
-            --lockfile=pnpm-lock.yaml
+          persist-credentials: false
+      - uses: google/osv-scanner-action/osv-scanner-action@9a498708959aeaef5ef730655706c5a1df1edbc2 # v2
+        with:
+          scan-args: --lockfile=pnpm-lock.yaml
 
   web:
-    name: Web, registry, and standalone
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
-      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
-        with:
-          version: 10.33.2
-      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
-        with:
-          node-version: 24
-          cache: pnpm
-      - name: Cache Next.js build
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        with:
-          path: .next/cache
-          key: nextjs-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml', 'next.config.*', 'proxy.ts') }}
-          restore-keys: nextjs-${{ runner.os }}-
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm run lint
-      - run: pnpm run audit:composition
-      - run: pnpm exec tsc --noEmit
-      - run: pnpm run test:unit
-      - run: pnpm run test:coverage
-      - name: Build the tested revision
-        env:
-          AURORA_BUILD_SHA: ${{ github.sha }}
-        run: pnpm run build
-      - name: Enforce production client JavaScript budgets
-        run: pnpm run performance:check
-      - name: Install Playwright Chromium, Firefox, and WebKit
-        run: pnpm exec playwright install --with-deps chromium firefox webkit
-      - name: Cross-browser, mobile, and strict Storybook accessibility contracts
-        run: pnpm run test:e2e
-      - run: pnpm run refs:check
-      - run: pnpm run audit:standalone
-      - name: Smoke production security and cache headers
-        env:
-          AURORA_BUILD_SHA: ${{ github.sha }}
-        run: ops/smoke-production.sh
-      - run: pnpm run registry:check
-      - run: pnpm run registry:validate
-      - run: pnpm run registry:graph
-      - run: pnpm run registry:smoke
-      - run: pnpm run gallery:check
-      - run: pnpm run catalog:check
-      - run: pnpm run tokens:generate
-      - name: Generated artifacts are committed
-        run: git diff --exit-code
+    uses: dinglebear-ai/workflows/.github/workflows/fast-pnpm.yml@66e64b9f31de7ac1f9aa8c9f87ede9bbec5eae1d
+    with:
+      node-version: "24"
+      pnpm-version: "10.33.2"
+      audit-command: pnpm audit --audit-level high
+      lint-command: pnpm run lint
+      typecheck-command: pnpm exec tsc --noEmit
+      test-command: pnpm run test:coverage
+      contract-command: >-
+        pnpm run audit:composition &&
+        pnpm run refs:check &&
+        pnpm run audit:standalone &&
+        pnpm run registry:check &&
+        pnpm run registry:validate &&
+        pnpm run registry:graph &&
+        pnpm run registry:smoke &&
+        pnpm run gallery:check &&
+        pnpm run catalog:check &&
+        pnpm run tokens:generate &&
+        git diff --exit-code
+      timeout-minutes: 25
 
-  android:
-    name: Android app and library variants
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
+  gate:
+    name: CI
+    if: always()
+    needs: [contract, policy, gradle-wrapper, dependencies, web]
+    runs-on: ci-pool-ops
+    timeout-minutes: 2
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
-      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
-        with:
-          version: 10.33.2
-      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
-        with:
-          node-version: 24
-          cache: pnpm
-      - uses: actions/setup-java@c1e323688fd81a25caa38c78aa6df2d33d3e20d9 # v4
-        with:
-          distribution: temurin
-          java-version: "21"
-      - name: Cache Gradle wrapper and caches
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        with:
-          path: |
-            ~/.gradle/wrapper
-            ~/.gradle/caches
-          key: gradle-${{ runner.os }}-${{ hashFiles('android/**/*.gradle*', 'android/gradle/wrapper/gradle-wrapper.properties') }}
-          restore-keys: gradle-${{ runner.os }}-
-      - run: pnpm install --frozen-lockfile
-      - name: Gate all app/library variants, release lint/package, wrapper, and Roborazzi goldens
-        run: ./gradlew androidCheck --no-daemon
-        working-directory: android
-      - name: Run Android managed-device instrumentation smoke
-        run: |
-          if [[ -e /dev/kvm ]]; then sudo chmod 666 /dev/kvm; fi
-          ./gradlew androidManagedDeviceCheck --no-daemon
-        working-directory: android
-      - name: Smoke external composite-build consumption
-        run: ops/smoke-android-composite.sh
+      - name: Require every fast lane
+        env:
+          RESULTS: ${{ join(needs.*.result, ' ') }}
+        run: test "$RESULTS" = "success success success success success"

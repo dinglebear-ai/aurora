@@ -5,28 +5,21 @@ on:
   schedule:
     - cron: "17,47 * * * *"
 
-permissions: {}
+permissions:
+  contents: read
 
 concurrency:
   group: aurora-public-synthetics
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   public-path:
-    # Self-hosted (tootie runner farm): residential egress is not challenged by
-    # Cloudflare, unlike GitHub-hosted Azure IPs (see ops/synthetics-cloudflare.md).
-    runs-on: [self-hosted, unraid]
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
-      - name: Check landing, content negotiation, deployed-revision registry checksum, revision, and TLS
-        env:
-          AURORA_PUBLIC_URL: ${{ vars.AURORA_PUBLIC_URL || 'https://aurora.tootie.tv' }}
-          AURORA_TLS_MIN_SECONDS: ${{ vars.AURORA_TLS_MIN_SECONDS || '1209600' }}
-        run: ops/synthetic-check.sh
-      - name: Check the co-hosted dinglebear tenant
-        env:
-          AURORA_PUBLIC_URL: ${{ vars.AURORA_TENANT_URL || 'https://dinglebear.ai' }}
-          AURORA_TLS_MIN_SECONDS: ${{ vars.AURORA_TLS_MIN_SECONDS || '1209600' }}
-        run: ops/synthetic-check.sh
+    uses: dinglebear-ai/workflows/.github/workflows/synthetic-check.yml@66e64b9f31de7ac1f9aa8c9f87ede9bbec5eae1d
+    with:
+      command: >-
+        AURORA_PUBLIC_URL="${{ vars.AURORA_PUBLIC_URL || 'https://aurora.tootie.tv' }}"
+        AURORA_TLS_MIN_SECONDS="${{ vars.AURORA_TLS_MIN_SECONDS || '1209600' }}"
+        ops/synthetic-check.sh &&
+        AURORA_PUBLIC_URL="${{ vars.AURORA_TENANT_URL || 'https://dinglebear.ai' }}"
+        AURORA_TLS_MIN_SECONDS="${{ vars.AURORA_TLS_MIN_SECONDS || '1209600' }}"
+        ops/synthetic-check.sh
