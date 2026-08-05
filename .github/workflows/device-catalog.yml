@@ -117,6 +117,12 @@ jobs:
             "build-tools;36.0.0" \
             "ndk;28.2.13676358" \
             "system-images;android-35;google_apis;x86_64"
+          {
+            echo "$ANDROID_HOME/emulator"
+            echo "$ANDROID_HOME/cmdline-tools/latest/bin"
+            echo "$ANDROID_HOME/platform-tools"
+          } >> "$GITHUB_PATH"
+          export PATH="$ANDROID_HOME/emulator:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH"
           echo "no" | avdmanager create avd \
             --force \
             --name aurora_catalog_ci \
