@@ -73,7 +73,7 @@ Started with housekeeping (merged `fix/registry-namespaced-deps` to main; cleane
 - **Shell/file tools**: extensive (git, pnpm, tsc, eslint, python helpers).
 - **Workflow (multi-agent)**: 6 throttled runs (chunks of 6) for reskin/create waves; one early run hit a transient 529/rate-limit at 16-concurrency, fixed by chunking.
 - **claude_design MCP**: `list_projects/list_files/read_file/render_preview` to pull CD sources + project-scoped serve token (reusable across paths).
-- **webwright skill + Playwright (firefox)**: CD reference screenshots + live gallery spot-checks; firefox driver was flaky under load (known dookie gotcha) → ran at low concurrency, some refs captured from source instead.
+- **webwright skill + Playwright (firefox)**: CD reference screenshots + live gallery spot-checks; firefox driver was flaky under load (known devhost gotcha) → ran at low concurrency, some refs captured from source instead.
 - **save-to-md / quick-push skills**: this doc + version bump + push.
 
 ## Commands Executed

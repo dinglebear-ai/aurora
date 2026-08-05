@@ -37,7 +37,7 @@ The entire 1,035-file Aurora project was reviewed through all five phases. The r
 - Public traffic previously depended on a writable root development container; production now uses a non-root, read-only, digest-pinned runner with explicit topology and rollback.
 - CI promotion previously raced tested source identity; publication now builds the tested SHA, scans the exact digest, emits an SPDX SBOM, signs with Cosign, verifies identity, and only then promotes.
 - Combobox, RadioGroup, and Popover needed explicit keyboard/focus contracts; the final Popover implementation uses deterministic layout-phase focus with a tested completion marker.
-- Scheduled public synthetics currently receive HTTP 403 from GitHub-hosted runners even though `ops/synthetic-check.sh` passes from dookie; this remains open as `aurora-otgu`.
+- Scheduled public synthetics currently receive HTTP 403 from GitHub-hosted runners even though `ops/synthetic-check.sh` passes from devhost; this remains open as `aurora-otgu`.
 
 ## Technical Decisions
 
@@ -672,7 +672,7 @@ The review itself updated deployment, security, registry, Android, and operation
 - Popover Storybook interaction checks exposed a real focus race and then an external-test synchronization race; both contracts were fixed and passed 15 repeated strict-axe runs.
 - The first legacy-container production migration received an early public 502; rollback restored service, readiness/rollback waits were added, and the retry succeeded.
 - Playwright results reappeared after cleanup; timestamps and process inspection showed another live session running Storybook from the UI integration worktree, so the regenerated outputs were preserved and the session record was corrected.
-- Scheduled GitHub-hosted public synthetics fail with HTTP 403 at the first curl. Local/public verification from dookie succeeds. This unresolved external-path discrepancy is tracked in `aurora-otgu`.
+- Scheduled GitHub-hosted public synthetics fail with HTTP 403 at the first curl. Local/public verification from devhost succeeds. This unresolved external-path discrepancy is tracked in `aurora-otgu`.
 
 ## Behavior Changes (Before/After)
 
@@ -699,7 +699,7 @@ The review itself updated deployment, security, registry, Android, and operation
 | GitHub CI | Four protected checks | Run 29499187382 succeeded | pass |
 | Image publication | Exact tested SHA scanned and signed | Run 29499457639 attempt 2 succeeded | pass |
 | Live container | Final digest, healthy, read-only, non-root | `226f625...`, healthy, `READONLY=true`, user `1000:1000` | pass |
-| Public endpoint from dookie | HTTP 200, revision, schema, TLS | Passed; revision `178e13d...` | pass |
+| Public endpoint from devhost | HTTP 200, revision, schema, TLS | Passed; revision `178e13d...` | pass |
 | Scheduled GitHub public synthetic | Same public checks | HTTP 403 at first curl | fail |
 | Repository sync | Clean `main`, zero divergence | `main...origin/main`, 0 ahead / 0 behind | pass |
 

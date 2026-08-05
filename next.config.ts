@@ -1,10 +1,10 @@
 import type { NextConfig } from "next";
 
 // AURORA_DEV_ORIGIN: LAN or tailnet host that the dev server accepts CORS
-// requests from. Defaults to the tootie LAN address (10.1.0.6) used in the
+// requests from. Defaults to the nashost LAN address (192.0.2.6) used in the
 // homelab reverse-proxy setup; set to a tailnet hostname (e.g.
-// tootie.manatee-triceratops.ts.net) when Tailscale is preferred.
-const DEV_ORIGIN = process.env.AURORA_DEV_ORIGIN ?? "10.1.0.6";
+// nashost.example.ts.net) when Tailscale is preferred.
+const DEV_ORIGIN = process.env.AURORA_DEV_ORIGIN ?? "192.0.2.6";
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,

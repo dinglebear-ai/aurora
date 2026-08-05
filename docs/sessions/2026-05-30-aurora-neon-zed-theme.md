@@ -33,7 +33,7 @@ doesn't collide with canonical Aurora.
 - Migrated the interactive shell from **zsh4humans → antidote** (static-bundle mode), preserving p10k, plugins, fzf keybindings, completions; removed dead per-startup env lines. (home dir; dotfiles repo commit `55931a4`.)
 - Expanded **chezmoi** tracking: added `statusline-aurora.sh`, encrypted `settings.json`/`settings.local.json`, codex `.credentials.json`, and gemini `settings.json`/`mcp.json`/`gemini-credentials.json`/`google_accounts.json`; removed stale gmail/proton auth; hardened perms to 0600.
 - Built the **Aurora Zed theme** (dark+light, schema v0.2.0), iterated brightness twice to a neon palette, then added a **full file-type icon theme** (60 generated glyph-tile SVGs, 98 suffix + 22 stem mappings).
-- Placed the work in this repo under `editors/zed/` + served copy `public/zed/`; deployed to dookie and steamy.
+- Placed the work in this repo under `editors/zed/` + served copy `public/zed/`; deployed to devhost and winhost.
 - Audited palette drift across all 11 Aurora theme artifacts: only Zed diverged. Per user decision (Zed-only neon), renamed Zed to **Aurora Neon** and pushed (`dfae0cf`).
 
 ## 3. Sequence of Events
@@ -41,9 +41,9 @@ doesn't collide with canonical Aurora.
 1. mise review → identified lockfile/orphan/brew-dup issues; user fixed; advised on `idiomatic_version_file` and settings.
 2. zsh4humans → antidote migration: baseline benchmark, install antidote, rewrite `.zshrc`/`.zshenv`, re-implement compinit + fzf keys, verify under pty.
 3. chezmoi audit across `~/.claude`, `~/.codex`, `~/.gemini`; encrypt+track secrets, remove auth files, harden perms; commit+push dotfiles repo.
-4. Zed theme created (`editors/zed/themes/aurora.json`), schema-validated, deployed to `~/.config/zed` + steamy.
+4. Zed theme created (`editors/zed/themes/aurora.json`), schema-validated, deployed to `~/.config/zed` + winhost.
 5. Two brightening passes (shimmer → neon); canvas lifted `#07131c`→`#102a3e`, syntax pushed to electric cyan/violet/mint/gold/rose.
-6. Full icon theme generated via `generate-icons.py`; schema-validated; extension deployed to steamy.
+6. Full icon theme generated via `generate-icons.py`; schema-validated; extension deployed to winhost.
 7. Committed editor-themes collection (`0e34218`), pushed `feat/zed-aurora-theme`.
 8. Palette-drift audit → only Zed neon; everything else canonical.
 9. Renamed Zed → "Aurora Neon"; cleared a stale `index.lock` left by a concurrent agent; committed `dfae0cf`; verified across origin + all deploy targets.
@@ -75,7 +75,7 @@ doesn't collide with canonical Aurora.
 | created | `public/zed/aurora.json` | — | Served copy of UI theme | byte-match w/ source |
 | created | `editors/warp/*`, `editors/claude-code/*`, `public/warp/*` | — | Sibling editor themes (committed in `0e34218` scope) | `git show 0e34218 --stat` |
 
-Cross-repo / cross-host (not this repo): `~/.zshrc`, `~/.zshenv` (antidote migration); `~/.local/share/chezmoi` commit `55931a4` (zsh + tracking + encrypted secrets); `~/.config/zed/themes/aurora.json` (dookie deploy); `C:\Users\jmaga\zed-aurora-extension\*` (steamy deploy).
+Cross-repo / cross-host (not this repo): `~/.zshrc`, `~/.zshenv` (antidote migration); `~/.local/share/chezmoi` commit `55931a4` (zsh + tracking + encrypted secrets); `~/.config/zed/themes/aurora.json` (devhost deploy); `C:\Users\jmaga\zed-aurora-extension\*` (winhost deploy).
 
 ## 7. Beads Activity
 
@@ -91,7 +91,7 @@ Cross-repo / cross-host (not this repo): `~/.zshrc`, `~/.zshenv` (antidote migra
 
 ## 9. Tools and Skills Used
 
-- **Shell (Bash)**: git, rsync, ssh (steamy-wsl), `chezmoi`, `mise`, `hyperfine`, `uvx check-jsonschema`, `jq`, `python3`. Purpose: migration, validation, deployment, benchmarking.
+- **Shell (Bash)**: git, rsync, ssh (winhost-wsl), `chezmoi`, `mise`, `hyperfine`, `uvx check-jsonschema`, `jq`, `python3`. Purpose: migration, validation, deployment, benchmarking.
 - **File tools**: Read/Write/Edit for `.zshrc`/`.zshenv`, theme JSON, generator, README, extension.toml.
 - **External CLI**: `axon` (RAG `search`+`ask`) to answer "how to create Zed themes" with cited sources.
 - **AskUserQuestion**: framework choice (antidote), icon style (glyph tiles), commit scope, propagation scope.
@@ -105,7 +105,7 @@ Cross-repo / cross-host (not this repo): `~/.zshrc`, `~/.zshenv` (antidote migra
 | `python3 editors/zed/generate-icons.py` | 60 svgs, 98 suffixes, 22 stems |
 | `uvx check-jsonschema --schemafile .../v0.2.0.json editors/zed/themes/aurora.json` | `ok -- validation done` |
 | `git commit … && git push origin feat/zed-aurora-theme` (`0e34218`, `dfae0cf`) | pushed; branch in sync with origin |
-| `rsync -rtq --delete … steamy-wsl:/mnt/c/Users/jmaga/zed-aurora-extension/` | extension synced to steamy |
+| `rsync -rtq --delete … winhost-wsl:/mnt/c/Users/jmaga/zed-aurora-extension/` | extension synced to winhost |
 
 ## 11. Errors Encountered
 
@@ -119,7 +119,7 @@ Cross-repo / cross-host (not this repo): `~/.zshrc`, `~/.zshenv` (antidote migra
 |---|---|---|
 | Zed themes | none in repo | Aurora Neon / Aurora Neon Light + Aurora Neon Icons available via extension |
 | Zed theme palette | n/a | neon (canvas `#102a3e`, cyan `#38d2ff`) — divergent from canonical Aurora, intentionally |
-| Theme distribution | n/a | served at `aurora.tootie.tv/zed/aurora.json`; extension deployed to dookie + steamy |
+| Theme distribution | n/a | served at `aurora.tootie.tv/zed/aurora.json`; extension deployed to devhost + winhost |
 
 ## 13. Verification Evidence
 
@@ -128,7 +128,7 @@ Cross-repo / cross-host (not this repo): `~/.zshrc`, `~/.zshenv` (antidote migra
 | `check-jsonschema … themes/aurora.json` | valid | `ok -- validation done` | pass |
 | `check-jsonschema … icon_themes/aurora.json` | valid | `ok -- validation done` | pass |
 | hex scan of theme JSON | no malformed hex | caught + fixed `#1b3span`, `#688persp` | pass |
-| origin + 4 deploy targets carry "Aurora Neon" | all match | origin/public/dookie/steamy all "Aurora Neon" | pass |
+| origin + 4 deploy targets carry "Aurora Neon" | all match | origin/public/devhost/winhost all "Aurora Neon" | pass |
 | icon path resolution | all 60 exist | `missing icon files: none` | pass |
 
 ## 14. Risks and Rollback
@@ -155,7 +155,7 @@ Cross-repo / cross-host (not this repo): `~/.zshrc`, `~/.zshenv` (antidote migra
 
 ## 18. Next Steps
 
-1. **Activate in Zed** (each machine): `zed: install dev extension` → the extension folder (dookie `editors/zed`, steamy `C:\Users\jmaga\zed-aurora-extension`); then `theme selector` → **Aurora Neon**, `icon theme selector` → **Aurora Neon Icons**. Remove the `~/.config/zed/themes/aurora.json` drop-in to avoid a duplicate.
+1. **Activate in Zed** (each machine): `zed: install dev extension` → the extension folder (devhost `editors/zed`, winhost `C:\Users\jmaga\zed-aurora-extension`); then `theme selector` → **Aurora Neon**, `icon theme selector` → **Aurora Neon Icons**. Remove the `~/.config/zed/themes/aurora.json` drop-in to avoid a duplicate.
 2. **Open the PR** for `feat/zed-aurora-theme` (or split out the Zed commits). Suggested follow-up bead: "Open PR: Aurora Neon Zed editor + icon theme".
 3. **Decide** on the shared-branch question (Open Questions) before merge.
 4. The `feat/prompt-input-action-left` branch remains live and independent — unaffected by this session.

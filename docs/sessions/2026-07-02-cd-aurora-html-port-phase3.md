@@ -24,12 +24,12 @@ Ported the remaining Claude Design (CD) `Aurora.html` page experience into the N
 2. Audited the existing app: phases 1–2 of the port already existed (commits `159a682`, `d99b22c`); built a delta list (⌘K palette, Icons/Docs views, header parity).
 3. Phase 3 (`d86e79a`): generalized the registry `command-palette` block (sections/placeholder/filter props), extracted `lib/fuzzy.ts`, built `SiteCommandPalette`, `/icons` (`IconsView` — Lucide grid + `OperationIcon` grid), `/docs` (6 CD pages on real routes with sticky sub-nav), header Search button + nav entries, hero eyebrow + footer copy parity.
 4. Hit a pre-existing `main` build break (commit `71be925` pointed `attachments.tsx` at the consumer install path). Fixed with a repo-local shim `components/aurora/attachment.ts` (`e28e960`).
-5. Verified visually: chrome-devtools MCP needs X (unavailable); the agent-browser Chrome on :9222 is network-isolated from sandbox-local ports and its screenshot API stalls on background tabs; Playwright/Firefox crashed. Working recipe: :9222 Chrome + the Tailscale IP (`100.88.16.79:3777`) + `AURORA_DEV_ORIGIN` for Next dev assets + `Page.bringToFront` before `Page.captureScreenshot`.
+5. Verified visually: chrome-devtools MCP needs X (unavailable); the agent-browser Chrome on :9222 is network-isolated from sandbox-local ports and its screenshot API stalls on background tabs; Playwright/Firefox crashed. Working recipe: :9222 Chrome + the Tailscale IP (`198.51.100.1:3777`) + `AURORA_DEV_ORIGIN` for Next dev assets + `Page.bringToFront` before `Page.captureScreenshot`.
 6. User showed the CD Components view (manifest-driven live tiles) vs our gallery-sidebar link. Built the live catalog (`8e726c5`): extracted `app/gallery/demo-map.tsx` (shared slug→demo map), rebuilt `ComponentCatalog` with lazy scaled live previews + `LiveDrawer`, added `/components`, rewired nav/⌘K/pillar.
 7. Added drawer prev/next arrows + ←/→ keys + n/total counter (`b8ae564`).
 8. Replaced the header Components dropdown with an on-page shadcn·React / Android·Compose segmented toggle (`5e9a61e`); Android flavor driven by `lib/kotlin-map.ts` parsing `docs/component-kotlin-map.md` (120 counterparts; 125 catalog items ported).
 9. Implemented suggestions 1–4 (`6303d5d`): light-mode pass over all new surfaces (found + fixed a swallowed space after a `<Strong>` in docs copy), ⌘K → `/components?c=slug` drawer deep-links, URL state via `history.replaceState` + `useSearchParams` watcher (Suspense-wrapped), mobile hamburger nav.
-10. Fixed 4 errors reported from the live site (`8438afe`): catalog tile `<button>` wrapped demos containing buttons — invalid nesting caused 3 of the 4 errors (2 console + 1 hydration); converted tiles to `div[role=button]`. The 4th (`eval()` blocked) is dev-mode React only — identified that `aurora.tootie.tv` is served by the `dev` compose target on dookie.
+10. Fixed 4 errors reported from the live site (`8438afe`): catalog tile `<button>` wrapped demos containing buttons — invalid nesting caused 3 of the 4 errors (2 console + 1 hydration); converted tiles to `div[role=button]`. The 4th (`eval()` blocked) is dev-mode React only — identified that `aurora.tootie.tv` is served by the `dev` compose target on devhost.
 11. Maintenance pass for this note: corrected the stale SWAG upstream claim in `CLAUDE.md` (`c8f9e79`).
 
 ## Key findings
@@ -38,8 +38,8 @@ Ported the remaining Claude Design (CD) `Aurora.html` page experience into the N
 - dsCards must NOT be copied into the app: they render a parallel component implementation (split-brain with the registry). Their curated hero compositions are portable, though — recorded in `bd remember` key `catalog-preview-upgrade-option-declined-2026-07-02` (user declined the port).
 - `origin/main` was un-buildable at session start: `registry/aurora/blocks/ai/elements/attachments.tsx:3` imported `@/components/aurora/attachment` (the consumer install target of `aurora-attachment` per `registry.json`), which didn't exist in-repo.
 - Interactive content cannot nest inside `<button>`: the catalog tile button wrapping live demos re-parents markup during HTML parsing and fails hydration (errors seen on the live site's dev overlay).
-- `aurora.tootie.tv` is served by the `aurora-design-system` **dev** container on **dookie** (compose `dev` target, `50000→3000`, bind-mounts the primary checkout) — merges go live with no deploy step; the `eval()` console error and dev overlay exist only because of dev mode. An unused `aurora-prod` standalone service exists in `docker-compose.yaml`.
-- Environment: browsers on dookie cannot reach sandbox-local ports; the reliable headless capture path is the :9222 Chrome + Tailscale IP + `Page.bringToFront` (new-headless background tabs never paint, so `captureScreenshot` hangs forever without it).
+- `aurora.tootie.tv` is served by the `aurora-design-system` **dev** container on **devhost** (compose `dev` target, `50000→3000`, bind-mounts the primary checkout) — merges go live with no deploy step; the `eval()` console error and dev overlay exist only because of dev mode. An unused `aurora-prod` standalone service exists in `docker-compose.yaml`.
+- Environment: browsers on devhost cannot reach sandbox-local ports; the reliable headless capture path is the :9222 Chrome + Tailscale IP + `Page.bringToFront` (new-headless background tabs never paint, so `captureScreenshot` hangs forever without it).
 
 ## Technical decisions
 
@@ -68,7 +68,7 @@ Ported the remaining Claude Design (CD) `Aurora.html` page experience into the N
 | created | `app/(marketing)/components/page.tsx` | /components route (kotlinMap + syncUrl) | `8e726c5`, `5e9a61e`, `6303d5d` |
 | created | `lib/kotlin-map.ts` | parses component-kotlin-map.md table | `5e9a61e` |
 | modified | `tests/gallery-slug-consistency.test.ts` | reads demo keys from demo-map.tsx | `8e726c5` |
-| modified | `CLAUDE.md` | corrected SWAG upstream (dookie, not tootie) | `c8f9e79` |
+| modified | `CLAUDE.md` | corrected SWAG upstream (devhost, not nashost) | `c8f9e79` |
 | created | `docs/sessions/2026-07-02-cd-aurora-html-port-phase3.md` | this session note | this commit |
 
 ## Beads activity
@@ -87,8 +87,8 @@ Ported the remaining Claude Design (CD) `Aurora.html` page experience into the N
 - **Plans:** `docs/plans/` does not exist in this repo — no-op (evidence: `ls docs/plans` → no such directory).
 - **Beads:** all three session beads closed with work verified (see above); no orphaned session work. Follow-ups are covered by existing epics or `bd remember`.
 - **Worktrees/branches:** two worktrees registered — primary (`main`) and this one (`claude/upbeat-hypatia-14f9fe`); both at the same commit, branch fully merged into `main` via fast-forward pushes. Branch and worktree left in place because the worktree is the active session workspace; safe to remove later with `git worktree remove` + branch delete.
-- **Stale docs:** `CLAUDE.md` SWAG upstream corrected (`tootie:50000` → dookie container, dev/prod services documented) — evidence: `docker ps` on dookie shows `aurora-design-system … 0.0.0.0:50000->3000`, and the user confirmed. No other doc contradictions observed.
-- **Transparency:** the live SWAG conf on squirts (`aurora.subdomain.conf`) was not inspected; if its upstream host literally says `tootie`, it still resolves to the dookie container per observed behavior — flagged in Open Questions.
+- **Stale docs:** `CLAUDE.md` SWAG upstream corrected (`nashost:50000` → devhost container, dev/prod services documented) — evidence: `docker ps` on devhost shows `aurora-design-system … 0.0.0.0:50000->3000`, and the user confirmed. No other doc contradictions observed.
+- **Transparency:** the live SWAG conf on edgehost (`aurora.subdomain.conf`) was not inspected; if its upstream host literally says `nashost`, it still resolves to the devhost container per observed behavior — flagged in Open Questions.
 
 ## Tools and skills used
 
@@ -107,7 +107,7 @@ Ported the remaining Claude Design (CD) `Aurora.html` page experience into the N
 | `pnpm install` (worktree) | node_modules populated (35s; worktree was cold) |
 | `pnpm registry:build` | regenerated `public/r/*.json` |
 | `pnpm lint` / `pnpm build` / `pnpm test:unit` / `pnpm audit:composition` | all green at every commit point (65/65 tests) |
-| `AURORA_DEV_ORIGIN=100.88.16.79 pnpm dev --port 3777` | dev server for visual verification |
+| `AURORA_DEV_ORIGIN=198.51.100.1 pnpm dev --port 3777` | dev server for visual verification |
 | `pnpm start --port 3778` | production server for console-clean verification |
 | `git push origin claude/upbeat-hypatia-14f9fe:main` | fast-forward merges to main (×5) |
 | `bd create/claim/close`, `bd dolt push` | bead lifecycle |
@@ -158,7 +158,7 @@ Ported the remaining Claude Design (CD) `Aurora.html` page experience into the N
 
 ## Open questions
 
-- The SWAG conf on squirts (`aurora.subdomain.conf`) was not read; `CLAUDE.md` now documents the dookie container as the upstream based on `docker ps` + user confirmation — worth confirming the conf's literal upstream host next time someone touches it.
+- The SWAG conf on edgehost (`aurora.subdomain.conf`) was not read; `CLAUDE.md` now documents the devhost container as the upstream based on `docker ps` + user confirmation — worth confirming the conf's literal upstream host next time someone touches it.
 - Sparse tile previews (e.g. Direction) remain until/unless the dsCard composition port is revived.
 
 ## Next steps

@@ -114,7 +114,7 @@ export default function EmptyStateDemo() {
               as="h2"
               icon={<CloudOff size={24} aria-hidden />}
               title="Couldn’t reach the gateway"
-              description="The request to lab.tootie.tv timed out. Check the connection and try again."
+              description="The request to lab.example.internal timed out. Check the connection and try again."
               action={
                 <Button variant="warn" iconLeft={<RefreshCw size={14} aria-hidden />}>
                   Retry

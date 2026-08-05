@@ -13,23 +13,23 @@ beads: q007 bcjw thfe vyjr mkr1 syc7 w0am ilkm xe0i 01xq nev6 6mwo (12 closed) |
 
 ## User Request
 
-After the parallel-dispatch session that landed PRs #6–#15: ask for an auth/server briefing, run a code review on the full diff, address all findings, install the APK via emulator on dookie and walk the chat flow end-to-end via claude-in-mobile / ADB, file all UI polish opportunities as beads, run lavra-research on each, and then lavra-work the resulting backlog.
+After the parallel-dispatch session that landed PRs #6–#15: ask for an auth/server briefing, run a code review on the full diff, address all findings, install the APK via emulator on devhost and walk the chat flow end-to-end via claude-in-mobile / ADB, file all UI polish opportunities as beads, run lavra-research on each, and then lavra-work the resulting backlog.
 
 ## Session Overview
 
 Long-running execution session. Three distinct phases:
 
 1. **Code review + fixes**: 6 review findings addressed (AuthRepository, ChatViewModel handshake gate, SidebarViewModel timeout, ChatScreen empty-image guard, CodexRepository demux logging, dead `session/update` regression). Build green, APK uploaded.
-2. **Live emulator test + bead capture**: Installed APK on dookie's existing emulator, drove the chat flow via ADB. Discovered `getAuthStatus` is not a real Codex protocol method — patched StartupViewModel to trust local AUTH_METHOD. Sent a real prompt round-trip ("Say hello and count from 1 to 3" → "Hello. 1, 2, 3." + tool call). Catalogued 14 polish opportunities as beads, dispatched 4 parallel lavra-research agents to attach evidence to each.
+2. **Live emulator test + bead capture**: Installed APK on devhost's existing emulator, drove the chat flow via ADB. Discovered `getAuthStatus` is not a real Codex protocol method — patched StartupViewModel to trust local AUTH_METHOD. Sent a real prompt round-trip ("Say hello and count from 1 to 3" → "Hello. 1, 2, 3." + tool call). Catalogued 14 polish opportunities as beads, dispatched 4 parallel lavra-research agents to attach evidence to each.
 3. **Multi-wave lavra-work execution**: Three waves of parallel-then-sequential agent dispatch. Wave 1 (q007, bcjw, thfe) shipped via the user committing `5bea020 Polish Android chat components`. Wave 2 (vyjr, mkr1, syc7, w0am) shipped via three commits. Wave 3 (ilkm, xe0i, 01xq, nev6, 6mwo) all touched `ChatScreen.kt` so a single sequential agent owned the file; shipped via `830e323`. All 12 polish beads closed; APK uploaded after each wave.
 
 ## Sequence of Events
 
-1. Asked about auth model + server target; identified `codex app-server --listen ws://127.0.0.1:4500` on dookie (loopback, no auth required)
+1. Asked about auth model + server target; identified `codex app-server --listen ws://127.0.0.1:4500` on devhost (loopback, no auth required)
 2. Ran code-review skill with 3 finder angles + verifier; 6 findings consolidated
 3. Applied fixes; rebased through a large remote update that had independently fixed 2 of the same issues; resolved 4 conflict files keeping both the remote refactor and the timeout-safety additions
 4. Built APK 21M, uploaded to `gdrive:Aurora/app-debug.apk`
-5. Installed APK on dookie's emulator-5554 via ADB; launched and observed LoginScreen
+5. Installed APK on devhost's emulator-5554 via ADB; launched and observed LoginScreen
 6. Identified `getAuthStatus` is not in Codex protocol — patched StartupViewModel to trust local `AUTH_METHOD`
 7. Bypassed login, observed chat screen, sent real message; round-trip worked; tool call rendered
 8. Tested ApprovalPolicyBar dropdown (worked), model selector dropdown (didn't open — bug), attach button, sidebar (opened by accident)
@@ -122,13 +122,13 @@ Long-running execution session. Three distinct phases:
 
 ## Tools and Skills Used
 
-- **Bash**: `bd`, `git`, `gh`, `rtk` wrappers, `./gradlew`, `adb`, `ssh dookie`, `rclone`, `python3` snippets — for nearly every coordination step
+- **Bash**: `bd`, `git`, `gh`, `rtk` wrappers, `./gradlew`, `adb`, `ssh devhost`, `rclone`, `python3` snippets — for nearly every coordination step
 - **Read/Write/Edit**: file inspection and direct edits when not delegated to subagents
 - **Agent (general-purpose subagents)**: dispatched 5 planning agents + 5 execution agents (prior session continuation) + 4 lavra-research agents + 3 wave-1 implementers + 3 wave-2 implementers + 1 wave-3 sequential implementer. ~15 subagent invocations total. Inter-agent WIP races observed during parallel waves — combined build is source of truth.
 - **AskUserQuestion**: server-context confirmation, wave scope selection
 - **Skill tool**: `code-review`, `gh-pr`, `screenshots`, `save-to-md`, `vibin:save-to-md`, `lavra:lavra-learn`, `lavra:lavra-work`, `lavra:lavra-work-multi`, `superpowers:dispatching-parallel-agents`
 - **MCP tools**: `mcp__plugin_lab_lab__scout` (tool discovery), `mcp__plugin_lab_lab__invoke` (axon scrape of OpenAI Codex app-server docs)
-- **ADB over SSH to dookie**: `adb install -r`, `adb shell input tap/text/keyevent`, `adb shell screencap -p`, `adb shell uiautomator dump`, `adb shell run-as` for DataStore prefs inspection, `adb logcat` for diagnostics
+- **ADB over SSH to devhost**: `adb install -r`, `adb shell input tap/text/keyevent`, `adb shell screencap -p`, `adb shell uiautomator dump`, `adb shell run-as` for DataStore prefs inspection, `adb logcat` for diagnostics
 - **rclone**: `rclone copy` to gdrive:Aurora (5+ APK uploads, ~21M each)
 - **Issues**: (a) `device` MCP tool name collision between `lab` and `claude-in-mobile` gateways — couldn't route to claude-in-mobile, fell back to direct ADB which worked fine. (b) Raw websocket-client Python rejected with 403 due to Origin header; switched to socket-level handshake without Origin. (c) `bd auto-export` git-add failures (harmless warnings, didn't block push).
 
@@ -140,14 +140,14 @@ git diff --stat origin/main...HEAD              # establish review scope
 ./gradlew :app:assembleDebug                    # BUILD SUCCESSFUL after each wave
 
 # Server inspection
-ssh dookie "ss -tlnp | grep ':4500'"            # codex app-server on 127.0.0.1:4500
-ssh dookie "ps -p 389362 -o cmd"                # codex app-server --listen ws://127.0.0.1:4500
+ssh devhost "ss -tlnp | grep ':4500'"            # codex app-server on 127.0.0.1:4500
+ssh devhost "ps -p 389362 -o cmd"                # codex app-server --listen ws://127.0.0.1:4500
 
 # Live testing
-ssh dookie "adb devices"                        # emulator-5554 ready
-scp APK dookie:/tmp/ && ssh dookie "adb install -r /tmp/aurora-app-debug.apk"
-ssh dookie "adb shell am start -n tv.tootie.aurora.app/.MainActivity"
-ssh dookie "adb shell input tap X Y; adb shell screencap -p > /tmp/aurora-screen.png"
+ssh devhost "adb devices"                        # emulator-5554 ready
+scp APK devhost:/tmp/ && ssh devhost "adb install -r /tmp/aurora-app-debug.apk"
+ssh devhost "adb shell am start -n tv.tootie.aurora.app/.MainActivity"
+ssh devhost "adb shell input tap X Y; adb shell screencap -p > /tmp/aurora-screen.png"
 
 # Bead workflow
 bd create --title=... --description=... --type=... --priority=...     # 14 polish beads
@@ -236,7 +236,7 @@ rclone copy app-debug.apk gdrive:Aurora                               # final AP
 **Recommended immediate next commands:**
 ```bash
 # Install the final APK on the emulator for visual verification
-ssh dookie "adb install -r /tmp/aurora-app-debug.apk && adb shell am start -n tv.tootie.aurora.app/.MainActivity"
+ssh devhost "adb install -r /tmp/aurora-app-debug.apk && adb shell am start -n tv.tootie.aurora.app/.MainActivity"
 # View remaining open beads to plan next session
 bd ready --json | jq '.[].title' | head -10
 ```
