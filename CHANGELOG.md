@@ -26,6 +26,7 @@ breaking changes and will be listed here.
 
 ### Security and delivery
 
+- Updated Next.js and its lint configuration to 16.3.0, aligned the device catalog React type packages, and pinned patched transitive versions required by the OSV dependency gate.
 - Switched the CSP to same-origin scripts plus the documented Next.js static
   bootstrap relaxation so public pages remain prerenderable; forms are
   restricted to self and production upgrades insecure requests.
@@ -56,6 +57,11 @@ breaking changes and will be listed here.
   Android light/dark parity changes made after v0.3.1. Consumers upgrading from
   v0.3.1 should rebuild vendored components, review changed component props,
   regenerate Android tokens, and verify both color modes before release.
+
+
+### Licensing
+
+- Relicense Dinglebear-owned original work under AGPL-3.0-only and document separate commercial licensing; third-party material retains its original terms.
 
 ## [0.5.1](https://github.com/dinglebear-ai/aurora/compare/v0.5.0...v0.5.1) (2026-07-29)
 
@@ -106,6 +112,7 @@ breaking changes and will be listed here.
 
 
 ### Changed
+
 
 * **docker:** stop the dev image chowning 93k files (30min -&gt; ~14min) ([#60](https://github.com/jmagar/aurora/issues/60)) ([624df8b](https://github.com/jmagar/aurora/commit/624df8b1197b11f428f91c7661fe838b78508f11))
 

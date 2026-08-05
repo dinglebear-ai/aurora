@@ -11,12 +11,12 @@ import { Skeleton } from "@/registry/aurora/ui/skeleton"
 type DemoModule = { default: ComponentType }
 type DemoLoader = () => Promise<DemoModule>
 
-const galleryModules = import.meta.glob<DemoModule>([
+const galleryModules = import.meta.glob([
   "../../../app/gallery/demos/*.tsx",
   "!../../../app/gallery/demos/parity-demo.tsx",
   "!../../../app/gallery/demos/alert-demo.tsx",
   "!../../../app/gallery/demos/status-indicator-demo.tsx",
-])
+]) as Record<string, DemoLoader>
 
 const demoComponents = Object.fromEntries(
   Object.entries(galleryModules).map(([path, loader]) => {
