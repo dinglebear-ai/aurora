@@ -8,7 +8,7 @@ from a browser.
 
 ## Root cause (proven, not guessed)
 
-`aurora.tootie.tv` is proxied through **Cloudflare** (the `example.internal` zone;
+`aurora.tootie.tv` is proxied through **Cloudflare** (the `tootie.tv` zone;
 `dinglebear.ai` is *not* proxied — it answers straight from nginx/SWAG). A
 diagnostic run from a GitHub runner captured:
 
@@ -57,7 +57,7 @@ gh secret set AURORA_SYNTHETIC_TOKEN --repo dinglebear-ai/aurora --body "$TOKEN"
 echo "Cloudflare rule value: $TOKEN"   # paste into the rule below, then clear scrollback
 ```
 
-In the Cloudflare dashboard for the **example.internal** zone →
+In the Cloudflare dashboard for the **tootie.tv** zone →
 **Security → WAF → Custom rules → Create rule**:
 
 - **Field / expression:**
