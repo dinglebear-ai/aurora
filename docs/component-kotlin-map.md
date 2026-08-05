@@ -1,3 +1,9 @@
+---
+title: Aurora Component to Kotlin and Compose Map
+created: 2026-07-30
+updated: 2026-07-30
+---
+
 # Aurora Component → Kotlin/Compose Map
 
 Cross-reference of every Aurora (shadcn/React) component and its nearest Jetpack Compose / Material 3 equivalent.

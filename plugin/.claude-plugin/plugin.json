@@ -1,13 +1,13 @@
 {
     "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
     "name": "aurora",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "description": "Aurora design system skill for building dark-first, navy/cyan/rose/Axon-orange operator and agent control-plane UI with the @aurora shadcn registry and var(--aurora-*) tokens.",
     "author": {
         "name": "Jacob Magar",
         "email": "jmagar@users.noreply.github.com"
     },
-    "repository": "https://github.com/jmagar/aurora",
+    "repository": "https://github.com/dinglebear-ai/aurora",
     "homepage": "https://aurora.tootie.tv",
     "license": "MIT",
     "keywords": [

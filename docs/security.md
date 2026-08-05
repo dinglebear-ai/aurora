@@ -1,3 +1,9 @@
+---
+title: Security Posture
+created: 2026-07-30
+updated: 2026-07-30
+---
+
 # Security Posture
 
 This document describes the known security characteristics and limitations of

@@ -1,92 +1,88 @@
-name: Publish image
+name: Release artifacts
 
 on:
-  workflow_run:
-    workflows: ["CI"]
-    types: [completed]
-    branches: [main]
+  release:
+    types: [published]
 
 permissions: {}
 
 concurrency:
-  group: publish-tested-main
+  group: aurora-release-${{ github.event.release.tag_name }}
   cancel-in-progress: false
 
 jobs:
-  publish:
-    name: Publish tested SHA and promote its verified digest
-    if: >-
-      github.event.workflow_run.conclusion == 'success' &&
-      github.event.workflow_run.event == 'push' &&
-      github.event.workflow_run.head_branch == 'main'
-    runs-on: ubuntu-latest
+  web:
+    permissions:
+      contents: read
+    uses: dinglebear-ai/workflows/.github/workflows/hosted-web-release.yml@542ea7b7e5ca2d4e21f3277bfcf158584fee90ec
+    with:
+      checkout-ref: ${{ github.event.release.tag_name }}
+      node-version: "24"
+      package-cache: pnpm
+      pnpm-version: "10.33.2"
+      cache-dependency-path: pnpm-lock.yaml
+      install-command: pnpm install --frozen-lockfile
+      coverage-command: pnpm run test:coverage
+      build-command: >-
+        AURORA_BUILD_SHA=${{ github.sha }}
+        pnpm run build
+      performance-command: pnpm run performance:check
+      e2e-command: pnpm run test:e2e
+      artifact-name: aurora-web-${{ github.event.release.tag_name }}
+      artifact-path: .next/standalone
+      diagnostic-path: |
+        playwright-report/
+        test-results/
+      timeout-minutes: 60
+
+  android:
+    permissions:
+      contents: read
+    uses: dinglebear-ai/workflows/.github/workflows/hosted-android-release.yml@542ea7b7e5ca2d4e21f3277bfcf158584fee90ec
+    with:
+      checkout-ref: ${{ github.event.release.tag_name }}
+      java-version: "21"
+      working-directory: android
+      setup-command: >-
+        corepack enable &&
+        corepack prepare pnpm@10.33.2 --activate &&
+        pnpm --dir .. install --frozen-lockfile
+      release-command: ./gradlew androidCheck --no-daemon
+      device-command: |
+        if [[ -e /dev/kvm ]]; then sudo chmod 666 /dev/kvm; fi
+        ./gradlew androidManagedDeviceCheck --no-daemon
+        ../ops/smoke-android-composite.sh
+      artifact-name: aurora-android-${{ github.event.release.tag_name }}
+      artifact-path: android/**/build/outputs/**
+      report-path: android/**/build/reports/**
+      timeout-minutes: 90
+
+  container:
     permissions:
       contents: read
       packages: write
-    env:
-      # Derived, not hard-coded: this was left pointing at ghcr.io/jmagar/aurora
-      # after the repository moved to dinglebear-ai, and GITHUB_TOKEN cannot push
-      # to a package in another account's namespace.
-      IMAGE: ghcr.io/${{ github.repository }}
-      TESTED_SHA: ${{ github.event.workflow_run.head_sha }}
-    steps:
-      - name: Check out the exact tested revision
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
-        with:
-          ref: ${{ github.event.workflow_run.head_sha }}
-          persist-credentials: false
-      - name: Prove checkout identity
-        run: test "$(git rev-parse HEAD)" = "$TESTED_SHA"
-      - name: Log in to GHCR
-        uses: docker/login-action@af1e73f918a031802d376d3c8bbc3fe56130a9b0 # v4.4.0
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Set up Buildx
-        uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c # v4.2.0
-      - name: Build and push immutable SHA tag with provenance and SBOM attestations
-        id: build
-        uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
-        with:
-          context: .
-          target: runner
-          push: true
-          tags: ${{ env.IMAGE }}:sha-${{ env.TESTED_SHA }}
-          labels: |
-            org.opencontainers.image.source=https://github.com/${{ github.repository }}
-            org.opencontainers.image.revision=${{ env.TESTED_SHA }}
-          build-args: AURORA_BUILD_SHA=${{ env.TESTED_SHA }}
-          provenance: false
-          sbom: false
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-      - name: Record tested image identity
-        env:
-          DIGEST: ${{ steps.build.outputs.digest }}
-        run: |
-          test -n "$DIGEST"
-          printf '%s\n' "$IMAGE@$DIGEST" > image-ref.txt
-          printf '%s\n' "$TESTED_SHA" > source-sha.txt
-      - name: Scan the exact digest before promotion
-        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
-        with:
-          image-ref: ${{ env.IMAGE }}@${{ steps.build.outputs.digest }}
-          version: v0.72.0
-          format: table
-          severity: CRITICAL,HIGH
-          ignore-unfixed: true
-          exit-code: "1"
-      - name: Promote only the scanned digest to latest
-        env:
-          DIGEST: ${{ steps.build.outputs.digest }}
-        run: docker buildx imagetools create --tag "$IMAGE:latest" "$IMAGE@$DIGEST"
-      - name: Upload promotion evidence
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-        with:
-          name: aurora-image-${{ env.TESTED_SHA }}
-          path: |
-            image-ref.txt
-            source-sha.txt
-          if-no-files-found: error
-          retention-days: 90
+      attestations: write
+      id-token: write
+    uses: dinglebear-ai/workflows/.github/workflows/hosted-container-release.yml@542ea7b7e5ca2d4e21f3277bfcf158584fee90ec
+    with:
+      checkout-ref: ${{ github.event.release.tag_name }}
+      image: ghcr.io/${{ github.repository }}
+      release-tag: ${{ github.event.release.tag_name }}
+      build-args: AURORA_BUILD_SHA=${{ github.sha }}
+      smoke-command: |
+        set -euo pipefail
+        name="aurora-release-smoke-${GITHUB_RUN_ID}"
+        trap 'docker rm -f "$name" >/dev/null 2>&1 || true' EXIT
+        docker run -d --name "$name" -p 127.0.0.1::3000 "$IMAGE_REF" >/dev/null
+        port="$(docker port "$name" 3000/tcp | awk -F: '{print $NF}')"
+        for _ in {1..45}; do
+          curl --fail --silent "http://127.0.0.1:${port}/" >/dev/null && exit 0
+          sleep 2
+        done
+        docker logs "$name"
+        exit 1
+      cache-scope: aurora-release
+      timeout-minutes: 60
+    secrets:
+      REGISTRY_USERNAME: ${{ github.actor }}
+      REGISTRY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
