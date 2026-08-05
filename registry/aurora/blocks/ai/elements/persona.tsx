@@ -65,7 +65,6 @@ const Persona = (
       selected = false,
       className,
       style,
-      role: elementRole,
       tabIndex,
       onClick,
       onKeyDown,
@@ -78,11 +77,11 @@ const Persona = (
     const dotSize = isCompact ? 10 : 13
     const interactiveProps = onClick
       ? {
-          role: elementRole ?? "button",
+          role: "button",
           tabIndex: tabIndex ?? 0,
         }
       : {
-          role: elementRole,
+          role: undefined,
           tabIndex,
         }
 

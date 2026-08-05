@@ -125,8 +125,8 @@ const Rating = (
         ref={ref}
         role={interactive ? "radiogroup" : "img"}
         aria-label={label}
-        aria-readonly={readOnly || undefined}
-        aria-disabled={disabled || undefined}
+        data-readonly={readOnly || undefined}
+        data-disabled={disabled || undefined}
         onMouseLeave={interactive ? () => setHover(null) : undefined}
         className={cn(
           "inline-flex items-center",

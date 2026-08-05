@@ -34,12 +34,17 @@ const fixtureComponents: Readonly<Record<FixtureId, ReturnType<typeof lazy>>> = 
   disclosure: lazy(() => import("@/catalog/fixtures").then((fixtureModule) => ({ default: fixtureModule.DisclosureFixture }))),
   overlays: lazy(() => import("@/catalog/fixtures").then((fixtureModule) => ({ default: fixtureModule.OverlaysFixture }))),
   widgets: lazy(() => import("@/catalog/fixtures").then((fixtureModule) => ({ default: fixtureModule.WidgetsFixture }))),
+  "gateway-page": lazy(() => import("@/catalog/fixtures").then((fixtureModule) => ({ default: fixtureModule.GatewayPageFixture }))),
+  "chat-page": lazy(() => import("@/catalog/fixtures").then((fixtureModule) => ({ default: fixtureModule.ChatPageFixture }))),
+  "log-viewer-page": lazy(() => import("@/catalog/fixtures").then((fixtureModule) => ({ default: fixtureModule.LogViewerPageFixture }))),
+  "palette-page": lazy(() => import("@/catalog/fixtures").then((fixtureModule) => ({ default: fixtureModule.PalettePageFixture }))),
+  "files-page": lazy(() => import("@/catalog/fixtures").then((fixtureModule) => ({ default: fixtureModule.FilesPageFixture }))),
 }
 
 export function RegistryPreview({ item }: { item: RegistryCatalogItem }) {
   if (item.fixtureId) {
     const Fixture = fixtureComponents[item.fixtureId as FixtureId]
-    return <Suspense fallback={<PreviewSkeleton />}><Fixture /></Suspense>
+    return <Suspense fallback={<PreviewSkeleton />}><div data-catalog-preview-kind="fixture" data-catalog-preview-ready="true"><Fixture /></div></Suspense>
   }
 
   if (item.demoModule) {
@@ -47,7 +52,7 @@ export function RegistryPreview({ item }: { item: RegistryCatalogItem }) {
     if (Demo) {
       return (
         <PreviewErrorBoundary key={item.id} fallback={<MetadataPreview item={item} error />}>
-          <Suspense fallback={<PreviewSkeleton />}><div className="catalog-demo-surface"><Demo /></div></Suspense>
+          <Suspense fallback={<PreviewSkeleton />}><div className="catalog-demo-surface" data-catalog-preview-kind="gallery" data-catalog-preview-ready="true"><Demo /></div></Suspense>
         </PreviewErrorBoundary>
       )
     }
@@ -57,7 +62,7 @@ export function RegistryPreview({ item }: { item: RegistryCatalogItem }) {
 }
 
 function PreviewSkeleton() {
-  return <div className="flex w-full flex-col gap-4"><Skeleton variant="title" width="w-1/3" /><Skeleton variant="text" /><Skeleton variant="text" width="w-2/3" /><Skeleton variant="card" /></div>
+  return <div className="flex w-full flex-col gap-4" data-catalog-preview-loading="true"><Skeleton variant="title" width="w-1/3" /><Skeleton variant="text" /><Skeleton variant="text" width="w-2/3" /><Skeleton variant="card" /></div>
 }
 
 function MetadataPreview({ item, error = false }: { item: RegistryCatalogItem; error?: boolean }) {
@@ -67,7 +72,7 @@ function MetadataPreview({ item, error = false }: { item: RegistryCatalogItem; e
   }
 
   return (
-    <Card className="w-full max-w-[760px]" accent={error ? "rose" : "cyan"}>
+    <Card className="w-full max-w-[760px]" accent={error ? "rose" : "cyan"} data-catalog-preview-kind="metadata" data-catalog-preview-ready="true" data-catalog-preview-error={error ? "true" : undefined}>
       <CardHeader><div className="flex flex-wrap items-start justify-between gap-3"><div><CardTitle>{error ? "Preview unavailable" : item.title}</CardTitle><CardDescription>{error ? "The registry metadata is still available while this demo is repaired." : "Registry metadata and cross-platform contract."}</CardDescription></div><Badge tone={error ? "error" : "info"}>{item.registryType.replace("registry:", "")}</Badge></div></CardHeader>
       <CardContent className="flex flex-col gap-5">
         <div className="grid gap-3 sm:grid-cols-2"><Metadata label="Registry name" value={item.id} /><Metadata label="Mobile readiness" value={item.mobileReadiness} /><Metadata label="Source" value={item.sourcePath ?? "Generated registry item"} /><Metadata label="Preview" value={item.demoModule ?? "Metadata only"} /></div>

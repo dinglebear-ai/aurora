@@ -11,6 +11,7 @@ const eslintConfig = [...nextCoreWebVitals, ...nextTypescript, {
     ".next/**",
     "out/**",
     "storybook-static/**",
+    "public/catalog/**",
     "public/r/**",
     "public/dinglebear/**",
     "android/**/build/**",
@@ -19,6 +20,9 @@ const eslintConfig = [...nextCoreWebVitals, ...nextTypescript, {
     // minified bundles were linted and reported 77 errors that do not exist in
     // CI (which lints without a prebuilt dist).
     "apps/*/dist/**",
+    "apps/*/src-tauri/target/**",
+    "apps/*/src-tauri/gen/**/build/**",
+    "apps/*/src-tauri/gen/**/.gradle/**",
     "themes/**",
     "dinglebear/**",
   ],

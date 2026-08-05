@@ -23,7 +23,7 @@ export default function TagInputDemo() {
 
       <div style={{ maxWidth: 440 }}>
         <div style={label}>Tags</div>
-        <TagInput defaultValue={["rag", "search", "embeddings"]} />
+        <TagInput aria-label="Tags" defaultValue={["rag", "search", "embeddings"]} />
       </div>
     </div>
   )

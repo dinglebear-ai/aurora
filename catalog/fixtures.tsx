@@ -1,8 +1,13 @@
 "use client"
 
+import * as React from "react"
 import type { ComponentType } from "react"
 import { CircleAlert, CircleCheck, Download, Info, MoreHorizontal, Save, Search, Settings, Sparkles } from "lucide-react"
 
+import { Message, MessageAvatar, MessageContent } from "@/registry/aurora/blocks/ai/elements/message"
+import { PromptInput } from "@/registry/aurora/blocks/ai/prompt-input/prompt-input"
+import { FileTree } from "@/registry/aurora/blocks/files/file-tree/file-tree"
+import { CodeBlock } from "@/registry/aurora/blocks/workspace/code-block/code-block"
 import { Accordion, AccordionItem } from "@/registry/aurora/ui/accordion"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/registry/aurora/ui/alert-dialog"
 import { Badge } from "@/registry/aurora/ui/badge"
@@ -28,7 +33,20 @@ import { Textarea } from "@/registry/aurora/ui/textarea"
 import { Timeline, TimelineItem } from "@/registry/aurora/ui/timeline"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/registry/aurora/ui/tooltip"
 
-export type FixtureId = "button" | "card" | "feedback" | "forms" | "progress" | "disclosure" | "overlays" | "widgets"
+export type FixtureId =
+  | "button"
+  | "card"
+  | "feedback"
+  | "forms"
+  | "progress"
+  | "disclosure"
+  | "overlays"
+  | "widgets"
+  | "gateway-page"
+  | "chat-page"
+  | "log-viewer-page"
+  | "palette-page"
+  | "files-page"
 
 export const fixtureRenderers: Readonly<Record<FixtureId, ComponentType>> = {
   button: ButtonFixture,
@@ -39,6 +57,11 @@ export const fixtureRenderers: Readonly<Record<FixtureId, ComponentType>> = {
   disclosure: DisclosureFixture,
   overlays: OverlaysFixture,
   widgets: WidgetsFixture,
+  "gateway-page": GatewayPageFixture,
+  "chat-page": ChatPageFixture,
+  "log-viewer-page": LogViewerPageFixture,
+  "palette-page": PalettePageFixture,
+  "files-page": FilesPageFixture,
 }
 
 export function ButtonFixture() {
@@ -133,6 +156,102 @@ export function WidgetsFixture() {
       <MultiSelect aria-label="Environments" options={[{ value: "alpha", label: "Alpha" }, { value: "beta", label: "Beta" }]} />
       <RadioGroup defaultValue="alpha" aria-label="Agent"><RadioGroupItem value="alpha">Alpha</RadioGroupItem><RadioGroupItem value="beta">Beta</RadioGroupItem></RadioGroup>
       <Popover><PopoverTrigger>Open popover</PopoverTrigger><PopoverContent><Button>First action</Button></PopoverContent></Popover>
+    </div>
+  )
+}
+
+export function GatewayPageFixture() {
+  return (
+    <div className="aurora-page-shell min-h-[460px] w-full p-4 sm:p-6">
+      <div className="mx-auto grid max-w-6xl gap-5 lg:grid-cols-[1fr_360px]">
+        <section className="flex flex-col gap-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div><p className="aurora-text-eyebrow">Aurora starter</p><h1 className="aurora-text-display-2">Gateway operations</h1></div>
+            <Button variant="aurora">Run health check</Button>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-3">
+            {[['Connected tools', '42'], ['Queued jobs', '8'], ['Warnings', '2']].map(([label, value]) => (
+              <Card key={label}><CardHeader><CardTitle>{value}</CardTitle><CardDescription>{label}</CardDescription></CardHeader></Card>
+            ))}
+          </div>
+        </section>
+        <Card>
+          <CardHeader><CardTitle>Activity</CardTitle><CardDescription>Recent gateway events</CardDescription></CardHeader>
+          <CardContent className="flex flex-col gap-3">
+            <Badge tone="success">All systems nominal</Badge>
+            <Timeline><TimelineItem tone="online" title="Registry smoke passed">aurora-base installed cleanly.</TimelineItem><TimelineItem tone="online" title="Gateway sync complete">42 upstream tools available.</TimelineItem></Timeline>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  )
+}
+
+export function ChatPageFixture() {
+  const [value, setValue] = React.useState("")
+  return (
+    <div className="aurora-page-shell min-h-[460px] w-full p-4 sm:p-6">
+      <div className="mx-auto flex max-w-4xl flex-col gap-5">
+        <div><p className="aurora-text-eyebrow">Aurora starter</p><h1 className="aurora-text-display-2">Agent chat</h1></div>
+        <section className="flex flex-col gap-3">
+          <Message><MessageAvatar label="AI" /><MessageContent tone="assistant">Aurora is installed. The registry base, tokens, and component styles are ready.</MessageContent></Message>
+          <Message role="user"><MessageAvatar label="JM" tone="cyan" /><MessageContent tone="user">Show me the gateway health summary.</MessageContent></Message>
+        </section>
+        <PromptInput value={value} onChange={setValue} onSubmit={() => setValue("")} placeholder="Ask Aurora..." />
+      </div>
+    </div>
+  )
+}
+
+export function LogViewerPageFixture() {
+  return (
+    <div className="aurora-page-shell min-h-[420px] w-full p-4 sm:p-6">
+      <div className="mx-auto flex max-w-5xl flex-col gap-4">
+        <div className="flex items-center justify-between gap-3"><h1 className="aurora-text-display-2">Log viewer</h1><Badge tone="info">Live tail</Badge></div>
+        <CodeBlock language="log" code={[
+          '2026-07-31T21:00:00Z INFO gateway connected upstream=labby',
+          '2026-07-31T21:00:04Z WARN registry smoke waiting for install',
+          '2026-07-31T21:00:07Z INFO registry smoke passed',
+        ].join('\n')} />
+      </div>
+    </div>
+  )
+}
+
+const PAGE_SWATCHES = [
+  ['Primary', 'var(--aurora-accent-primary)'],
+  ['Rose', 'var(--aurora-accent-pink)'],
+  ['Success', 'var(--aurora-success)'],
+  ['Warn', 'var(--aurora-warn)'],
+  ['Error', 'var(--aurora-error)'],
+] as const
+
+export function PalettePageFixture() {
+  return (
+    <div className="aurora-page-shell min-h-[420px] w-full p-4 sm:p-6">
+      <div className="mx-auto max-w-4xl">
+        <p className="aurora-text-eyebrow">Aurora starter</p><h1 className="aurora-text-display-2">Palette</h1>
+        <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {PAGE_SWATCHES.map(([label, color]) => <div key={label} className="rounded-[var(--aurora-radius-2)] border p-4" style={{ borderColor: 'var(--aurora-border-default)', background: 'var(--aurora-panel-medium)' }}><div className="mb-3 h-16 rounded-[var(--aurora-radius-1)]" style={{ background: color }} /><Badge tone="neutral">{label}</Badge></div>)}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export function FilesPageFixture() {
+  return (
+    <div className="aurora-page-shell min-h-[420px] w-full p-4 sm:p-6">
+      <div className="mx-auto max-w-4xl">
+        <p className="aurora-text-eyebrow">Aurora starter</p><h1 className="aurora-text-display-2">Files</h1>
+        <div className="mt-5 rounded-[var(--aurora-radius-2)] border p-4" style={{ borderColor: 'var(--aurora-border-default)', background: 'var(--aurora-panel-medium)' }}>
+          <FileTree defaultExpandedIds={['pages']} tree={[
+            { id: 'registry', name: 'registry.json', type: 'file', language: 'json' },
+            { id: 'styles', name: 'aurora.css', type: 'file', language: 'css' },
+            { id: 'pages', name: 'pages', type: 'folder', children: [{ id: 'gateway', name: 'gateway.tsx', type: 'file', language: 'tsx' }, { id: 'chat', name: 'chat.tsx', type: 'file', language: 'tsx' }] },
+          ]} />
+        </div>
+      </div>
     </div>
   )
 }

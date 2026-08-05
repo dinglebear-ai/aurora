@@ -28,6 +28,7 @@ export default function AiSpeechInputDemo() {
         }}
       >
         <SpeechInput
+          aria-label="Speech transcript"
           defaultRecording
           defaultValue="Migrate the schema table, then re-run the ingest job…"
         />

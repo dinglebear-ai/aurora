@@ -227,50 +227,58 @@ export function DatePicker(
               </Button>
             </div>
 
-            <div className="grid grid-cols-7 gap-1" role="grid">
-              {["S", "M", "T", "W", "T", "F", "S"].map((day, index) => (
-                <div
-                  key={index}
-                  role="columnheader"
-                  className="grid h-7 place-items-center"
-                  style={{ fontSize: "13px", fontWeight: 700, color: "var(--aurora-text-muted)" }}
-                >
-                  {day}
+            <div className="grid gap-1" role="grid" aria-label={monthFormatter.format(visibleMonth)}>
+              <div className="grid grid-cols-7 gap-1" role="row">
+                {["S", "M", "T", "W", "T", "F", "S"].map((day, index) => (
+                  <div
+                    key={index}
+                    role="columnheader"
+                    className="grid h-7 place-items-center"
+                    style={{ fontSize: "13px", fontWeight: 700, color: "var(--aurora-text-muted)" }}
+                  >
+                    {day}
+                  </div>
+                ))}
+              </div>
+              {Array.from({ length: cells.length / 7 }, (_, weekIndex) => (
+                <div key={weekIndex} className="grid grid-cols-7 gap-1" role="row">
+                  {cells.slice(weekIndex * 7, weekIndex * 7 + 7).map((date, dayIndex) => {
+                    const cellIndex = weekIndex * 7 + dayIndex
+                    if (!date) {
+                      return <div key={`empty-${cellIndex}`} role="gridcell" aria-hidden className="h-10" />
+                    }
+                    const isSelected = sameDay(date, selected)
+                    const isToday = !isSelected && sameDay(date, today)
+                    return (
+                      <Button
+                        variant="plain"
+                        size="unstyled"
+                        key={date.toISOString()}
+                        type="button"
+                        role="gridcell"
+                        aria-label={date.toLocaleDateString(undefined, { month: "long", day: "numeric", year: "numeric" })}
+                        aria-selected={isSelected || undefined}
+                        aria-current={isToday ? "date" : undefined}
+                        className="grid h-10 place-items-center border transition-colors"
+                        onClick={() => handleSelect(date)}
+                        style={{
+                          borderRadius: "12px",
+                          fontSize: "16px",
+                          fontWeight: isSelected ? 700 : 500,
+                          background: isSelected ? "var(--aurora-accent-primary)" : "transparent",
+                          borderColor: isToday
+                            ? "color-mix(in srgb, var(--aurora-accent-primary) 60%, transparent)"
+                            : "transparent",
+                          color: isSelected ? "var(--aurora-accent-foreground)" : "var(--aurora-text-primary)",
+                          boxShadow: isSelected ? "var(--aurora-active-glow)" : "none",
+                        }}
+                      >
+                        {date.getDate()}
+                      </Button>
+                    )
+                  })}
                 </div>
               ))}
-              {cells.map((date, index) => {
-                if (!date) {
-                  return <div key={`empty-${index}`} aria-hidden className="h-10" />
-                }
-                const isSelected = sameDay(date, selected)
-                const isToday = !isSelected && sameDay(date, today)
-                return (
-                  <Button
-                    variant="plain"
-                    size="unstyled"
-                    key={date.toISOString()}
-                    type="button"
-                    role="gridcell"
-                    aria-selected={isSelected || undefined}
-                    aria-current={isToday ? "date" : undefined}
-                    className="grid h-10 place-items-center border transition-colors"
-                    onClick={() => handleSelect(date)}
-                    style={{
-                      borderRadius: "12px",
-                      fontSize: "16px",
-                      fontWeight: isSelected ? 700 : 500,
-                      background: isSelected ? "var(--aurora-accent-primary)" : "transparent",
-                      borderColor: isToday
-                        ? "color-mix(in srgb, var(--aurora-accent-primary) 60%, transparent)"
-                        : "transparent",
-                      color: isSelected ? "var(--aurora-accent-foreground)" : "var(--aurora-text-primary)",
-                      boxShadow: isSelected ? "var(--aurora-active-glow)" : "none",
-                    }}
-                  >
-                    {date.getDate()}
-                  </Button>
-                )
-              })}
             </div>
           </div>
         ) : null}

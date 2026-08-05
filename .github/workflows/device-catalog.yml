@@ -1,0 +1,196 @@
+name: Device Catalog
+
+on:
+  pull_request:
+    paths:
+      - "apps/device-catalog/**"
+      - "catalog/**"
+      - "registry/**"
+      - "stories/aurora/**"
+      - "tests/device-catalog/**"
+      - "tests/device-catalog-inventory.test.ts"
+      - "scripts/generate-device-catalog.mjs"
+      - "scripts/run-device-catalog-android.mjs"
+      - "scripts/test-device-catalog-android.mjs"
+      - "playwright.device-catalog.config.ts"
+      - "next.config.ts"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - ".github/workflows/device-catalog.yml"
+  push:
+    branches: [main]
+    paths:
+      - "apps/device-catalog/**"
+      - "catalog/**"
+      - "registry/**"
+      - "stories/aurora/**"
+      - "tests/device-catalog/**"
+      - "tests/device-catalog-inventory.test.ts"
+      - "scripts/generate-device-catalog.mjs"
+      - "scripts/run-device-catalog-android.mjs"
+      - "scripts/test-device-catalog-android.mjs"
+      - "playwright.device-catalog.config.ts"
+      - "next.config.ts"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - ".github/workflows/device-catalog.yml"
+
+permissions: {}
+
+concurrency:
+  group: device-catalog-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  browser:
+    name: Browser catalog matrix
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+        with:
+          version: 10.33.2
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install --with-deps chromium
+      - name: Crawl every catalog item at four viewport profiles
+        run: pnpm catalog:device:crawl
+      - name: Upload browser catalog evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: device-catalog-browser-${{ github.sha }}
+          path: outputs/device-catalog/
+          if-no-files-found: warn
+          retention-days: 14
+
+  android:
+    name: Tauri Android catalog smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+        with:
+          version: 10.33.2
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: pnpm
+      - uses: actions/setup-java@c1e323688fd81a25caa38c78aa6df2d33d3e20d9 # v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407 # v3
+      - name: Cache Cargo and Gradle
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            ~/.gradle/wrapper
+            ~/.gradle/caches
+            apps/device-catalog/src-tauri/target
+          key: device-catalog-android-${{ runner.os }}-${{ hashFiles('apps/device-catalog/src-tauri/Cargo.lock', 'apps/device-catalog/src-tauri/gen/android/gradle/wrapper/gradle-wrapper.properties', 'pnpm-lock.yaml') }}
+          restore-keys: device-catalog-android-${{ runner.os }}-
+      - run: pnpm install --frozen-lockfile
+      - name: Install Rust Android target
+        run: rustup target add x86_64-linux-android
+      - name: Install Android SDK, NDK, and emulator image
+        run: |
+          export ANDROID_AVD_HOME="$RUNNER_TEMP/aurora-android-avd"
+          echo "ANDROID_AVD_HOME=$ANDROID_AVD_HOME" >> "$GITHUB_ENV"
+          mkdir -p "$ANDROID_AVD_HOME"
+          yes | sdkmanager --licenses >/dev/null
+          sdkmanager \
+            "platform-tools" \
+            "emulator" \
+            "platforms;android-36" \
+            "build-tools;36.0.0" \
+            "ndk;28.2.13676358" \
+            "system-images;android-35;google_apis;x86_64"
+          {
+            echo "$ANDROID_HOME/emulator"
+            echo "$ANDROID_HOME/cmdline-tools/latest/bin"
+            echo "$ANDROID_HOME/platform-tools"
+          } >> "$GITHUB_PATH"
+          export PATH="$ANDROID_HOME/emulator:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH"
+          echo "no" | avdmanager create avd \
+            --force \
+            --name aurora_catalog_ci \
+            --package "system-images;android-35;google_apis;x86_64"
+          emulator -list-avds | grep -Fx aurora_catalog_ci
+          test -f "$ANDROID_AVD_HOME/aurora_catalog_ci.ini"
+          echo "NDK_HOME=$ANDROID_HOME/ndk/28.2.13676358" >> "$GITHUB_ENV"
+          echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk/28.2.13676358" >> "$GITHUB_ENV"
+      - name: Configure emulator acceleration
+        run: |
+          if [[ -e /dev/kvm ]]; then
+            sudo chmod 666 /dev/kvm
+            if emulator -accel-check; then
+              echo "AURORA_ANDROID_ACCEL=on" >> "$GITHUB_ENV"
+            else
+              echo "AURORA_ANDROID_ACCEL=off" >> "$GITHUB_ENV"
+            fi
+          else
+            echo "AURORA_ANDROID_ACCEL=off" >> "$GITHUB_ENV"
+          fi
+      - name: Build, install, and verify the Tauri Android catalog
+        env:
+          AURORA_ANDROID_DEVICE_TIMEOUT_MS: "360000"
+          AURORA_ANDROID_BOOT_TIMEOUT_MS: "420000"
+        run: |
+          mkdir -p outputs/device-catalog/android
+          set +e
+          set -o pipefail
+          pnpm catalog:device:android:test -- --avd aurora_catalog_ci 2>&1 \
+            | tee outputs/device-catalog/android/ci.log
+          status=${PIPESTATUS[0]}
+          set -e
+          if (( status != 0 )); then
+            if [[ -f outputs/device-catalog/android/failure.json ]]; then
+              stage=$(jq -r '.stage // "unknown"' outputs/device-catalog/android/failure.json)
+              message=$(jq -r '.error.message // "Unknown Android smoke failure"' outputs/device-catalog/android/failure.json | tr '\n' ' ')
+            else
+              stage="unknown"
+              message="Android smoke exited before producing failure.json"
+            fi
+            if [[ -s outputs/device-catalog/android/emulator.log ]]; then
+              diagnostic_log=outputs/device-catalog/android/emulator.log
+            else
+              diagnostic_log=outputs/device-catalog/android/ci.log
+            fi
+            diagnostic_tail=$(tail -n 20 "$diagnostic_log" 2>/dev/null || true)
+            annotation_tail=$(printf "%s" "$diagnostic_tail" | tr '\n' ' ' | cut -c1-1800)
+            {
+              echo "## Android catalog smoke failed"
+              echo
+              echo "- Stage: $stage"
+              echo "- Error: $message"
+              echo
+              echo "### Diagnostic log tail"
+              echo '```text'
+              printf '%s\n' "$diagnostic_tail"
+              echo '```'
+              echo
+              echo "The full command log and diagnostics are attached in the Android catalog evidence artifact."
+            } >> "$GITHUB_STEP_SUMMARY"
+            echo "::error title=Android catalog smoke failed::$stage: $message | $annotation_tail"
+          fi
+          exit "$status"
+      - name: Upload Android catalog evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: device-catalog-android-${{ github.sha }}
+          path: outputs/device-catalog/android/
+          if-no-files-found: warn
+          retention-days: 14

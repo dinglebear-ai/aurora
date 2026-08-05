@@ -38,7 +38,7 @@ export default function NativeSelectDemo() {
 
       <div style={stage}>
         <div style={control}>
-          <NativeSelect defaultValue="prod">
+          <NativeSelect aria-label="Deployment environment" defaultValue="prod">
             <option value="prod">Production</option>
             <option value="staging">Staging</option>
             <option value="local">Local</option>

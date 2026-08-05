@@ -65,6 +65,7 @@ next-env.d.ts
 
 # codex marketplace assets (large generated PNGs, not part of the registry)
 /public/codex-marketplace/
+/public/catalog/
 
 *storybook.log
 storybook-static

@@ -73,10 +73,26 @@ const nextConfig: NextConfig = {
           destination: "/r/registry.json",
         },
       ],
+      fallback: [
+        {
+          source: "/catalog/:path*",
+          destination: "/catalog/index.html",
+        },
+      ],
     };
   },
   async redirects() {
     return [
+      {
+        source: "/catalog",
+        destination: "/catalog/aurora-button",
+        permanent: false,
+      },
+      {
+        source: "/catalog/",
+        destination: "/catalog/aurora-button",
+        permanent: false,
+      },
       // young_office: a static HTML project co-hosted under /young_office/.
       // Next.js serves index.html only when the path ends in the filename;
       // these non-permanent redirects handle bare directory access so the
@@ -116,6 +132,24 @@ const nextConfig: NextConfig = {
       {
         source: "/",
         headers: [{ key: "Vary", value: "Accept, User-Agent" }],
+      },
+      {
+        source: "/catalog/assets/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+      {
+        source: "/catalog/:item",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=300, s-maxage=300, stale-while-revalidate=86400",
+          },
+        ],
       },
       // Registry names are intentionally mutable discovery URLs. Production
       // consumers pin the Git commit URL documented in docs/versioning.md.

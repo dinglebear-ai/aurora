@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "node ../../scripts/generate-device-catalog.mjs --check && tsc --noEmit && vite build",
+    "build:hosted": "node ../../scripts/generate-device-catalog.mjs --check && tsc --noEmit && AURORA_CATALOG_HOSTED=1 vite build",
     "preview": "vite preview",
     "tauri": "tauri",
     "tauri:dev": "tauri dev",
