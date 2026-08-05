@@ -13,7 +13,7 @@ concurrency:
 
 jobs:
   public-path:
-    # Self-hosted (tootie runner farm): residential egress is not challenged by
+    # Self-hosted (nashost runner farm): residential egress is not challenged by
     # Cloudflare, unlike GitHub-hosted Azure IPs (see ops/synthetics-cloudflare.md).
     runs-on: [self-hosted, unraid]
     permissions:

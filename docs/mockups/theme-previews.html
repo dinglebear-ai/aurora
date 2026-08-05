@@ -31,7 +31,7 @@
     <div class="row"><span class="ln">2</span></div>
     <div class="row"><span class="ln">3</span><span style="color:#5a7a92">// dispatch one action across surfaces</span></div>
     <div class="row"><span class="ln">4</span><span style="color:#38d2ff">pub async fn</span> <span style="color:#7ee0c8">dispatch</span><span style="color:#a8c5d8">(</span><span style="color:#f0f8fd">action</span><span style="color:#a8c5d8">:</span> <span style="color:#ffd479">Action</span><span style="color:#a8c5d8">)</span> <span style="color:#38d2ff">-></span> <span style="color:#ffd479">Result</span><span style="color:#a8c5d8">&lt;</span><span style="color:#ffd479">Json</span><span style="color:#a8c5d8">&gt; {</span></div>
-    <div class="row"><span class="ln">5</span>    <span style="color:#38d2ff">let</span> <span style="color:#f0f8fd">gw</span> <span style="color:#38d2ff">=</span> <span style="color:#ffd479">Gateway</span><span style="color:#a8c5d8">::</span><span style="color:#7ee0c8">connect</span><span style="color:#a8c5d8">(</span><span style="color:#b8e6a0">"lab.tootie.tv"</span><span style="color:#a8c5d8">).</span><span style="color:#7ee0c8">await</span><span style="color:#a8c5d8">?;</span></div>
+    <div class="row"><span class="ln">5</span>    <span style="color:#38d2ff">let</span> <span style="color:#f0f8fd">gw</span> <span style="color:#38d2ff">=</span> <span style="color:#ffd479">Gateway</span><span style="color:#a8c5d8">::</span><span style="color:#7ee0c8">connect</span><span style="color:#a8c5d8">(</span><span style="color:#b8e6a0">"lab.example.internal"</span><span style="color:#a8c5d8">).</span><span style="color:#7ee0c8">await</span><span style="color:#a8c5d8">?;</span></div>
     <div class="row"><span class="ln">6</span>    <span style="color:#f0f8fd">gw</span><span style="color:#a8c5d8">.</span><span style="color:#c9a6f0">run</span><span style="color:#a8c5d8">(</span><span style="color:#f0f8fd">action</span><span style="color:#a8c5d8">,</span> <span style="color:#ffb38a">3</span><span style="color:#a8c5d8">).</span><span style="color:#7ee0c8">await</span></div>
     <div class="row"><span class="ln">7</span><span style="color:#a8c5d8">}</span></div>
   </div>
@@ -79,7 +79,7 @@
 <div class="tile" style="background:#0a1c2e">
   <div style="height:36px;background:#103154;display:flex;align-items:flex-end;padding:0 10px;gap:6px">
     <div class="tab" style="background:#0d2640;color:#f0f8fd;margin-bottom:0">
-      <span class="dot" style="background:#4dc8fa"></span>Aurora<span style="color:#7fa8c8;font-weight:400">— tootie.tv</span></div>
+      <span class="dot" style="background:#4dc8fa"></span>Aurora<span style="color:#7fa8c8;font-weight:400">— example.internal</span></div>
     <div class="tab" style="color:#b4d2e6;margin-bottom:0;font-weight:500">Labby</div>
     <div style="color:#7fa8c8;margin-bottom:6px;font-size:16px">+</div>
   </div>
@@ -96,7 +96,7 @@
 <!-- 5. CHROME light -->
 <div class="tile" style="background:#f5f9fc">
   <div style="height:36px;background:#dbe9f4;display:flex;align-items:flex-end;padding:0 10px;gap:6px">
-    <div class="tab" style="background:#ffffff;color:#0d2236;margin-bottom:0"><span class="dot" style="background:#0288d1"></span>Aurora<span style="color:#5a7a90;font-weight:400">— tootie.tv</span></div>
+    <div class="tab" style="background:#ffffff;color:#0d2236;margin-bottom:0"><span class="dot" style="background:#0288d1"></span>Aurora<span style="color:#5a7a90;font-weight:400">— example.internal</span></div>
     <div class="tab" style="color:#3d6070;margin-bottom:0;font-weight:500">Labby</div>
     <div style="color:#5a7a90;margin-bottom:6px;font-size:16px">+</div>
   </div>
