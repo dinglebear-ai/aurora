@@ -120,8 +120,8 @@ and shadcn CLI (registry JSON from `public/r/*.json`).
   `docs/component-kotlin-map.md` (Kotlin/Compose parity matrix).
 - **SWAG upstream contract:** `aurora.dinglebear.ai` (canonical; `aurora.tootie.tv`
   also matches via the wildcard `server_name aurora.*`), `dinglebear.ai`, and
-  `www.dinglebear.ai` are reverse-proxied by SWAG on `squirts` to the immutable
-  `aurora` production container on **dookie**, host port `50000→3000`. The
+  `www.dinglebear.ai` are reverse-proxied by SWAG on `edgehost` to the immutable
+  `aurora` production container on **devhost**, host port `50000→3000`. The
   canonical digest-only Compose overlay and SWAG templates are tracked under
   `ops/`; `docs/deployment.md` is the runbook. The `aurora-dev` source bind mount
   is isolated on port 3000 and must never receive public traffic. Scheme HTTP,

@@ -10,7 +10,7 @@ policy with tested build-time script hashes.
 
 | Surface | Hostnames | Runtime | Port/network |
 |---|---|---|---|
-| Aurora design system | `aurora.tootie.tv` | `aurora` digest-pinned production container on dookie | host `50000` to container `3000`; external `jakenet` |
+| Aurora design system | `aurora.tootie.tv` | `aurora` digest-pinned production container on devhost | host `50000` to container `3000`; external `jakenet` |
 | Co-hosted fleet tenant | `dinglebear.ai`, `www.dinglebear.ai` | same immutable image; host routing in `proxy.ts` | same upstream |
 | Local development | no public hostname | `aurora-dev` profile with source bind mount | host `3000`; isolated `aurora-dev` network |
 | Local production smoke | no public hostname | `aurora-prod-build` profile | host `50001`; isolated `aurora-prod-build` network |
@@ -18,7 +18,7 @@ policy with tested build-time script hashes.
 The tracked production contract is `ops/compose/production.yaml`; tracked SWAG
 templates are under `ops/swag/`. `ops/check-production-topology.sh` validates
 that both sides agree on port, network, tenant names, digest use, and isolation.
-The host port binds only to `AURORA_BIND_ADDRESS` (dookie's Tailscale address),
+The host port binds only to `AURORA_BIND_ADDRESS` (devhost's Tailscale address),
 not a wildcard interface, so routable clients cannot bypass the SWAG ingress.
 
 ## Publish and promotion
@@ -51,9 +51,9 @@ the immutable digest pin plus the Trivy gate above.
    fails. The `AURORA_ALERT_WEBHOOK_URL` steps were removed: the secret was
    never set, so every "alert" was a no-op that made three workflows look
    monitored while `publish.yml` stayed broken for a week unnoticed.
-3. On dookie, create `jakenet` if it does not exist and install Docker Compose.
+3. On devhost, create `jakenet` if it does not exist and install Docker Compose.
    Keep the deployment env file outside the checkout.
-4. On squirts, render the tracked SWAG templates, review the diff against the
+4. On edgehost, render the tracked SWAG templates, review the diff against the
    installed vhosts, run `nginx -t`, then atomically install/reload them. Do not
    copy an unreviewed generated file over live proxy configuration.
 
@@ -66,7 +66,7 @@ Create a private environment file from the tracked example:
 cp ops/compose/production.env.example ~/.config/aurora/production.env
 chmod 600 ~/.config/aurora/production.env
 # Replace AURORA_IMAGE_REF and AURORA_EXPECTED_SHA with the workflow outputs.
-# Confirm AURORA_BIND_ADDRESS is dookie's current Tailscale address and set both
+# Confirm AURORA_BIND_ADDRESS is devhost's current Tailscale address and set both
 # AURORA_PUBLIC_URL and AURORA_TENANT_URL to their production HTTPS origins.
 ```
 
@@ -86,7 +86,7 @@ on both Aurora and the co-hosted dinglebear tenant:
 ops/deploy.sh ~/.config/aurora/production.env
 ```
 
-Only after that succeeds should SWAG public traffic point to dookie port 50000.
+Only after that succeeds should SWAG public traffic point to devhost port 50000.
 The dev profile remains on port 3000 and is never attached to `jakenet`.
 
 ## Rollback
@@ -109,7 +109,7 @@ intentional delay between merging and manual promotion is not reported as an
 outage.
 
 The `ops/install-monitor.sh` systemd watchdog was removed. It was never
-installed on dookie — `aurora-monitor.timer` did not exist there — and its
+installed on devhost — `aurora-monitor.timer` did not exist there — and its
 `AURORA_ALERT_WEBHOOK_URL` was never set, so it could not have paged anyone. CI
 was running a unit test for it. Container health is covered by the Compose
 `HEALTHCHECK` and the twice-hourly synthetics above.

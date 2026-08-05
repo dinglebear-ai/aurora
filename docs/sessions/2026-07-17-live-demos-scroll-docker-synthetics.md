@@ -154,7 +154,7 @@ aurora-g15h and aurora-rmb4 (P3 openwiki transitive-dep hardening).
   `pr57` (tracked closed PR #57, superseded by #69) — `git branch -D pr57`.
   Left auto-PR branches `#73` (release-please 0.4.3) and `#74` (openwiki update)
   untouched — bot-owned, not this session's to merge.
-- **Stale docs**: updated the `aurora-tootie-serves-dev-build` memory to reflect
+- **Stale docs**: updated the `aurora-nashost-serves-dev-build` memory to reflect
   the post-#46 topology (prod on 50000, dev container profile-gated). Added
   `ops/synthetics-cloudflare.md` runbook.
 - **Skipped/blocked**: could not create the Cloudflare Skip rule — the SWAG
@@ -163,7 +163,7 @@ aurora-g15h and aurora-rmb4 (P3 openwiki transitive-dep hardening).
 ## Tools and Skills Used
 
 - **Shell (Bash)**: git, gh (PR merge/checks/watch), docker build/inspect/run,
-  cosign verify, curl diagnostics, bd, ssh to squirts. Primary workhorse.
+  cosign verify, curl diagnostics, bd, ssh to edgehost. Primary workhorse.
 - **File tools (Read/Edit/Write)**: all code and doc edits.
 - **claude-in-chrome (CDP over Playwright to axon-chrome)**: verified previews,
   portal placement, and scroll behavior on real builds. Hit the known
@@ -247,7 +247,7 @@ aurora-g15h and aurora-rmb4 (P3 openwiki transitive-dep hardening).
 ## Next Steps
 
 - **Operator (unblocks synthetics)**: `gh secret set AURORA_SYNTHETIC_TOKEN` and
-  add the Cloudflare Skip custom rule on the tootie.tv zone per
+  add the Cloudflare Skip custom rule on the example.internal zone per
   `ops/synthetics-cloudflare.md`; then re-run `synthetics.yml` to confirm green
   and close aurora-otgu.
 - **Bot PRs**: review/merge #73 (release 0.4.3) and #74 (OpenWiki update) as
