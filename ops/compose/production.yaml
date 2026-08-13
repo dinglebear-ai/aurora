@@ -16,7 +16,11 @@ services:
     read_only: true
     tmpfs:
       - /tmp:rw,noexec,nosuid,size=64m
-      - /app/.next/cache:rw,noexec,nosuid,size=64m
+      # uid/gid must match `user:` below. Without them the tmpfs inherits the
+      # image directory's root:root 0755 and Next.js cannot mkdir
+      # /app/.next/cache/images, so every optimized image request throws
+      # EACCES as an unhandledRejection.
+      - /app/.next/cache:rw,noexec,nosuid,size=64m,uid=1000,gid=1000
     cap_drop: ["ALL"]
     security_opt:
       - no-new-privileges:true
