@@ -1,0 +1,41 @@
+# osv-scanner configuration.
+#
+# Entries here suppress advisories that cannot currently be resolved by any
+# dependency change. Everything that CAN be fixed is fixed instead — see the
+# pnpm.overrides block in package.json, which pins away from advisories for
+# brace-expansion, fast-uri, ip-address, js-yaml, postcss, and undici.
+#
+# Each entry must record why it cannot be fixed and carry an ignoreUntil date
+# so it is re-evaluated rather than silently suppressed forever. When an
+# ignoreUntil date passes, the advisory reappears and this job fails again —
+# that is intentional.
+
+[[IgnoredVulns]]
+id = "GHSA-5p2g-fcmc-qvqq"
+ignoreUntil = 2026-11-13
+reason = """
+image-size: DoS via infinite loops in the JXL and HEIF parsers.
+
+No patched release exists. The advisory covers `<= 2.0.2` and 2.0.2 is the
+newest published version of image-size, so there is no version to upgrade to
+and a pnpm override has no safe target.
+
+Reachability: devDependency only, via @storybook/nextjs-vite ->
+vite-plugin-storybook-nextjs. The latest plugin (3.3.2) still declares
+image-size ^2.0.0, so upgrading Storybook does not drop it. It is not part of
+any published package or the deployed web/registry output, and it only parses
+images supplied at Storybook build time in CI and local dev.
+
+Re-evaluate by 2026-11-13: check whether image-size has published a fixed
+release, or whether vite-plugin-storybook-nextjs has dropped the dependency.
+"""
+
+[[IgnoredVulns]]
+id = "GHSA-w3rx-r6r6-pgpr"
+ignoreUntil = 2026-11-13
+reason = """
+image-size: DoS via an infinite loop in the ICNS parser.
+
+Same package, same dependency path, and the same lack of a patched release as
+GHSA-5p2g-fcmc-qvqq above. See that entry for the full rationale.
+"""
