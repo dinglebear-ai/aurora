@@ -139,6 +139,33 @@ test("chat has a dedicated unclipped mobile layout on touch viewports", async ({
   }
 })
 
+test("rich chat turns keep hover actions inside paint-contained message items", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name.includes("mobile"))
+  await page.goto("/gallery/chat-block")
+
+  const assertContainedRail = async (anchor: ReturnType<typeof page.getByText>) => {
+    const item = anchor.locator('xpath=ancestor::*[@data-slot="message-scroller-item"][1]')
+    const message = item.locator('[data-slot="message"]')
+    await message.hover()
+    const itemBox = await item.boundingBox()
+    const rail = item.locator(".aurora-chat-action-rail")
+    const timestampBox = await rail.locator("span").first().boundingBox()
+    const buttonBoxes = await rail.locator("button").evaluateAll((buttons) => buttons.map((button) => {
+      const rect = button.getBoundingClientRect()
+      return { y: rect.y, bottom: rect.bottom }
+    }))
+    expect(itemBox).not.toBeNull()
+    expect(timestampBox).not.toBeNull()
+    if (itemBox && timestampBox) expect(timestampBox.y + timestampBox.height).toBeLessThanOrEqual(itemBox.y + itemBox.height + 0.5)
+    if (itemBox) for (const box of buttonBoxes) expect(box.bottom).toBeLessThanOrEqual(itemBox.y + itemBox.height + 0.5)
+  }
+
+  await assertContainedRail(page.getByText("Sources & references"))
+  const reasoning = page.getByRole("button", { name: /Reasoned for 2s/i })
+  await reasoning.click()
+  await assertContainedRail(reasoning)
+})
+
 test("tenant host routing and CSP contracts are enforced", async ({ request }) => {
   const tenant = await request.get("/", { headers: { host: "dinglebear.ai", accept: "text/html" } })
   expect(tenant.ok()).toBe(true)
