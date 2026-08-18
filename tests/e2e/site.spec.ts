@@ -88,7 +88,7 @@ test("chat autocomplete popovers accept real pointer clicks above the transcript
   await expect(input).toHaveValue("@chat.tsx ")
 })
 
-test("chat actions stay discoverable and user bubbles stay message-shaped on touch viewports", async ({ page }, testInfo) => {
+test("chat has a dedicated unclipped mobile layout on touch viewports", async ({ page }, testInfo) => {
   test.skip(!testInfo.project.name.includes("mobile"))
   await page.goto("/gallery/chat-block")
 
@@ -96,12 +96,47 @@ test("chat actions stay discoverable and user bubbles stay message-shaped on tou
   await expect(actionRail).toHaveCSS("pointer-events", "auto")
   const opacity = Number(await actionRail.evaluate((element) => getComputedStyle(element).opacity))
   expect(opacity).toBeGreaterThan(0.5)
+  const railBox = await actionRail.boundingBox()
+  expect(railBox?.height ?? 0).toBeGreaterThanOrEqual(17)
+
+  const timestamp = actionRail.locator("span").first()
+  const timestampBox = await timestamp.boundingBox()
+  expect(timestampBox).not.toBeNull()
+  if (railBox && timestampBox) {
+    expect(timestampBox.y).toBeGreaterThanOrEqual(railBox.y - 0.5)
+    expect(timestampBox.y + timestampBox.height).toBeLessThanOrEqual(railBox.y + railBox.height + 0.5)
+  }
 
   const bubble = page.locator('[data-slot="bubble"][data-align="end"]').first()
   const message = bubble.locator('xpath=ancestor::*[@data-slot="message"][1]')
   const bubbleWidth = (await bubble.boundingBox())?.width ?? 0
   const messageWidth = (await message.boundingBox())?.width ?? 1
   expect(bubbleWidth / messageWidth).toBeLessThan(0.9)
+
+  const viewport = page.locator('[data-slot="message-scroller-viewport"]')
+  const horizontalOverflow = await viewport.evaluate((element) => element.scrollWidth - element.clientWidth)
+  expect(horizontalOverflow).toBeLessThanOrEqual(1)
+  await viewport.evaluate((element) => {
+    element.scrollTop = Math.max(1, (element.scrollHeight - element.clientHeight) / 2)
+    element.dispatchEvent(new Event("scroll"))
+  })
+  const activeScrollButton = page.locator('[data-slot="message-scroller-button"][data-active="true"]').first()
+  await expect(activeScrollButton).toBeVisible()
+  const scrollButtonBox = await activeScrollButton.boundingBox()
+  const viewportBox = await viewport.boundingBox()
+  if (scrollButtonBox && viewportBox) expect(scrollButtonBox.x).toBeGreaterThan(viewportBox.x + viewportBox.width / 2)
+
+  const composer = page.locator(".aurora-chat-composer")
+  const composerBox = await composer.boundingBox()
+  const modelBox = await page.getByRole("combobox", { name: "Model" }).boundingBox()
+  const reasoningBox = await page.getByRole("combobox", { name: "Reasoning" }).boundingBox()
+  expect(composerBox).not.toBeNull()
+  expect(modelBox).not.toBeNull()
+  expect(reasoningBox).not.toBeNull()
+  if (composerBox && modelBox && reasoningBox) {
+    expect(modelBox.x).toBeGreaterThanOrEqual(composerBox.x)
+    expect(reasoningBox.x + reasoningBox.width).toBeLessThanOrEqual(composerBox.x + composerBox.width + 0.5)
+  }
 })
 
 test("tenant host routing and CSP contracts are enforced", async ({ request }) => {
