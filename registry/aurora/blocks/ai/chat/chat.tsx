@@ -357,9 +357,9 @@ function AuroraChatBlock({ title = "Aurora Chat", subtitle = "Composable convers
         <MessageScrollerProvider autoScroll scrollPreviousItemPeek={48}>
           <MessageScroller>
             <MessageScrollerViewport>
-              <MessageScrollerContent className="gap-2.5 px-2.5 py-2.5 sm:gap-3.5 sm:px-4 sm:py-3">
+              <MessageScrollerContent className="gap-2.5 px-2.5 py-2.5 sm:gap-2 sm:px-4 sm:py-3">
                 {items.map((item) => (
-                  <MessageScrollerItem key={item.id} messageId={item.id} scrollAnchor={item.kind === "message" ? item.scrollAnchor : false}>
+                  <MessageScrollerItem key={item.id} messageId={item.id} scrollAnchor={item.kind === "message" ? item.scrollAnchor : false} className={item.kind === "message" ? "sm:pb-[9px]" : undefined}>
                     {item.kind === "marker" ? <ThreadMarker item={item} /> : (
                       <MessageGroup className="gap-1">
                         <Message align={item.role === "user" ? "end" : "start"}>

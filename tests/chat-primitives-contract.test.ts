@@ -52,6 +52,7 @@ test("new chat surfaces preserve Aurora conversation ergonomics", () => {
   assert.ok(block.includes("sm:group-hover/message:opacity-100"), "desktop timestamps and actions should stay subordinate until hover or focus")
   assert.ok(block.includes("aurora-chat-action-rail pointer-events-auto h-[18px] min-h-[18px]"), "mobile action rails should reserve enough height to avoid clipping timestamps and controls")
   assert.ok(block.includes("sm:pointer-events-none sm:h-0 sm:min-h-0"), "desktop action rails should remain zero-height hover affordances")
+  assert.ok(block.includes("sm:pb-[9px]"), "desktop message items should reserve paint-safe space for zero-height hover actions")
   assert.ok(block.includes("max-w-[86%] sm:max-w-[36ch]"), "user bubbles should preserve their silhouette on narrow viewports")
   assert.ok(block.includes("h-[min(680px,78svh)]"), "mobile chat should use small-viewport units instead of desktop vh sizing")
   assert.ok(block.includes("max-w-[44%] flex-1"), "mobile model and reasoning selectors should share the composer footer without overflowing")
