@@ -138,16 +138,16 @@ function CopyIconButton({ value, compact = false }: { value: string; compact?: b
  * architecture: `forwardRef` to the underlying `<pre>`, `displayName`, full
  * prop spread, and an accessible copy affordance.
  */
-const Snippet = ({ ref, code, language = "tsx", density = "default", className, style, ...props }: SnippetProps & { ref?: React.Ref<HTMLPreElement> }) => {
+const Snippet = ({ ref, code, language = "tsx", density = "default", className, style, tabIndex, ...props }: SnippetProps & { ref?: React.Ref<HTMLPreElement> }) => {
   const compact = density === "compact"
   return (
     <div
       className={className}
       style={{
-        background: "var(--aurora-panel-strong)",
+        background: compact ? "color-mix(in srgb, var(--aurora-panel-strong) 92%, transparent)" : "var(--aurora-panel-strong)",
         border: "1px solid var(--aurora-border-default)",
-        borderRadius: "var(--aurora-radius-2)",
-        boxShadow: "var(--aurora-shadow-medium), var(--aurora-highlight-medium)",
+        borderRadius: compact ? "10px" : "var(--aurora-radius-2)",
+        boxShadow: compact ? "var(--aurora-highlight-medium)" : "var(--aurora-shadow-medium), var(--aurora-highlight-medium)",
         overflow: "hidden",
         ...style,
       }}
@@ -157,8 +157,9 @@ const Snippet = ({ ref, code, language = "tsx", density = "default", className, 
         style={{
           padding: compact ? "6px 8px" : "12px 14px",
           borderBottom: "1px solid var(--aurora-border-default)",
-          background:
-            "linear-gradient(180deg, color-mix(in srgb, var(--aurora-panel-strong-top) 70%, transparent), transparent)",
+          background: compact
+            ? "color-mix(in srgb, var(--aurora-panel-medium) 52%, transparent)"
+            : "linear-gradient(180deg, color-mix(in srgb, var(--aurora-panel-strong-top) 70%, transparent), transparent)",
         }}
       >
         <div className="flex items-center gap-2.5">
@@ -171,6 +172,7 @@ const Snippet = ({ ref, code, language = "tsx", density = "default", className, 
       </div>
       <pre
         ref={ref}
+        tabIndex={tabIndex ?? 0}
         className="overflow-auto aurora-text-code"
         style={{
           margin: 0,

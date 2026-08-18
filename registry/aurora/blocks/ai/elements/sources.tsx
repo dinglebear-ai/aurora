@@ -112,8 +112,14 @@ const Sources = (
     return (
       <div
         ref={ref}
-        className={[compact ? "grid gap-2 p-2.5" : "grid gap-3 p-4", className].filter(Boolean).join(" ")}
-        style={panelStyle(style)}
+        className={[compact ? "grid gap-1.5 p-2" : "grid gap-3 p-4", className].filter(Boolean).join(" ")}
+        style={panelStyle(compact ? {
+          background: "color-mix(in srgb, var(--aurora-panel-medium) 38%, transparent)",
+          border: "1px solid color-mix(in srgb, var(--aurora-border-default) 78%, transparent)",
+          borderRadius: "10px",
+          boxShadow: "var(--aurora-highlight-medium)",
+          ...style,
+        } : style)}
         {...props}
       >
         {collapsible ? (

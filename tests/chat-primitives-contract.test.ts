@@ -50,6 +50,9 @@ test("new chat surfaces preserve Aurora conversation ergonomics", () => {
   assert.ok(message.includes("self-start"), "message avatars should align with Aurora identity rows")
   assert.ok(block.includes('variant={item.role === "user" ? "default" : "ghost"}'), "assistant messages should render without bubbles")
   assert.ok(block.includes("group-hover/message:opacity-100"), "timestamps and actions should stay subordinate until hover or focus")
+  assert.ok(block.includes("aurora-chat-action-rail pointer-events-none h-0"), "hidden action rails should not reserve vertical transcript space")
+  assert.ok(block.includes("max-w-[86%] sm:max-w-[36ch]"), "user bubbles should preserve their silhouette on narrow viewports")
+  assert.ok(block.includes("aurora-chat-composer"), "composer should retain the unified Aurora focus surface")
   assert.ok(block.includes('aria-label="Edit message"'), "user messages should expose edit actions")
   assert.ok(block.includes("<ThumbsUp"), "assistant actions should include thumbs up beside copy and retry")
   assert.equal(block.includes(">Retry</Button>"), false, "copy and retry controls should stay icon-only")
@@ -66,6 +69,13 @@ test("new chat surfaces preserve Aurora conversation ergonomics", () => {
   assert.ok(block.includes("absolute bottom-1 right-1"), "send or stop control should live inside the input field")
   assert.equal(/<Textarea[^>]*disabled=/.test(block), false, "the composer should remain editable while the assistant is replying")
   assert.equal(block.includes("aria-label={item.role === \"user\" ? \"You\" : \"Aurora\"}"), false, "user turns should not regain redundant identity avatars")
+})
+
+test("chat developer surfaces keep scrollable code keyboard reachable", () => {
+  const snippet = read("registry/aurora/blocks/ai/elements/snippet.tsx")
+  const codeBlock = read("registry/aurora/blocks/workspace/code-block/code-block.tsx")
+  assert.ok(snippet.includes("tabIndex={tabIndex ?? 0}"), "scrollable snippets should be keyboard focusable")
+  assert.ok(codeBlock.includes("tabIndex={0}"), "scrollable code blocks should be keyboard focusable")
 })
 
 test("each new chat primitive has a gallery demo", () => {
