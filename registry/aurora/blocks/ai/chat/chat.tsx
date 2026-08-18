@@ -429,7 +429,7 @@ function AuroraChatBlock({ title = "Aurora Chat", subtitle = "Composable convers
             <span className="hidden min-w-0 items-center gap-1.5 sm:flex" style={{ color: "var(--aurora-text-muted)", fontSize: "10px" }}><span className="inline-flex items-center gap-1"><kbd className="aurora-chat-kbd">@</kbd>files</span><span aria-hidden="true">·</span><span className="inline-flex items-center gap-1"><kbd className="aurora-chat-kbd">/</kbd>skills</span></span>
             <span className="flex-1" />
             {editingMessageId ? <Button type="button" variant="plain" size="unstyled" className="flex items-center gap-1 rounded-[6px] px-1.5 py-0.5 [&_svg]:size-3" onClick={() => { setEditingMessageId(null); setValue("") }} style={{ color: "var(--aurora-text-muted)", fontSize: "10px" }}><X aria-hidden="true" />Cancel edit</Button> : null}
-            {isResponding && !activeAssistantId ? <span aria-live="polite" className="aurora-chat-thinking-label"><span className="aurora-chat-thinking-dots" aria-hidden="true"><span /><span /><span /></span>{reasoning === "Auto" ? "Thinking" : reasoning}</span> : null}
+            {isResponding && !activeAssistantId ? <span aria-live="polite" className="aurora-chat-thinking-label"><span className="aurora-chat-thinking-dots" aria-hidden="true"><span /><span /><span /></span>{reasoning === "Auto" ? "Thinking" : `Thinking · ${reasoning}`}</span> : null}
           </div>
         </div>
       </form>

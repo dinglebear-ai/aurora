@@ -81,7 +81,8 @@ export const AttachmentLifecycle: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await userEvent.click(canvas.getByRole("button", { name: "Add mock attachment" }))
-    const attachment = canvasElement.querySelector<HTMLElement>('.aurora-chat-attachment')
+    const attachment = canvasElement.querySelector<HTMLElement>('.aurora-chat-attachment[data-state="uploading"]')
+    await expect(attachment).toBeInTheDocument()
     await expect(attachment).toHaveAttribute("data-state", "uploading")
     await waitFor(() => expect(attachment).toHaveAttribute("data-state", "processing"), { timeout: 1200 })
     await waitFor(() => expect(attachment).toHaveAttribute("data-state", "done"), { timeout: 2200 })
