@@ -112,7 +112,7 @@ function AssistantShowcase({ kind }: { kind?: ShowcaseKind }) {
 function SuggestionPopup({ label, items, activeIndex, onSelect }: { label: string; items: Suggestion[]; activeIndex: number; onSelect: (item: Suggestion) => void }) {
   if (items.length === 0) return null
   return (
-    <div role="listbox" aria-label={label} className="absolute bottom-[calc(100%+6px)] left-0 z-40 w-[min(320px,92%)] overflow-hidden rounded-[10px] border p-1" style={{ borderColor: "var(--aurora-border-strong)", background: "var(--aurora-surface-raised)", boxShadow: "var(--aurora-shadow-strong), var(--aurora-highlight-strong)" }}>
+    <div role="listbox" aria-label={label} className="absolute bottom-[calc(100%+6px)] left-2 z-40 w-[min(320px,92%)] overflow-hidden rounded-[10px] border p-1" style={{ borderColor: "var(--aurora-border-strong)", background: "var(--aurora-surface-raised)", boxShadow: "var(--aurora-shadow-strong), var(--aurora-highlight-strong)" }}>
       {items.map((item, index) => (
         <Button key={item.id} type="button" variant="plain" size="unstyled" role="option" aria-selected={index === activeIndex} className="flex w-full items-center gap-2 rounded-[7px] px-2 py-1.5 text-left data-[selected=true]:bg-[var(--aurora-hover-bg)]" data-selected={index === activeIndex ? "true" : "false"} onMouseDown={(event) => event.preventDefault()} onClick={() => onSelect(item)}>
           {item.kind === "skill" ? <Command className="size-3.5 shrink-0" aria-hidden style={{ color: "var(--axon-orange)" }} /> : <FileCode2 className="size-3.5 shrink-0" aria-hidden style={{ color: "var(--aurora-accent-primary)" }} />}
@@ -388,12 +388,12 @@ function AuroraChatBlock({ title = "Aurora Chat", subtitle = "Composable convers
         <Button type="button" variant="ghost" size="icon" className="!size-6 [&_svg]:!size-3.5" aria-label="Close preview" onClick={() => setPreviewAttachment(null)}><X aria-hidden="true" /></Button>
       </div> : null}
 
-      <form className="relative shrink-0 border-t p-2" style={{ borderColor: "var(--aurora-border-default)", background: "color-mix(in srgb, var(--aurora-panel-strong) 94%, transparent)" }} onSubmit={(event) => { event.preventDefault(); if (!showStopButton) submitMessage() }}>
+      <form className="relative z-30 shrink-0 border-t p-2" style={{ borderColor: "var(--aurora-border-default)", background: "color-mix(in srgb, var(--aurora-panel-strong) 94%, transparent)" }} onSubmit={(event) => { event.preventDefault(); if (!showStopButton) submitMessage() }}>
+        <SuggestionPopup label="Skills and slash commands" items={slashOpen ? filteredSlash : []} activeIndex={slashActiveIndex} onSelect={insertSlashCommand} />
+        <SuggestionPopup label="File mentions" items={mentionOpen ? filteredMentions : []} activeIndex={mentionActiveIndex} onSelect={insertMention} />
         {composerAttachment ? <AttachmentGroup className="mb-1.5 gap-1 py-0"><AttachmentCard attachment={composerAttachment} onOpen={setPreviewAttachment} onRemove={() => setComposerAttachment(null)} compact /></AttachmentGroup> : null}
         <div className="overflow-hidden rounded-[11px] border" style={{ borderColor: "var(--aurora-border-strong)", background: "var(--aurora-control-surface)", boxShadow: "var(--aurora-highlight-medium)" }}>
           <div className="relative">
-            <SuggestionPopup label="Skills and slash commands" items={slashOpen ? filteredSlash : []} activeIndex={slashActiveIndex} onSelect={insertSlashCommand} />
-            <SuggestionPopup label="File mentions" items={mentionOpen ? filteredMentions : []} activeIndex={mentionActiveIndex} onSelect={insertMention} />
             <Button type="button" variant="ghost" size="icon" className="absolute bottom-1 left-1 z-10 !size-6 [&_svg]:!size-3.5" aria-label="Add mock attachment" disabled={Boolean(composerAttachment)} onClick={addMockAttachment}><Paperclip aria-hidden="true" /></Button>
             <Textarea ref={textareaRef} unstyled autoGrow rows={1} value={value} aria-label="Message" aria-autocomplete="list" placeholder={editingMessageId ? "Edit your message…" : isResponding ? "Steer the response…" : "Ask Aurora anything…"} className="max-h-[96px] min-h-[38px] w-full resize-none bg-transparent px-9 py-2 outline-none" style={{ color: "var(--aurora-text-primary)", fontFamily: "var(--aurora-font-sans)", fontSize: "var(--aurora-type-body-sm)", lineHeight: "var(--aurora-line-body)", caretColor: "var(--aurora-accent-primary)" }} onChange={handleComposerChange} onKeyDown={handleComposerKeyDown} />
             {showStopButton ? (
