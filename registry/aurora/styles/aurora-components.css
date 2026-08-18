@@ -391,7 +391,7 @@
   outline-offset: 2px;
 }
 .aurora-bubble--default > .aurora-bubble__content {
-  background: color-mix(in srgb, var(--aurora-accent-primary) 13%, var(--aurora-panel-medium));
+  background: linear-gradient(180deg, color-mix(in srgb, var(--aurora-accent-primary) 13%, var(--aurora-panel-medium)), color-mix(in srgb, var(--aurora-accent-primary) 7%, var(--aurora-panel-medium)));
   border-color: color-mix(in srgb, var(--aurora-accent-primary) 36%, var(--aurora-border-default));
 }
 .aurora-bubble--secondary > .aurora-bubble__content {
@@ -403,8 +403,8 @@
   border-color: var(--aurora-border-default);
 }
 .aurora-bubble--tinted > .aurora-bubble__content {
-  background: color-mix(in srgb, var(--axon-orange) 10%, var(--aurora-panel-medium));
-  border-color: color-mix(in srgb, var(--axon-orange) 28%, var(--aurora-border-default));
+  background: linear-gradient(180deg, color-mix(in srgb, var(--axon-orange) 9%, var(--aurora-panel-strong)), color-mix(in srgb, var(--axon-orange) 4%, var(--aurora-panel-medium)));
+  border-color: color-mix(in srgb, var(--axon-orange) 24%, var(--aurora-border-default));
 }
 .aurora-bubble--outline > .aurora-bubble__content {
   background: color-mix(in srgb, var(--aurora-control-surface) 70%, transparent);

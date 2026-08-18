@@ -40,6 +40,20 @@ test("interactive chat block composes all five primitive families and stays loca
   assert.equal(/Math\.random\s*\(/.test(source), false)
 })
 
+test("new chat surfaces preserve Aurora conversation ergonomics", () => {
+  const block = read("registry/aurora/blocks/ai/chat/chat.tsx")
+  const bubble = read("registry/aurora/ui/bubble.tsx")
+  const message = read("registry/aurora/ui/message.tsx")
+
+  assert.ok(bubble.includes("max-w-[42ch]"), "chat bubbles should preserve Aurora prose width")
+  assert.ok(bubble.includes("rounded-[16px_16px_16px_6px]"), "assistant bubbles should keep Aurora asymmetric corners")
+  assert.ok(bubble.includes("rounded-[16px_16px_6px_16px]"), "user bubbles should keep Aurora asymmetric corners")
+  assert.ok(message.includes("self-start"), "message avatars should align with Aurora identity rows")
+  assert.ok(block.includes("group-hover/message:opacity-100"), "message actions should stay subordinate until hover or focus")
+  assert.ok(block.includes("Enter sends · Shift + Enter for newline"), "composer should retain PromptInput keyboard guidance")
+  assert.equal(block.includes("aria-label={item.role === \"user\" ? \"You\" : \"Aurora\"}"), false, "user turns should not regain redundant identity avatars")
+})
+
 test("each new chat primitive has a gallery demo", () => {
   const manifest = JSON.parse(read("lib/gallery-manifest.json")) as Record<string, string>
   assert.equal(manifest["message-scroller"], "message-scroller-demo")

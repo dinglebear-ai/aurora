@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Bot, Check, CheckCheck, Copy, FileText, Paperclip, RefreshCw, RotateCcw, Send, Sparkles, ThumbsUp, User, X } from "lucide-react"
+import { Bot, Check, CheckCheck, Copy, FileText, Paperclip, RefreshCw, RotateCcw, Send, Sparkles, ThumbsUp, X } from "lucide-react"
 
 import { Attachment, AttachmentAction, AttachmentActions, AttachmentContent, AttachmentDescription, AttachmentGroup, AttachmentMedia, AttachmentTitle, AttachmentTrigger, type AttachmentState } from "@/registry/aurora/ui/attachment"
 import { Bubble, BubbleContent, BubbleGroup, BubbleReactions } from "@/registry/aurora/ui/bubble"
@@ -143,19 +143,27 @@ function AuroraChatBlock({ title = "Aurora Chat", subtitle = "Composable convers
                     {item.kind === "marker" ? <ThreadMarker item={item} /> : (
                       <MessageGroup className="gap-1">
                         <Message align={item.role === "user" ? "end" : "start"}>
-                          <MessageAvatar aria-label={item.role === "user" ? "You" : "Aurora"} className="!size-6 !min-w-6 [&_svg]:size-3.5" style={item.role === "user" ? { borderColor: "color-mix(in srgb, var(--aurora-accent-primary) 38%, var(--aurora-border-default))", background: "color-mix(in srgb, var(--aurora-accent-primary) 10%, var(--aurora-panel-medium))", color: "var(--aurora-accent-primary)" } : undefined}>
-                            {item.role === "user" ? <User aria-hidden="true" /> : <Bot aria-hidden="true" />}
-                          </MessageAvatar>
+                          {item.role === "assistant" ? (
+                            <MessageAvatar aria-label="Aurora" className="!size-6 !min-w-6 [&_svg]:size-3.5">
+                              <Bot aria-hidden="true" />
+                            </MessageAvatar>
+                          ) : null}
                           <MessageContent className="gap-1.5">
-                            <MessageHeader className="min-h-4 px-2">{item.role === "user" ? "You" : "Aurora"}<span aria-hidden="true" className="mx-1">·</span>{item.time}</MessageHeader>
+                            {item.role === "assistant" ? (
+                              <MessageHeader className="min-h-4 gap-1.5 px-0">
+                                <span style={{ color: "var(--aurora-text-primary)", fontWeight: "var(--aurora-weight-ui)" }}>Aurora</span>
+                                <span aria-hidden="true">·</span>
+                                <span>{item.time}</span>
+                              </MessageHeader>
+                            ) : null}
                             <BubbleGroup>
-                              <Bubble variant={item.role === "user" ? "default" : item.streaming ? "tinted" : "muted"} align={item.role === "user" ? "end" : "start"} className={item.role === "assistant" && !item.streaming ? "pb-2" : undefined}>
+                              <Bubble variant={item.role === "user" ? "default" : "tinted"} align={item.role === "user" ? "end" : "start"} className={item.role === "assistant" && !item.streaming ? "pb-2" : undefined}>
                                 <BubbleContent style={{ padding: "8px 11px" }}>
                                   {item.text}
                                   {item.streaming ? <span aria-hidden="true" className="ml-1 inline-block h-[1em] w-[2px] translate-y-[2px] rounded-full" style={{ background: "var(--aurora-accent-pink)", animation: "aurora-msg-caret 1.1s steps(1) infinite" }} /> : null}
                                 </BubbleContent>
                                 {item.role === "assistant" && !item.streaming ? (
-                                  <BubbleReactions className="!min-h-0 !p-0.5">
+                                  <BubbleReactions className="!min-h-0 !p-0.5 opacity-0 transition-opacity duration-150 group-hover/message:opacity-100 group-focus-within/message:opacity-100">
                                     <Button type="button" variant="plain" size="unstyled" className="flex size-[18px] items-center justify-center rounded-full [&_svg]:!size-3.5" aria-pressed={likedIds.has(item.id)} aria-label={likedIds.has(item.id) ? "Remove reaction" : "Like message"} onClick={() => toggleLike(item.id)} style={{ color: likedIds.has(item.id) ? "var(--aurora-accent-primary)" : "var(--aurora-text-muted)" }}>
                                       <ThumbsUp data-icon="inline-start" aria-hidden="true" />
                                     </Button>
@@ -164,12 +172,16 @@ function AuroraChatBlock({ title = "Aurora Chat", subtitle = "Composable convers
                               </Bubble>
                               {item.attachments?.length ? <AttachmentGroup>{item.attachments.map((attachment) => <AttachmentCard key={attachment.id} attachment={attachment} onOpen={setPreviewAttachment} />)}</AttachmentGroup> : null}
                             </BubbleGroup>
-                            <MessageFooter className="min-h-4 px-2">
-                              <Button type="button" variant="plain" size="unstyled" className="flex size-5 items-center justify-center rounded-[5px] [&_svg]:!size-3.5" aria-label={copiedId === item.id ? "Copied" : "Copy message"} onClick={() => copyMessage(item)}>
-                                {copiedId === item.id ? <Check data-icon="inline-start" aria-hidden="true" /> : <Copy data-icon="inline-start" aria-hidden="true" />}
-                              </Button>
-                              {item.role === "assistant" && !item.streaming ? <Button type="button" variant="plain" size="unstyled" className="flex size-5 items-center justify-center rounded-[5px] [&_svg]:!size-3.5" aria-label="Retry message" disabled={isResponding} onClick={() => retryMessage(item.id)}><RotateCcw data-icon="inline-start" aria-hidden="true" /></Button> : null}
-                            </MessageFooter>
+                            {item.role === "assistant" && !item.streaming ? (
+                              <MessageFooter className="min-h-0 gap-1 px-0 opacity-0 transition-opacity duration-150 group-hover/message:opacity-100 group-focus-within/message:opacity-100">
+                                <Button type="button" variant="plain" size="unstyled" className="inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 transition-colors hover:bg-[color-mix(in_srgb,var(--aurora-accent-primary)_10%,transparent)] [&_svg]:!size-3.5" aria-label={copiedId === item.id ? "Copied" : "Copy message"} onClick={() => copyMessage(item)} style={{ color: "var(--aurora-text-muted)", fontSize: "var(--aurora-type-label)", fontWeight: "var(--aurora-weight-ui)" }}>
+                                  {copiedId === item.id ? <Check data-icon="inline-start" aria-hidden="true" /> : <Copy data-icon="inline-start" aria-hidden="true" />}{copiedId === item.id ? "Copied" : "Copy"}
+                                </Button>
+                                <Button type="button" variant="plain" size="unstyled" className="inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 transition-colors hover:bg-[color-mix(in_srgb,var(--aurora-accent-pink)_10%,transparent)] [&_svg]:!size-3.5" aria-label="Retry message" disabled={isResponding} onClick={() => retryMessage(item.id)} style={{ color: "var(--aurora-text-muted)", fontSize: "var(--aurora-type-label)", fontWeight: "var(--aurora-weight-ui)" }}>
+                                  <RotateCcw data-icon="inline-start" aria-hidden="true" />Retry
+                                </Button>
+                              </MessageFooter>
+                            ) : null}
                           </MessageContent>
                         </Message>
                       </MessageGroup>
@@ -192,12 +204,15 @@ function AuroraChatBlock({ title = "Aurora Chat", subtitle = "Composable convers
 
       <form className="shrink-0 border-t p-2.5 sm:p-3" style={{ borderColor: "var(--aurora-border-default)", background: "color-mix(in srgb, var(--aurora-panel-strong) 94%, transparent)" }} onSubmit={(event) => { event.preventDefault(); submitMessage() }}>
         {composerAttachment ? <AttachmentGroup className="mb-2"><AttachmentCard attachment={composerAttachment} onOpen={setPreviewAttachment} onRemove={() => setComposerAttachment(null)} /></AttachmentGroup> : null}
-        <div className="flex items-end gap-1.5 rounded-[13px] border p-1.5" style={{ borderColor: "var(--aurora-border-strong)", background: "var(--aurora-control-surface)", boxShadow: "var(--aurora-highlight-medium)" }}>
-          <Button type="button" variant="ghost" size="icon" className="!size-7 [&_svg]:!size-4" aria-label="Add mock attachment" disabled={Boolean(composerAttachment) || isResponding} onClick={addMockAttachment}><Paperclip data-icon="inline-start" aria-hidden="true" /></Button>
-          <Textarea unstyled autoGrow rows={1} value={value} disabled={isResponding} aria-label="Message" placeholder={isResponding ? "Aurora is responding…" : "Ask Aurora anything…"} className="max-h-[112px] min-h-[32px] flex-1 resize-none bg-transparent px-1 py-1.5 outline-none" style={{ color: "var(--aurora-text-primary)", fontFamily: "var(--aurora-font-sans)", fontSize: "var(--aurora-type-body-sm)", lineHeight: "var(--aurora-line-body)" }} onChange={(event) => setValue(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter" && !event.shiftKey && !event.nativeEvent.isComposing) { event.preventDefault(); submitMessage() } }} />
-          <Button type="submit" variant="rose" size="icon" filled className="!size-7 rounded-[8px] [&_svg]:!size-4" aria-label="Send message" disabled={isResponding || (!value.trim() && !composerAttachment)}>{isResponding ? <Spinner size="sm" tone="rose" /> : <Send data-icon="inline-start" aria-hidden="true" />}</Button>
+        <div className="overflow-hidden rounded-[13px] border" style={{ borderColor: "var(--aurora-border-strong)", background: "var(--aurora-control-surface)", boxShadow: "var(--aurora-highlight-medium)" }}>
+          <Textarea unstyled autoGrow rows={1} value={value} disabled={isResponding} aria-label="Message" placeholder={isResponding ? "Aurora is responding…" : "Ask Aurora anything…"} className="max-h-[112px] min-h-[40px] w-full resize-none bg-transparent px-3 py-2.5 outline-none" style={{ color: "var(--aurora-text-primary)", fontFamily: "var(--aurora-font-sans)", fontSize: "var(--aurora-type-body-sm)", lineHeight: "var(--aurora-line-body)", caretColor: "var(--aurora-accent-primary)" }} onChange={(event) => setValue(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter" && !event.shiftKey && !event.nativeEvent.isComposing) { event.preventDefault(); submitMessage() } }} />
+          <div className="flex items-center gap-1.5 border-t px-1.5 py-1" style={{ borderColor: "color-mix(in srgb, var(--aurora-border-default) 72%, transparent)", background: "color-mix(in srgb, var(--aurora-control-surface) 45%, transparent)" }}>
+            <Button type="button" variant="ghost" size="icon" className="!size-7 [&_svg]:!size-[15px]" aria-label="Add mock attachment" disabled={Boolean(composerAttachment) || isResponding} onClick={addMockAttachment}><Paperclip data-icon="inline-start" aria-hidden="true" /></Button>
+            <span className="hidden sm:inline" style={{ color: "var(--aurora-text-muted)", fontSize: "11px", lineHeight: 1 }}>Enter sends · Shift + Enter for newline</span>
+            <span className="flex-1" />
+            <Button type="submit" variant="rose" size="icon" filled className="!size-7 rounded-[8px] [&_svg]:!size-[15px]" aria-label="Send message" disabled={isResponding || (!value.trim() && !composerAttachment)}>{isResponding ? <Spinner size="sm" tone="rose" /> : <Send data-icon="inline-start" aria-hidden="true" />}</Button>
+          </div>
         </div>
-        <div className="mt-1.5 flex items-center justify-between gap-3 px-1"><span style={{ color: "var(--aurora-text-muted)", fontSize: "var(--aurora-type-caption)", lineHeight: "var(--aurora-line-dense)" }}>Enter to send · Shift + Enter for a new line</span><span style={{ color: "var(--aurora-text-muted)", fontSize: "var(--aurora-type-caption)", lineHeight: "var(--aurora-line-dense)" }}>Mock UI · no network requests</span></div>
       </form>
     </section>
   )
