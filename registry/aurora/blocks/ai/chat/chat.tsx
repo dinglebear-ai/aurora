@@ -122,14 +122,14 @@ function AuroraChatBlock({ title = "Aurora Chat", subtitle = "Composable convers
     <section aria-label="Interactive Aurora chat demo" className={["flex h-[min(700px,78vh)] min-h-[560px] w-full min-w-0 flex-col overflow-hidden rounded-[16px] border", className].filter(Boolean).join(" ")} style={{ borderColor: "var(--aurora-border-strong)", background: "var(--aurora-page-bg)", boxShadow: "var(--aurora-shadow-strong), var(--aurora-highlight-strong)" }}>
       <header className="flex shrink-0 items-center justify-between gap-3 border-b px-4 py-2 sm:px-4" style={{ borderColor: "var(--aurora-border-default)", background: "color-mix(in srgb, var(--aurora-panel-strong) 92%, transparent)" }}>
         <div className="flex min-w-0 items-center gap-2.5">
-          <span className="flex size-8 shrink-0 items-center justify-center rounded-[10px] border" style={{ borderColor: "color-mix(in srgb, var(--axon-orange) 36%, var(--aurora-border-default))", background: "color-mix(in srgb, var(--axon-orange) 10%, var(--aurora-panel-medium))", color: "var(--axon-orange)" }}><Sparkles aria-hidden="true" /></span>
+          <span className="flex size-7 shrink-0 items-center justify-center rounded-[9px] border [&_svg]:size-4" style={{ borderColor: "color-mix(in srgb, var(--axon-orange) 36%, var(--aurora-border-default))", background: "color-mix(in srgb, var(--axon-orange) 10%, var(--aurora-panel-medium))", color: "var(--axon-orange)" }}><Sparkles aria-hidden="true" /></span>
           <div className="min-w-0"><h2 className="truncate" style={{ fontFamily: "var(--aurora-font-display)", fontSize: "var(--aurora-type-body)", fontWeight: "var(--aurora-weight-heading)", lineHeight: "var(--aurora-line-dense)" }}>{title}</h2><p className="truncate" style={{ color: "var(--aurora-text-muted)", fontSize: "var(--aurora-type-caption)", lineHeight: "var(--aurora-line-dense)" }}>{subtitle}</p></div>
         </div>
         <div className="flex shrink-0 items-center gap-2">
-          <span className="hidden items-center gap-2 rounded-full border px-2.5 py-1 sm:inline-flex" style={{ borderColor: "var(--aurora-border-default)", color: "var(--aurora-text-muted)", fontSize: "var(--aurora-type-label)" }}>
+          <span className="hidden items-center gap-1.5 rounded-full border px-2 py-0.5 sm:inline-flex" style={{ borderColor: "var(--aurora-border-default)", color: "var(--aurora-text-muted)", fontSize: "var(--aurora-type-label)" }}>
             <span className="aurora-status-dot" style={{ "--status-dot-color": "var(--aurora-success)" } as React.CSSProperties} />Local mock
           </span>
-          <Button variant="ghost" size="sm" type="button" onClick={resetDemo}><RefreshCw data-icon="inline-start" aria-hidden="true" />Reset</Button>
+          <Button variant="ghost" size="sm" type="button" className="!h-6 !px-2 [&_svg]:!size-3.5" onClick={resetDemo}><RefreshCw data-icon="inline-start" aria-hidden="true" />Reset</Button>
         </div>
       </header>
 
@@ -143,7 +143,7 @@ function AuroraChatBlock({ title = "Aurora Chat", subtitle = "Composable convers
                     {item.kind === "marker" ? <ThreadMarker item={item} /> : (
                       <MessageGroup className="gap-1">
                         <Message align={item.role === "user" ? "end" : "start"}>
-                          <MessageAvatar aria-label={item.role === "user" ? "You" : "Aurora"} className="!size-7 !min-w-7" style={item.role === "user" ? { borderColor: "color-mix(in srgb, var(--aurora-accent-primary) 38%, var(--aurora-border-default))", background: "color-mix(in srgb, var(--aurora-accent-primary) 10%, var(--aurora-panel-medium))", color: "var(--aurora-accent-primary)" } : undefined}>
+                          <MessageAvatar aria-label={item.role === "user" ? "You" : "Aurora"} className="!size-6 !min-w-6 [&_svg]:size-3.5" style={item.role === "user" ? { borderColor: "color-mix(in srgb, var(--aurora-accent-primary) 38%, var(--aurora-border-default))", background: "color-mix(in srgb, var(--aurora-accent-primary) 10%, var(--aurora-panel-medium))", color: "var(--aurora-accent-primary)" } : undefined}>
                             {item.role === "user" ? <User aria-hidden="true" /> : <Bot aria-hidden="true" />}
                           </MessageAvatar>
                           <MessageContent className="gap-1.5">
@@ -155,8 +155,8 @@ function AuroraChatBlock({ title = "Aurora Chat", subtitle = "Composable convers
                                   {item.streaming ? <span aria-hidden="true" className="ml-1 inline-block h-[1em] w-[2px] translate-y-[2px] rounded-full" style={{ background: "var(--aurora-accent-pink)", animation: "aurora-msg-caret 1.1s steps(1) infinite" }} /> : null}
                                 </BubbleContent>
                                 {item.role === "assistant" && !item.streaming ? (
-                                  <BubbleReactions>
-                                    <Button type="button" variant="plain" size="unstyled" className="flex size-5 items-center justify-center rounded-full" aria-pressed={likedIds.has(item.id)} aria-label={likedIds.has(item.id) ? "Remove reaction" : "Like message"} onClick={() => toggleLike(item.id)} style={{ color: likedIds.has(item.id) ? "var(--aurora-accent-primary)" : "var(--aurora-text-muted)" }}>
+                                  <BubbleReactions className="!min-h-0 !p-0.5">
+                                    <Button type="button" variant="plain" size="unstyled" className="flex size-[18px] items-center justify-center rounded-full [&_svg]:!size-3.5" aria-pressed={likedIds.has(item.id)} aria-label={likedIds.has(item.id) ? "Remove reaction" : "Like message"} onClick={() => toggleLike(item.id)} style={{ color: likedIds.has(item.id) ? "var(--aurora-accent-primary)" : "var(--aurora-text-muted)" }}>
                                       <ThumbsUp data-icon="inline-start" aria-hidden="true" />
                                     </Button>
                                   </BubbleReactions>
@@ -165,10 +165,10 @@ function AuroraChatBlock({ title = "Aurora Chat", subtitle = "Composable convers
                               {item.attachments?.length ? <AttachmentGroup>{item.attachments.map((attachment) => <AttachmentCard key={attachment.id} attachment={attachment} onOpen={setPreviewAttachment} />)}</AttachmentGroup> : null}
                             </BubbleGroup>
                             <MessageFooter className="min-h-4 px-2">
-                              <Button type="button" variant="plain" size="unstyled" className="flex size-6 items-center justify-center rounded-[6px]" aria-label={copiedId === item.id ? "Copied" : "Copy message"} onClick={() => copyMessage(item)}>
+                              <Button type="button" variant="plain" size="unstyled" className="flex size-5 items-center justify-center rounded-[5px] [&_svg]:!size-3.5" aria-label={copiedId === item.id ? "Copied" : "Copy message"} onClick={() => copyMessage(item)}>
                                 {copiedId === item.id ? <Check data-icon="inline-start" aria-hidden="true" /> : <Copy data-icon="inline-start" aria-hidden="true" />}
                               </Button>
-                              {item.role === "assistant" && !item.streaming ? <Button type="button" variant="plain" size="unstyled" className="flex size-6 items-center justify-center rounded-[6px]" aria-label="Retry message" disabled={isResponding} onClick={() => retryMessage(item.id)}><RotateCcw data-icon="inline-start" aria-hidden="true" /></Button> : null}
+                              {item.role === "assistant" && !item.streaming ? <Button type="button" variant="plain" size="unstyled" className="flex size-5 items-center justify-center rounded-[5px] [&_svg]:!size-3.5" aria-label="Retry message" disabled={isResponding} onClick={() => retryMessage(item.id)}><RotateCcw data-icon="inline-start" aria-hidden="true" /></Button> : null}
                             </MessageFooter>
                           </MessageContent>
                         </Message>
@@ -178,8 +178,8 @@ function AuroraChatBlock({ title = "Aurora Chat", subtitle = "Composable convers
                 ))}
               </MessageScrollerContent>
             </MessageScrollerViewport>
-            <MessageScrollerButton direction="start" />
-            <MessageScrollerButton direction="end" variant="aurora" />
+            <MessageScrollerButton direction="start" className="!size-7 rounded-[8px] [&_svg]:!size-4" />
+            <MessageScrollerButton direction="end" variant="aurora" className="!size-7 rounded-[8px] [&_svg]:!size-4" />
           </MessageScroller>
         </MessageScrollerProvider>
       </div>
@@ -187,15 +187,15 @@ function AuroraChatBlock({ title = "Aurora Chat", subtitle = "Composable convers
       {previewAttachment ? <div className="mx-4 mb-2 flex shrink-0 items-center gap-3 rounded-[12px] border px-3 py-2 sm:mx-5" role="region" aria-label="Attachment preview" style={{ borderColor: "color-mix(in srgb, var(--aurora-accent-primary) 28%, var(--aurora-border-default))", background: "color-mix(in srgb, var(--aurora-accent-primary) 6%, var(--aurora-panel-medium))" }}>
         <FileText aria-hidden="true" style={{ color: "var(--aurora-accent-primary)" }} />
         <div className="min-w-0 flex-1"><p className="truncate" style={{ fontSize: "var(--aurora-type-label)", fontWeight: "var(--aurora-weight-ui)", lineHeight: "var(--aurora-line-dense)" }}>{previewAttachment.title}</p><p className="truncate" style={{ color: "var(--aurora-text-muted)", fontSize: "var(--aurora-type-caption)", lineHeight: "var(--aurora-line-dense)" }}>Mock preview · {previewAttachment.description}</p></div>
-        <Button type="button" variant="ghost" size="icon" aria-label="Close preview" onClick={() => setPreviewAttachment(null)}><X data-icon="inline-start" aria-hidden="true" /></Button>
+        <Button type="button" variant="ghost" size="icon" className="!size-7 [&_svg]:!size-4" aria-label="Close preview" onClick={() => setPreviewAttachment(null)}><X data-icon="inline-start" aria-hidden="true" /></Button>
       </div> : null}
 
       <form className="shrink-0 border-t p-2.5 sm:p-3" style={{ borderColor: "var(--aurora-border-default)", background: "color-mix(in srgb, var(--aurora-panel-strong) 94%, transparent)" }} onSubmit={(event) => { event.preventDefault(); submitMessage() }}>
         {composerAttachment ? <AttachmentGroup className="mb-2"><AttachmentCard attachment={composerAttachment} onOpen={setPreviewAttachment} onRemove={() => setComposerAttachment(null)} /></AttachmentGroup> : null}
         <div className="flex items-end gap-1.5 rounded-[13px] border p-1.5" style={{ borderColor: "var(--aurora-border-strong)", background: "var(--aurora-control-surface)", boxShadow: "var(--aurora-highlight-medium)" }}>
-          <Button type="button" variant="ghost" size="icon" aria-label="Add mock attachment" disabled={Boolean(composerAttachment) || isResponding} onClick={addMockAttachment}><Paperclip data-icon="inline-start" aria-hidden="true" /></Button>
+          <Button type="button" variant="ghost" size="icon" className="!size-7 [&_svg]:!size-4" aria-label="Add mock attachment" disabled={Boolean(composerAttachment) || isResponding} onClick={addMockAttachment}><Paperclip data-icon="inline-start" aria-hidden="true" /></Button>
           <Textarea unstyled autoGrow rows={1} value={value} disabled={isResponding} aria-label="Message" placeholder={isResponding ? "Aurora is responding…" : "Ask Aurora anything…"} className="max-h-[112px] min-h-[32px] flex-1 resize-none bg-transparent px-1 py-1.5 outline-none" style={{ color: "var(--aurora-text-primary)", fontFamily: "var(--aurora-font-sans)", fontSize: "var(--aurora-type-body-sm)", lineHeight: "var(--aurora-line-body)" }} onChange={(event) => setValue(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter" && !event.shiftKey && !event.nativeEvent.isComposing) { event.preventDefault(); submitMessage() } }} />
-          <Button type="submit" variant="rose" size="icon" filled aria-label="Send message" disabled={isResponding || (!value.trim() && !composerAttachment)}>{isResponding ? <Spinner size="sm" tone="rose" /> : <Send data-icon="inline-start" aria-hidden="true" />}</Button>
+          <Button type="submit" variant="rose" size="icon" filled className="!size-7 rounded-[8px] [&_svg]:!size-4" aria-label="Send message" disabled={isResponding || (!value.trim() && !composerAttachment)}>{isResponding ? <Spinner size="sm" tone="rose" /> : <Send data-icon="inline-start" aria-hidden="true" />}</Button>
         </div>
         <div className="mt-1.5 flex items-center justify-between gap-3 px-1"><span style={{ color: "var(--aurora-text-muted)", fontSize: "var(--aurora-type-caption)", lineHeight: "var(--aurora-line-dense)" }}>Enter to send · Shift + Enter for a new line</span><span style={{ color: "var(--aurora-text-muted)", fontSize: "var(--aurora-type-caption)", lineHeight: "var(--aurora-line-dense)" }}>Mock UI · no network requests</span></div>
       </form>
