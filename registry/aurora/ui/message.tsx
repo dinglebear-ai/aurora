@@ -32,10 +32,13 @@ function Message({
   )
 }
 
-function MessageAvatar({ className, ...props }: React.ComponentProps<"div">) {
+function MessageAvatar({ className, role, ...props }: React.ComponentProps<"div">) {
+  const ariaLabel = props["aria-label"]
+
   return (
     <div
       data-slot="message-avatar"
+      role={role ?? (ariaLabel ? "img" : undefined)}
       className={cn(
         "aurora-message__avatar flex min-w-8 shrink-0 items-center justify-center self-end overflow-hidden rounded-full",
         "group-has-data-[slot=message-footer]/message:-translate-y-8",
