@@ -23,6 +23,8 @@ export interface SourceProps extends React.AnchorHTMLAttributes<HTMLAnchorElemen
   source: SourceItem
   /** Optional 1-based ordinal rendered in the rose numbered chip. */
   index?: number
+  /** Compact density for references inside chat turns. */
+  density?: "default" | "compact"
 }
 
 // ---------------------------------------------------------------------------
@@ -45,7 +47,8 @@ function hostname(href?: string): string | null {
 // external-link arrow). Hover lifts the surface and border.
 // ---------------------------------------------------------------------------
 
-const Source = ({ ref, className, source, index, style, href, target, rel, tabIndex, ...props }: SourceProps & { ref?: React.Ref<HTMLAnchorElement> }) => {
+const Source = ({ ref, className, source, index, density = "default", style, href, target, rel, tabIndex, ...props }: SourceProps & { ref?: React.Ref<HTMLAnchorElement> }) => {
+    const compact = density === "compact"
     const safeHref = safeHttpUrl(href ?? source.href)
     const host = hostname(safeHref)
     const isLinked = Boolean(safeHref)
@@ -61,7 +64,7 @@ const Source = ({ ref, className, source, index, style, href, target, rel, tabIn
         aria-disabled={isLinked ? undefined : true}
         aria-label={host ? `${source.title}, ${host}` : source.title}
         className={cn(
-          "group grid grid-cols-[auto_minmax(0,1fr)_auto] items-start gap-3 p-3.5 no-underline",
+          compact ? "group grid grid-cols-[auto_minmax(0,1fr)_auto] items-start gap-2 p-2 no-underline" : "group grid grid-cols-[auto_minmax(0,1fr)_auto] items-start gap-3 p-3.5 no-underline",
           "transition-[background,border-color,box-shadow,transform] duration-150 ease-out",
           "outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--aurora-focus-ring)] focus-visible:ring-offset-0",
           isLinked &&
@@ -79,7 +82,7 @@ const Source = ({ ref, className, source, index, style, href, target, rel, tabIn
       >
         {index != null ? (
           <span
-            className="inline-flex size-7 shrink-0 items-center justify-center aurora-text-control"
+            className={compact ? "inline-flex size-5 shrink-0 items-center justify-center aurora-text-control" : "inline-flex size-7 shrink-0 items-center justify-center aurora-text-control"}
             aria-hidden
             style={{
               borderRadius: "calc(var(--aurora-radius-1) - 6px)",
@@ -100,7 +103,7 @@ const Source = ({ ref, className, source, index, style, href, target, rel, tabIn
           <span className="flex min-w-0 items-center gap-2">
             <span
               className="truncate aurora-text-control"
-              style={{ color: "var(--aurora-text-primary)", fontSize: 16, fontWeight: 700 }}
+              style={{ color: "var(--aurora-text-primary)", fontSize: compact ? 12 : 16, fontWeight: 700 }}
             >
               {source.title}
             </span>
@@ -119,7 +122,7 @@ const Source = ({ ref, className, source, index, style, href, target, rel, tabIn
               className="flex min-w-0 items-center gap-1.5 aurora-text-meta"
               style={{ color: "var(--aurora-text-muted)" }}
             >
-              <Globe className="size-3.5 shrink-0" aria-hidden />
+              <Globe className={compact ? "size-3 shrink-0" : "size-3.5 shrink-0"} aria-hidden />
               <span className="truncate">{host}</span>
             </span>
           ) : null}
@@ -128,7 +131,9 @@ const Source = ({ ref, className, source, index, style, href, target, rel, tabIn
 
         {isLinked ? (
           <ExternalLink
-            className="size-[18px] shrink-0 self-center text-[var(--aurora-text-muted)] transition-colors group-hover:text-[var(--aurora-accent-primary)]"
+            className={compact ? "size-3.5 shrink-0 self-center text-[var(--aurora-text-muted)] transition-colors group-hover:text-[var(--aurora-accent-primary)]" : "size-[18px] shrink-0 self-center text-[var(--aurora-text-muted)] transition-colors group-hover:text-[var(--aurora-accent-primary)]"}
+            data-density={density}
+            data-source-link="true"
             aria-hidden
           />
         ) : (
