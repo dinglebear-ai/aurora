@@ -45,12 +45,15 @@ test("new chat surfaces preserve Aurora conversation ergonomics", () => {
   const bubble = read("registry/aurora/ui/bubble.tsx")
   const message = read("registry/aurora/ui/message.tsx")
 
-  assert.ok(bubble.includes("max-w-[42ch]"), "chat bubbles should preserve Aurora prose width")
+  assert.ok(bubble.includes("max-w-[36ch]"), "chat bubbles should preserve compact Aurora prose width")
   assert.ok(bubble.includes("rounded-[16px_16px_16px_6px]"), "assistant bubbles should keep Aurora asymmetric corners")
   assert.ok(bubble.includes("rounded-[16px_16px_6px_16px]"), "user bubbles should keep Aurora asymmetric corners")
   assert.ok(message.includes("self-start"), "message avatars should align with Aurora identity rows")
   assert.ok(block.includes("group-hover/message:opacity-100"), "message actions should stay subordinate until hover or focus")
   assert.ok(block.includes("Enter sends · Shift + Enter for newline"), "composer should retain PromptInput keyboard guidance")
+  assert.ok(block.includes("min-h-[30px]"), "composer should keep the compact input height")
+  assert.ok(block.includes("compact />"), "chat attachments should use the compact chip treatment")
+  assert.ok(block.includes("!size-6"), "chat controls should remain in the compact 24px scale")
   assert.equal(block.includes("aria-label={item.role === \"user\" ? \"You\" : \"Aurora\"}"), false, "user turns should not regain redundant identity avatars")
 })
 
