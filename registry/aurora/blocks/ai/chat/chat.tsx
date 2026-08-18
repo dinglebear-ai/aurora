@@ -119,10 +119,10 @@ function AuroraChatBlock({ title = "Aurora Chat", subtitle = "Composable convers
   const resetDemo = React.useCallback(() => { clearTimers(); setItems(INITIAL_ITEMS); setValue(""); setComposerAttachment(null); setPreviewAttachment(null); setCopiedId(null); setLikedIds(new Set()); setIsResponding(false) }, [clearTimers])
 
   return (
-    <section aria-label="Interactive Aurora chat demo" className={["flex h-[min(760px,82vh)] min-h-[640px] w-full min-w-0 flex-col overflow-hidden rounded-[18px] border", className].filter(Boolean).join(" ")} style={{ borderColor: "var(--aurora-border-strong)", background: "var(--aurora-page-bg)", boxShadow: "var(--aurora-shadow-strong), var(--aurora-highlight-strong)" }}>
-      <header className="flex shrink-0 items-center justify-between gap-4 border-b px-4 py-3 sm:px-5" style={{ borderColor: "var(--aurora-border-default)", background: "color-mix(in srgb, var(--aurora-panel-strong) 92%, transparent)" }}>
-        <div className="flex min-w-0 items-center gap-3">
-          <span className="flex size-9 shrink-0 items-center justify-center rounded-[11px] border" style={{ borderColor: "color-mix(in srgb, var(--axon-orange) 36%, var(--aurora-border-default))", background: "color-mix(in srgb, var(--axon-orange) 10%, var(--aurora-panel-medium))", color: "var(--axon-orange)" }}><Sparkles aria-hidden="true" /></span>
+    <section aria-label="Interactive Aurora chat demo" className={["flex h-[min(700px,78vh)] min-h-[560px] w-full min-w-0 flex-col overflow-hidden rounded-[16px] border", className].filter(Boolean).join(" ")} style={{ borderColor: "var(--aurora-border-strong)", background: "var(--aurora-page-bg)", boxShadow: "var(--aurora-shadow-strong), var(--aurora-highlight-strong)" }}>
+      <header className="flex shrink-0 items-center justify-between gap-3 border-b px-4 py-2 sm:px-4" style={{ borderColor: "var(--aurora-border-default)", background: "color-mix(in srgb, var(--aurora-panel-strong) 92%, transparent)" }}>
+        <div className="flex min-w-0 items-center gap-2.5">
+          <span className="flex size-8 shrink-0 items-center justify-center rounded-[10px] border" style={{ borderColor: "color-mix(in srgb, var(--axon-orange) 36%, var(--aurora-border-default))", background: "color-mix(in srgb, var(--axon-orange) 10%, var(--aurora-panel-medium))", color: "var(--axon-orange)" }}><Sparkles aria-hidden="true" /></span>
           <div className="min-w-0"><h2 className="truncate" style={{ fontFamily: "var(--aurora-font-display)", fontSize: "var(--aurora-type-body)", fontWeight: "var(--aurora-weight-heading)", lineHeight: "var(--aurora-line-dense)" }}>{title}</h2><p className="truncate" style={{ color: "var(--aurora-text-muted)", fontSize: "var(--aurora-type-caption)", lineHeight: "var(--aurora-line-dense)" }}>{subtitle}</p></div>
         </div>
         <div className="flex shrink-0 items-center gap-2">
@@ -134,29 +134,29 @@ function AuroraChatBlock({ title = "Aurora Chat", subtitle = "Composable convers
       </header>
 
       <div className="min-h-0 flex-1">
-        <MessageScrollerProvider autoScroll scrollPreviousItemPeek={72}>
+        <MessageScrollerProvider autoScroll scrollPreviousItemPeek={56}>
           <MessageScroller>
             <MessageScrollerViewport>
-              <MessageScrollerContent className="px-4 py-5 sm:px-6">
+              <MessageScrollerContent className="gap-4 px-4 py-3 sm:px-5">
                 {items.map((item) => (
                   <MessageScrollerItem key={item.id} messageId={item.id} scrollAnchor={item.kind === "message" ? item.scrollAnchor : false}>
                     {item.kind === "marker" ? <ThreadMarker item={item} /> : (
-                      <MessageGroup>
+                      <MessageGroup className="gap-1">
                         <Message align={item.role === "user" ? "end" : "start"}>
-                          <MessageAvatar aria-label={item.role === "user" ? "You" : "Aurora"} style={item.role === "user" ? { borderColor: "color-mix(in srgb, var(--aurora-accent-primary) 38%, var(--aurora-border-default))", background: "color-mix(in srgb, var(--aurora-accent-primary) 10%, var(--aurora-panel-medium))", color: "var(--aurora-accent-primary)" } : undefined}>
+                          <MessageAvatar aria-label={item.role === "user" ? "You" : "Aurora"} className="!size-7 !min-w-7" style={item.role === "user" ? { borderColor: "color-mix(in srgb, var(--aurora-accent-primary) 38%, var(--aurora-border-default))", background: "color-mix(in srgb, var(--aurora-accent-primary) 10%, var(--aurora-panel-medium))", color: "var(--aurora-accent-primary)" } : undefined}>
                             {item.role === "user" ? <User aria-hidden="true" /> : <Bot aria-hidden="true" />}
                           </MessageAvatar>
-                          <MessageContent>
-                            <MessageHeader>{item.role === "user" ? "You" : "Aurora"}<span aria-hidden="true" className="mx-1">·</span>{item.time}</MessageHeader>
+                          <MessageContent className="gap-1.5">
+                            <MessageHeader className="min-h-4 px-2">{item.role === "user" ? "You" : "Aurora"}<span aria-hidden="true" className="mx-1">·</span>{item.time}</MessageHeader>
                             <BubbleGroup>
-                              <Bubble variant={item.role === "user" ? "default" : item.streaming ? "tinted" : "muted"} align={item.role === "user" ? "end" : "start"} className={item.role === "assistant" && !item.streaming ? "pb-3" : undefined}>
-                                <BubbleContent>
+                              <Bubble variant={item.role === "user" ? "default" : item.streaming ? "tinted" : "muted"} align={item.role === "user" ? "end" : "start"} className={item.role === "assistant" && !item.streaming ? "pb-2" : undefined}>
+                                <BubbleContent style={{ padding: "8px 11px" }}>
                                   {item.text}
                                   {item.streaming ? <span aria-hidden="true" className="ml-1 inline-block h-[1em] w-[2px] translate-y-[2px] rounded-full" style={{ background: "var(--aurora-accent-pink)", animation: "aurora-msg-caret 1.1s steps(1) infinite" }} /> : null}
                                 </BubbleContent>
                                 {item.role === "assistant" && !item.streaming ? (
                                   <BubbleReactions>
-                                    <Button type="button" variant="plain" size="unstyled" className="flex size-6 items-center justify-center rounded-full" aria-pressed={likedIds.has(item.id)} aria-label={likedIds.has(item.id) ? "Remove reaction" : "Like message"} onClick={() => toggleLike(item.id)} style={{ color: likedIds.has(item.id) ? "var(--aurora-accent-primary)" : "var(--aurora-text-muted)" }}>
+                                    <Button type="button" variant="plain" size="unstyled" className="flex size-5 items-center justify-center rounded-full" aria-pressed={likedIds.has(item.id)} aria-label={likedIds.has(item.id) ? "Remove reaction" : "Like message"} onClick={() => toggleLike(item.id)} style={{ color: likedIds.has(item.id) ? "var(--aurora-accent-primary)" : "var(--aurora-text-muted)" }}>
                                       <ThumbsUp data-icon="inline-start" aria-hidden="true" />
                                     </Button>
                                   </BubbleReactions>
@@ -164,11 +164,11 @@ function AuroraChatBlock({ title = "Aurora Chat", subtitle = "Composable convers
                               </Bubble>
                               {item.attachments?.length ? <AttachmentGroup>{item.attachments.map((attachment) => <AttachmentCard key={attachment.id} attachment={attachment} onOpen={setPreviewAttachment} />)}</AttachmentGroup> : null}
                             </BubbleGroup>
-                            <MessageFooter>
-                              <Button type="button" variant="plain" size="unstyled" className="flex size-7 items-center justify-center rounded-[7px]" aria-label={copiedId === item.id ? "Copied" : "Copy message"} onClick={() => copyMessage(item)}>
+                            <MessageFooter className="min-h-4 px-2">
+                              <Button type="button" variant="plain" size="unstyled" className="flex size-6 items-center justify-center rounded-[6px]" aria-label={copiedId === item.id ? "Copied" : "Copy message"} onClick={() => copyMessage(item)}>
                                 {copiedId === item.id ? <Check data-icon="inline-start" aria-hidden="true" /> : <Copy data-icon="inline-start" aria-hidden="true" />}
                               </Button>
-                              {item.role === "assistant" && !item.streaming ? <Button type="button" variant="plain" size="unstyled" className="flex size-7 items-center justify-center rounded-[7px]" aria-label="Retry message" disabled={isResponding} onClick={() => retryMessage(item.id)}><RotateCcw data-icon="inline-start" aria-hidden="true" /></Button> : null}
+                              {item.role === "assistant" && !item.streaming ? <Button type="button" variant="plain" size="unstyled" className="flex size-6 items-center justify-center rounded-[6px]" aria-label="Retry message" disabled={isResponding} onClick={() => retryMessage(item.id)}><RotateCcw data-icon="inline-start" aria-hidden="true" /></Button> : null}
                             </MessageFooter>
                           </MessageContent>
                         </Message>
@@ -190,14 +190,14 @@ function AuroraChatBlock({ title = "Aurora Chat", subtitle = "Composable convers
         <Button type="button" variant="ghost" size="icon" aria-label="Close preview" onClick={() => setPreviewAttachment(null)}><X data-icon="inline-start" aria-hidden="true" /></Button>
       </div> : null}
 
-      <form className="shrink-0 border-t p-3 sm:p-4" style={{ borderColor: "var(--aurora-border-default)", background: "color-mix(in srgb, var(--aurora-panel-strong) 94%, transparent)" }} onSubmit={(event) => { event.preventDefault(); submitMessage() }}>
+      <form className="shrink-0 border-t p-2.5 sm:p-3" style={{ borderColor: "var(--aurora-border-default)", background: "color-mix(in srgb, var(--aurora-panel-strong) 94%, transparent)" }} onSubmit={(event) => { event.preventDefault(); submitMessage() }}>
         {composerAttachment ? <AttachmentGroup className="mb-2"><AttachmentCard attachment={composerAttachment} onOpen={setPreviewAttachment} onRemove={() => setComposerAttachment(null)} /></AttachmentGroup> : null}
-        <div className="flex items-end gap-2 rounded-[15px] border p-2" style={{ borderColor: "var(--aurora-border-strong)", background: "var(--aurora-control-surface)", boxShadow: "var(--aurora-highlight-medium)" }}>
+        <div className="flex items-end gap-1.5 rounded-[13px] border p-1.5" style={{ borderColor: "var(--aurora-border-strong)", background: "var(--aurora-control-surface)", boxShadow: "var(--aurora-highlight-medium)" }}>
           <Button type="button" variant="ghost" size="icon" aria-label="Add mock attachment" disabled={Boolean(composerAttachment) || isResponding} onClick={addMockAttachment}><Paperclip data-icon="inline-start" aria-hidden="true" /></Button>
-          <Textarea unstyled autoGrow rows={1} value={value} disabled={isResponding} aria-label="Message" placeholder={isResponding ? "Aurora is responding…" : "Ask Aurora anything…"} className="max-h-[128px] min-h-[38px] flex-1 resize-none bg-transparent px-1 py-2 outline-none" style={{ color: "var(--aurora-text-primary)", fontFamily: "var(--aurora-font-sans)", fontSize: "var(--aurora-type-body-sm)", lineHeight: "var(--aurora-line-body)" }} onChange={(event) => setValue(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter" && !event.shiftKey && !event.nativeEvent.isComposing) { event.preventDefault(); submitMessage() } }} />
+          <Textarea unstyled autoGrow rows={1} value={value} disabled={isResponding} aria-label="Message" placeholder={isResponding ? "Aurora is responding…" : "Ask Aurora anything…"} className="max-h-[112px] min-h-[32px] flex-1 resize-none bg-transparent px-1 py-1.5 outline-none" style={{ color: "var(--aurora-text-primary)", fontFamily: "var(--aurora-font-sans)", fontSize: "var(--aurora-type-body-sm)", lineHeight: "var(--aurora-line-body)" }} onChange={(event) => setValue(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter" && !event.shiftKey && !event.nativeEvent.isComposing) { event.preventDefault(); submitMessage() } }} />
           <Button type="submit" variant="rose" size="icon" filled aria-label="Send message" disabled={isResponding || (!value.trim() && !composerAttachment)}>{isResponding ? <Spinner size="sm" tone="rose" /> : <Send data-icon="inline-start" aria-hidden="true" />}</Button>
         </div>
-        <div className="mt-2 flex items-center justify-between gap-3 px-1"><span style={{ color: "var(--aurora-text-muted)", fontSize: "var(--aurora-type-caption)", lineHeight: "var(--aurora-line-dense)" }}>Enter to send · Shift + Enter for a new line</span><span style={{ color: "var(--aurora-text-muted)", fontSize: "var(--aurora-type-caption)", lineHeight: "var(--aurora-line-dense)" }}>Mock UI · no network requests</span></div>
+        <div className="mt-1.5 flex items-center justify-between gap-3 px-1"><span style={{ color: "var(--aurora-text-muted)", fontSize: "var(--aurora-type-caption)", lineHeight: "var(--aurora-line-dense)" }}>Enter to send · Shift + Enter for a new line</span><span style={{ color: "var(--aurora-text-muted)", fontSize: "var(--aurora-type-caption)", lineHeight: "var(--aurora-line-dense)" }}>Mock UI · no network requests</span></div>
       </form>
     </section>
   )
