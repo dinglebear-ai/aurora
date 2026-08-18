@@ -71,6 +71,13 @@ test("new chat surfaces preserve Aurora conversation ergonomics", () => {
   assert.equal(block.includes("aria-label={item.role === \"user\" ? \"You\" : \"Aurora\"}"), false, "user turns should not regain redundant identity avatars")
 })
 
+test("chat developer surfaces keep scrollable code keyboard reachable", () => {
+  const snippet = read("registry/aurora/blocks/ai/elements/snippet.tsx")
+  const codeBlock = read("registry/aurora/blocks/workspace/code-block/code-block.tsx")
+  assert.ok(snippet.includes("tabIndex={tabIndex ?? 0}"), "scrollable snippets should be keyboard focusable")
+  assert.ok(codeBlock.includes("tabIndex={0}"), "scrollable code blocks should be keyboard focusable")
+})
+
 test("each new chat primitive has a gallery demo", () => {
   const manifest = JSON.parse(read("lib/gallery-manifest.json")) as Record<string, string>
   assert.equal(manifest["message-scroller"], "message-scroller-demo")

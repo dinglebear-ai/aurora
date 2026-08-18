@@ -358,6 +358,8 @@ export function CodeBlock({
 
       {/* Code body */}
       <div
+        tabIndex={0}
+        aria-label={filename ? `Code: ${filename}` : `Code: ${language}`}
         style={{
           overflowX: "auto",
           overflowY: "auto",

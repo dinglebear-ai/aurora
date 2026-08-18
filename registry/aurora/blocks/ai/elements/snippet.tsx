@@ -138,7 +138,7 @@ function CopyIconButton({ value, compact = false }: { value: string; compact?: b
  * architecture: `forwardRef` to the underlying `<pre>`, `displayName`, full
  * prop spread, and an accessible copy affordance.
  */
-const Snippet = ({ ref, code, language = "tsx", density = "default", className, style, ...props }: SnippetProps & { ref?: React.Ref<HTMLPreElement> }) => {
+const Snippet = ({ ref, code, language = "tsx", density = "default", className, style, tabIndex, ...props }: SnippetProps & { ref?: React.Ref<HTMLPreElement> }) => {
   const compact = density === "compact"
   return (
     <div
@@ -172,6 +172,7 @@ const Snippet = ({ ref, code, language = "tsx", density = "default", className, 
       </div>
       <pre
         ref={ref}
+        tabIndex={tabIndex ?? 0}
         className="overflow-auto aurora-text-code"
         style={{
           margin: 0,
