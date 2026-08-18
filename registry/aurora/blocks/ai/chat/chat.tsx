@@ -86,21 +86,21 @@ function AttachmentCard({ attachment, onOpen, onRemove, compact = false }: { att
 
 function ThreadMarker({ item }: { item: DemoMarker }) {
   const Icon = item.status === "synced" ? CheckCheck : item.status === "ready" ? Check : Sparkles
-  return <Marker variant={item.variant} role={item.status === "thinking" ? "status" : undefined}>{item.status ? <MarkerIcon>{item.status === "thinking" ? <Spinner size="sm" tone="rose" /> : <Icon aria-hidden="true" />}</MarkerIcon> : null}<MarkerContent>{item.label}</MarkerContent></Marker>
+  return <Marker variant={item.variant} role={item.status === "thinking" ? "status" : undefined} className={item.status === "thinking" ? "my-0.5" : "my-0.5 opacity-75"}>{item.status ? <MarkerIcon>{item.status === "thinking" ? <Spinner size="sm" tone="rose" /> : <Icon aria-hidden="true" />}</MarkerIcon> : null}<MarkerContent>{item.label}</MarkerContent></Marker>
 }
 
 function AssistantShowcase({ kind }: { kind?: ShowcaseKind }) {
   if (kind === "code") {
     return (
-      <div className="grid max-w-[560px] gap-1.5 pt-1">
+      <div className="grid max-w-[640px] gap-2 pt-1 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-start">
         <Snippet density="compact" language="tsx" code={DEMO_SNIPPET} />
-        <CodeBlock density="compact" language="typescript" filename="steering.ts" code={DEMO_CODE} showLineNumbers />
+        <CodeBlock density="compact" language="typescript" filename="steering.ts" code={DEMO_CODE} />
       </div>
     )
   }
   if (kind === "sources") {
     return (
-      <Sources density="compact" title="Sources & references" collapsible defaultOpen className="max-w-[560px]">
+      <Sources density="compact" title="Sources & references" collapsible defaultOpen className="max-w-[640px]">
         <Source density="compact" index={1} source={{ title: "shadcn chat components", href: "https://ui.shadcn.com/docs/changelog/2026-06-chat-components", badge: "DOCS" }} />
         <Source density="compact" index={2} source={{ title: "message-scroller.tsx", badge: "FILE" }} />
       </Sources>
@@ -111,18 +111,24 @@ function AssistantShowcase({ kind }: { kind?: ShowcaseKind }) {
 
 function SuggestionPopup({ label, items, activeIndex, onSelect }: { label: string; items: Suggestion[]; activeIndex: number; onSelect: (item: Suggestion) => void }) {
   if (items.length === 0) return null
+  const heading = label.startsWith("Skills") ? "Skills" : "Files"
   return (
-    <div role="listbox" aria-label={label} className="absolute bottom-[calc(100%+6px)] left-2 z-40 w-[min(320px,92%)] overflow-hidden rounded-[10px] border p-1" style={{ borderColor: "var(--aurora-border-strong)", background: "var(--aurora-surface-raised)", boxShadow: "var(--aurora-shadow-strong), var(--aurora-highlight-strong)" }}>
+    <div className="absolute bottom-[calc(100%+7px)] left-2 z-40 w-[min(310px,92%)] overflow-hidden rounded-[12px] border p-1.5" style={{ borderColor: "color-mix(in srgb, var(--aurora-border-strong) 88%, transparent)", background: "color-mix(in srgb, var(--aurora-surface-raised) 96%, transparent)", boxShadow: "var(--aurora-shadow-strong), var(--aurora-highlight-strong)", backdropFilter: "blur(14px)" }}>
+      <div className="flex items-center justify-between gap-2 px-1.5 pb-1 pt-0.5" style={{ color: "var(--aurora-text-muted)", fontSize: "10px", fontWeight: "var(--aurora-weight-ui)", letterSpacing: "0.04em", textTransform: "uppercase" }}>
+        <span>{heading}</span><span aria-hidden="true" className="normal-case tracking-normal">↑↓ · Enter</span>
+      </div>
+      <div role="listbox" aria-label={label}>
       {items.map((item, index) => (
-        <Button key={item.id} type="button" variant="plain" size="unstyled" role="option" aria-selected={index === activeIndex} className="flex w-full items-center gap-2 rounded-[7px] px-2 py-1.5 text-left data-[selected=true]:bg-[var(--aurora-hover-bg)]" data-selected={index === activeIndex ? "true" : "false"} onMouseDown={(event) => event.preventDefault()} onClick={() => onSelect(item)}>
+        <Button key={item.id} type="button" variant="plain" size="unstyled" role="option" aria-selected={index === activeIndex} className="flex w-full items-center gap-2 rounded-[8px] px-2 py-1.5 text-left transition-colors data-[selected=true]:bg-[var(--aurora-selected-bg)]" data-selected={index === activeIndex ? "true" : "false"} onMouseDown={(event) => event.preventDefault()} onClick={() => onSelect(item)}>
           {item.kind === "skill" ? <Command className="size-3.5 shrink-0" aria-hidden style={{ color: "var(--axon-orange)" }} /> : <FileCode2 className="size-3.5 shrink-0" aria-hidden style={{ color: "var(--aurora-accent-primary)" }} />}
           <span className="min-w-0 flex-1">
             <span className="block truncate" style={{ color: "var(--aurora-text-primary)", fontSize: "var(--aurora-type-label)", fontWeight: "var(--aurora-weight-ui)" }}>{item.label}</span>
             <span className="block truncate" style={{ color: "var(--aurora-text-muted)", fontSize: "var(--aurora-type-caption)" }}>{item.description}</span>
           </span>
-          <span style={{ color: "var(--aurora-text-muted)", fontSize: "10px", textTransform: "uppercase" }}>{item.kind}</span>
+          <span className="rounded-full border px-1.5 py-0.5" style={{ borderColor: "var(--aurora-border-default)", color: "var(--aurora-text-muted)", fontSize: "9px", lineHeight: 1, textTransform: "uppercase" }}>{item.kind}</span>
         </Button>
       ))}
+      </div>
     </div>
   )
 }
@@ -130,7 +136,7 @@ function SuggestionPopup({ label, items, activeIndex, onSelect }: { label: strin
 function CompactSelect({ label, value, options, onValueChange, icon }: { label: string; value: string; options: string[]; onValueChange: (value: string) => void; icon: React.ReactNode }) {
   return (
     <Select value={value} onValueChange={onValueChange}>
-      <SelectTrigger aria-label={label} className="!h-6 !w-auto min-w-[98px] gap-1 rounded-[7px] !px-2 !py-0 [&>svg]:!size-3">
+      <SelectTrigger aria-label={label} className="!h-6 !w-auto min-w-[94px] gap-1 rounded-full !px-2 !py-0 [&>svg]:!size-3">
         <span className="flex min-w-0 items-center gap-1.5">{icon}<SelectValue /></span>
       </SelectTrigger>
       <SelectContent className="min-w-[150px]">
@@ -318,17 +324,17 @@ function AuroraChatBlock({ title = "Aurora Chat", subtitle = "Composable convers
   const showStopButton = isResponding && !hasComposerPayload && !editingMessageId
 
   return (
-    <section aria-label="Interactive Aurora chat demo" className={["flex h-[min(720px,78vh)] min-h-[560px] w-full min-w-0 flex-col overflow-hidden rounded-[16px] border", className].filter(Boolean).join(" ")} style={{ borderColor: "var(--aurora-border-strong)", background: "var(--aurora-page-bg)", boxShadow: "var(--aurora-shadow-strong), var(--aurora-highlight-strong)" }}>
-      <header className="flex shrink-0 items-center justify-between gap-3 border-b px-3 py-1.5 sm:px-3.5" style={{ borderColor: "var(--aurora-border-default)", background: "color-mix(in srgb, var(--aurora-panel-strong) 92%, transparent)" }}>
+    <section aria-label="Interactive Aurora chat demo" className={["flex h-[min(720px,78vh)] min-h-[560px] w-full min-w-0 flex-col overflow-hidden rounded-[18px] border", className].filter(Boolean).join(" ")} style={{ borderColor: "color-mix(in srgb, var(--aurora-border-strong) 88%, transparent)", background: "linear-gradient(180deg, color-mix(in srgb, var(--aurora-page-bg) 96%, var(--aurora-panel-medium)), var(--aurora-page-bg))", boxShadow: "var(--aurora-shadow-strong), var(--aurora-highlight-strong)" }}>
+      <header className="flex shrink-0 items-center justify-between gap-3 border-b px-3 py-1.5 sm:px-3.5" style={{ borderColor: "color-mix(in srgb, var(--aurora-border-strong) 78%, transparent)", background: "linear-gradient(180deg, color-mix(in srgb, var(--aurora-panel-strong) 98%, transparent), color-mix(in srgb, var(--aurora-panel-medium) 92%, transparent))", boxShadow: "inset 0 -1px color-mix(in srgb, var(--aurora-highlight-medium) 55%, transparent)" }}>
         <div className="flex min-w-0 items-center gap-2">
-          <span className="flex size-7 shrink-0 items-center justify-center rounded-[9px] border [&_svg]:size-4" style={{ borderColor: "color-mix(in srgb, var(--axon-orange) 36%, var(--aurora-border-default))", background: "color-mix(in srgb, var(--axon-orange) 10%, var(--aurora-panel-medium))", color: "var(--axon-orange)" }}><Sparkles aria-hidden="true" /></span>
+          <span className="flex size-[26px] shrink-0 items-center justify-center rounded-[8px] border [&_svg]:size-3.5" style={{ borderColor: "color-mix(in srgb, var(--axon-orange) 36%, var(--aurora-border-default))", background: "color-mix(in srgb, var(--axon-orange) 10%, var(--aurora-panel-medium))", color: "var(--axon-orange)" }}><Sparkles aria-hidden="true" /></span>
           <div className="min-w-0"><h2 className="truncate" style={{ fontFamily: "var(--aurora-font-display)", fontSize: "var(--aurora-type-body)", fontWeight: "var(--aurora-weight-heading)", lineHeight: "var(--aurora-line-dense)" }}>{title}</h2><p className="truncate" style={{ color: "var(--aurora-text-muted)", fontSize: "var(--aurora-type-caption)", lineHeight: "var(--aurora-line-dense)" }}>{subtitle}</p></div>
         </div>
         <div className="flex shrink-0 items-center gap-1.5">
-          <span className="hidden items-center gap-1.5 rounded-full border px-2 py-0.5 sm:inline-flex" style={{ borderColor: "var(--aurora-border-default)", color: "var(--aurora-text-muted)", fontSize: "var(--aurora-type-label)" }}>
+          <span className="hidden items-center gap-1.5 rounded-full border px-2 py-0.5 sm:inline-flex" style={{ borderColor: "color-mix(in srgb, var(--aurora-border-default) 78%, transparent)", background: "color-mix(in srgb, var(--aurora-control-surface) 42%, transparent)", color: "var(--aurora-text-muted)", fontSize: "var(--aurora-type-caption)" }}>
             <span className="aurora-status-dot" style={{ "--status-dot-color": "var(--aurora-success)" } as React.CSSProperties} />Local mock
           </span>
-          <Button variant="ghost" size="sm" type="button" className="!h-6 !px-2 [&_svg]:!size-3.5" onClick={resetDemo}><RefreshCw data-icon="inline-start" aria-hidden="true" />Reset</Button>
+          <Button variant="ghost" size="sm" type="button" aria-label="Reset chat demo" className="!h-6 !px-1.5 sm:!px-2 [&_svg]:!size-3.5" onClick={resetDemo}><RefreshCw data-icon="inline-start" aria-hidden="true" /><span className="hidden sm:inline">Reset</span></Button>
         </div>
       </header>
 
@@ -336,17 +342,17 @@ function AuroraChatBlock({ title = "Aurora Chat", subtitle = "Composable convers
         <MessageScrollerProvider autoScroll scrollPreviousItemPeek={48}>
           <MessageScroller>
             <MessageScrollerViewport>
-              <MessageScrollerContent className="gap-3 px-3.5 py-2.5 sm:px-4">
+              <MessageScrollerContent className="gap-3.5 px-3.5 py-3 sm:px-4">
                 {items.map((item) => (
                   <MessageScrollerItem key={item.id} messageId={item.id} scrollAnchor={item.kind === "message" ? item.scrollAnchor : false}>
                     {item.kind === "marker" ? <ThreadMarker item={item} /> : (
                       <MessageGroup className="gap-1">
                         <Message align={item.role === "user" ? "end" : "start"}>
                           {item.role === "assistant" ? <MessageAvatar aria-label="Aurora" className="!size-[22px] !min-w-[22px] [&_svg]:size-3"><Bot aria-hidden="true" /></MessageAvatar> : null}
-                          <MessageContent className="gap-1">
+                          <MessageContent className="relative gap-1">
                             {item.role === "assistant" ? <MessageHeader className="min-h-0 px-0"><span style={{ color: "var(--aurora-text-primary)", fontSize: "var(--aurora-type-caption)", fontWeight: "var(--aurora-weight-ui)" }}>Aurora</span></MessageHeader> : null}
                             <BubbleGroup>
-                              <Bubble variant={item.role === "user" ? "default" : "ghost"} align={item.role === "user" ? "end" : "start"} className={item.role === "assistant" ? "max-w-[68ch]" : undefined}>
+                              <Bubble variant={item.role === "user" ? "default" : "ghost"} align={item.role === "user" ? "end" : "start"} className={item.role === "assistant" ? "max-w-[64ch]" : "max-w-[86%] sm:max-w-[36ch]"}>
                                 <BubbleContent style={item.role === "user" ? { padding: "7px 10px", lineHeight: "1.45" } : { lineHeight: "1.55" }}>
                                   {item.text}
                                   {item.streaming ? <span aria-hidden="true" className="ml-1 inline-block h-[1em] w-[2px] translate-y-[2px] rounded-full" style={{ background: "var(--aurora-accent-pink)", animation: "aurora-msg-caret 1.1s steps(1) infinite" }} /> : null}
@@ -356,16 +362,16 @@ function AuroraChatBlock({ title = "Aurora Chat", subtitle = "Composable convers
                             </BubbleGroup>
                             {item.role === "assistant" ? <AssistantShowcase kind={item.showcase} /> : null}
                             {item.role === "assistant" ? (
-                              <MessageFooter className="min-h-0 gap-0.5 px-0 opacity-0 transition-opacity duration-150 group-hover/message:opacity-100 group-focus-within/message:opacity-100">
+                              <MessageFooter className="aurora-chat-action-rail pointer-events-none h-0 min-h-0 translate-y-1 gap-0.5 px-0 opacity-0 transition-[opacity,transform] duration-150 group-hover/message:pointer-events-auto group-hover/message:translate-y-0 group-hover/message:opacity-100 group-focus-within/message:pointer-events-auto group-focus-within/message:translate-y-0 group-focus-within/message:opacity-100 [@media(hover:none)]:pointer-events-auto [@media(hover:none)]:translate-y-0 [@media(hover:none)]:opacity-70">
                                 <span className="mr-1" style={{ color: "var(--aurora-text-muted)", fontSize: "10.5px" }}>{item.time}</span>
-                                <Button type="button" variant="plain" size="unstyled" className="flex size-5 items-center justify-center rounded-[5px] [&_svg]:!size-3.5" aria-label={copiedId === item.id ? "Copied" : "Copy message"} onClick={() => copyMessage(item)}>{copiedId === item.id ? <Check aria-hidden="true" /> : <Copy aria-hidden="true" />}</Button>
-                                <Button type="button" variant="plain" size="unstyled" className="flex size-5 items-center justify-center rounded-[5px] [&_svg]:!size-3.5" aria-label="Retry message" disabled={isResponding} onClick={() => retryMessage(item.id)}><RotateCcw aria-hidden="true" /></Button>
-                                <Button type="button" variant="plain" size="unstyled" className="flex size-5 items-center justify-center rounded-[5px] [&_svg]:!size-3.5" aria-label={likedIds.has(item.id) ? "Remove reaction" : "Like message"} aria-pressed={likedIds.has(item.id)} onClick={() => toggleLike(item.id)} style={{ color: likedIds.has(item.id) ? "var(--aurora-accent-primary)" : "var(--aurora-text-muted)" }}><ThumbsUp aria-hidden="true" /></Button>
+                                <Button type="button" variant="plain" size="unstyled" className="flex size-[18px] items-center justify-center rounded-[5px] transition-colors hover:bg-[var(--aurora-hover-bg)] [&_svg]:!size-3" aria-label={copiedId === item.id ? "Copied" : "Copy message"} onClick={() => copyMessage(item)}>{copiedId === item.id ? <Check aria-hidden="true" /> : <Copy aria-hidden="true" />}</Button>
+                                <Button type="button" variant="plain" size="unstyled" className="flex size-[18px] items-center justify-center rounded-[5px] transition-colors hover:bg-[var(--aurora-hover-bg)] [&_svg]:!size-3" aria-label="Retry message" disabled={isResponding} onClick={() => retryMessage(item.id)}><RotateCcw aria-hidden="true" /></Button>
+                                <Button type="button" variant="plain" size="unstyled" className="flex size-[18px] items-center justify-center rounded-[5px] transition-colors hover:bg-[var(--aurora-hover-bg)] [&_svg]:!size-3" aria-label={likedIds.has(item.id) ? "Remove reaction" : "Like message"} aria-pressed={likedIds.has(item.id)} onClick={() => toggleLike(item.id)} style={{ color: likedIds.has(item.id) ? "var(--aurora-accent-primary)" : "var(--aurora-text-muted)" }}><ThumbsUp aria-hidden="true" /></Button>
                               </MessageFooter>
                             ) : (
-                              <MessageFooter className="min-h-0 justify-end gap-0.5 px-0 opacity-0 transition-opacity duration-150 group-hover/message:opacity-100 group-focus-within/message:opacity-100">
+                              <MessageFooter className="aurora-chat-action-rail pointer-events-none h-0 min-h-0 translate-y-1 justify-end gap-0.5 px-0 opacity-0 transition-[opacity,transform] duration-150 group-hover/message:pointer-events-auto group-hover/message:translate-y-0 group-hover/message:opacity-100 group-focus-within/message:pointer-events-auto group-focus-within/message:translate-y-0 group-focus-within/message:opacity-100 [@media(hover:none)]:pointer-events-auto [@media(hover:none)]:translate-y-0 [@media(hover:none)]:opacity-70">
                                 <span className="mr-1" style={{ color: "var(--aurora-text-muted)", fontSize: "10.5px" }}>{item.time}</span>
-                                <Button type="button" variant="plain" size="unstyled" className="flex size-5 items-center justify-center rounded-[5px] [&_svg]:!size-3.5" aria-label="Edit message" onClick={() => editMessage(item)}><Pencil aria-hidden="true" /></Button>
+                                <Button type="button" variant="plain" size="unstyled" className="flex size-[18px] items-center justify-center rounded-[5px] transition-colors hover:bg-[var(--aurora-hover-bg)] [&_svg]:!size-3" aria-label="Edit message" onClick={() => editMessage(item)}><Pencil aria-hidden="true" /></Button>
                               </MessageFooter>
                             )}
                           </MessageContent>
@@ -388,11 +394,11 @@ function AuroraChatBlock({ title = "Aurora Chat", subtitle = "Composable convers
         <Button type="button" variant="ghost" size="icon" className="!size-6 [&_svg]:!size-3.5" aria-label="Close preview" onClick={() => setPreviewAttachment(null)}><X aria-hidden="true" /></Button>
       </div> : null}
 
-      <form className="relative z-30 shrink-0 border-t p-2" style={{ borderColor: "var(--aurora-border-default)", background: "color-mix(in srgb, var(--aurora-panel-strong) 94%, transparent)" }} onSubmit={(event) => { event.preventDefault(); if (!showStopButton) submitMessage() }}>
+      <form className="relative z-30 shrink-0 border-t p-1.5" style={{ borderColor: "var(--aurora-border-default)", background: "color-mix(in srgb, var(--aurora-panel-strong) 94%, transparent)" }} onSubmit={(event) => { event.preventDefault(); if (!showStopButton) submitMessage() }}>
         <SuggestionPopup label="Skills and slash commands" items={slashOpen ? filteredSlash : []} activeIndex={slashActiveIndex} onSelect={insertSlashCommand} />
         <SuggestionPopup label="File mentions" items={mentionOpen ? filteredMentions : []} activeIndex={mentionActiveIndex} onSelect={insertMention} />
         {composerAttachment ? <AttachmentGroup className="mb-1.5 gap-1 py-0"><AttachmentCard attachment={composerAttachment} onOpen={setPreviewAttachment} onRemove={() => setComposerAttachment(null)} compact /></AttachmentGroup> : null}
-        <div className="overflow-hidden rounded-[11px] border" style={{ borderColor: "var(--aurora-border-strong)", background: "var(--aurora-control-surface)", boxShadow: "var(--aurora-highlight-medium)" }}>
+        <div className="aurora-chat-composer overflow-hidden rounded-[12px] border" data-streaming={isResponding ? "true" : undefined} style={{ borderColor: "var(--aurora-border-strong)", background: "linear-gradient(180deg, color-mix(in srgb, var(--aurora-control-surface) 96%, var(--aurora-panel-strong)), var(--aurora-control-surface))", boxShadow: "var(--aurora-highlight-medium)" }}>
           <div className="relative">
             <Button type="button" variant="ghost" size="icon" className="absolute bottom-1 left-1 z-10 !size-6 [&_svg]:!size-3.5" aria-label="Add mock attachment" disabled={Boolean(composerAttachment)} onClick={addMockAttachment}><Paperclip aria-hidden="true" /></Button>
             <Textarea ref={textareaRef} unstyled autoGrow rows={1} value={value} aria-label="Message" aria-autocomplete="list" placeholder={editingMessageId ? "Edit your message…" : isResponding ? "Steer the response…" : "Ask Aurora anything…"} className="max-h-[96px] min-h-[38px] w-full resize-none bg-transparent px-9 py-2 outline-none" style={{ color: "var(--aurora-text-primary)", fontFamily: "var(--aurora-font-sans)", fontSize: "var(--aurora-type-body-sm)", lineHeight: "var(--aurora-line-body)", caretColor: "var(--aurora-accent-primary)" }} onChange={handleComposerChange} onKeyDown={handleComposerKeyDown} />
@@ -402,7 +408,7 @@ function AuroraChatBlock({ title = "Aurora Chat", subtitle = "Composable convers
               <Button type="submit" variant="rose" size="icon" filled className="absolute bottom-1 right-1 z-10 !size-6 rounded-[7px] [&_svg]:!size-3.5" aria-label={editingMessageId ? "Save edited message" : isResponding ? "Send steering message" : "Send message"} disabled={!hasComposerPayload}><Send aria-hidden="true" /></Button>
             )}
           </div>
-          <div className="flex min-w-0 items-center gap-1.5 border-t px-1.5 py-1" style={{ borderColor: "color-mix(in srgb, var(--aurora-border-default) 72%, transparent)", background: "color-mix(in srgb, var(--aurora-control-surface) 45%, transparent)" }}>
+          <div className="flex min-w-0 items-center gap-1 border-t px-1.5 py-0.5" style={{ borderColor: "color-mix(in srgb, var(--aurora-border-default) 68%, transparent)", background: "linear-gradient(180deg, color-mix(in srgb, var(--aurora-panel-medium) 30%, transparent), color-mix(in srgb, var(--aurora-control-surface) 58%, transparent))" }}>
             <CompactSelect label="Model" value={model} options={MODELS} onValueChange={setModel} icon={<Cpu className="size-3 shrink-0" aria-hidden style={{ color: "var(--axon-orange)" }} />} />
             <CompactSelect label="Reasoning" value={reasoning} options={REASONING_LEVELS} onValueChange={setReasoning} icon={<Brain className="size-3 shrink-0" aria-hidden style={{ color: "var(--aurora-accent-pink)" }} />} />
             <span className="hidden min-w-0 truncate sm:inline" style={{ color: "var(--aurora-text-muted)", fontSize: "10px" }}><AtSign className="mr-1 inline size-3" aria-hidden />files · / skills</span>

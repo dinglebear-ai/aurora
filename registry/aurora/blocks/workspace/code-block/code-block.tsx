@@ -314,11 +314,11 @@ export function CodeBlock({
         width: "100%",
         maxWidth: "100%",
         minWidth: 0,
-        background: "var(--aurora-panel-strong)",
+        background: compact ? "color-mix(in srgb, var(--aurora-panel-strong) 92%, transparent)" : "var(--aurora-panel-strong)",
         border: "1px solid var(--aurora-border-default)",
-        borderRadius: "var(--aurora-radius-2)",
+        borderRadius: compact ? "10px" : "var(--aurora-radius-2)",
         overflow: "hidden",
-        boxShadow: "var(--aurora-shadow-medium)",
+        boxShadow: compact ? "var(--aurora-highlight-medium)" : "var(--aurora-shadow-medium)",
       }}
     >
       {/* Titlebar */}
@@ -329,9 +329,9 @@ export function CodeBlock({
           gap: "10px",
           padding: compact ? "6px 8px" : "10px 16px",
           minWidth: 0,
-          background: "var(--aurora-panel-medium)",
+          background: compact ? "color-mix(in srgb, var(--aurora-panel-medium) 62%, transparent)" : "var(--aurora-panel-medium)",
           borderBottom: "1px solid var(--aurora-border-default)",
-          boxShadow: "var(--aurora-highlight-medium)",
+          boxShadow: compact ? "none" : "var(--aurora-highlight-medium)",
         }}
       >
         {/* Language / filename badge */}

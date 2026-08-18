@@ -88,6 +88,22 @@ test("chat autocomplete popovers accept real pointer clicks above the transcript
   await expect(input).toHaveValue("@chat.tsx ")
 })
 
+test("chat actions stay discoverable and user bubbles stay message-shaped on touch viewports", async ({ page }, testInfo) => {
+  test.skip(!testInfo.project.name.includes("mobile"))
+  await page.goto("/gallery/chat-block")
+
+  const actionRail = page.locator(".aurora-chat-action-rail").first()
+  await expect(actionRail).toHaveCSS("pointer-events", "auto")
+  const opacity = Number(await actionRail.evaluate((element) => getComputedStyle(element).opacity))
+  expect(opacity).toBeGreaterThan(0.5)
+
+  const bubble = page.locator('[data-slot="bubble"][data-align="end"]').first()
+  const message = bubble.locator('xpath=ancestor::*[@data-slot="message"][1]')
+  const bubbleWidth = (await bubble.boundingBox())?.width ?? 0
+  const messageWidth = (await message.boundingBox())?.width ?? 1
+  expect(bubbleWidth / messageWidth).toBeLessThan(0.9)
+})
+
 test("tenant host routing and CSP contracts are enforced", async ({ request }) => {
   const tenant = await request.get("/", { headers: { host: "dinglebear.ai", accept: "text/html" } })
   expect(tenant.ok()).toBe(true)

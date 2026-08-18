@@ -434,6 +434,18 @@
   color: var(--aurora-text-muted);
 }
 
+.aurora-chat-composer {
+  transition: border-color 150ms ease, box-shadow 150ms ease, background 150ms ease;
+}
+.aurora-chat-composer[data-streaming="true"] {
+  border-color: color-mix(in srgb, var(--axon-orange) 28%, var(--aurora-border-strong));
+}
+.aurora-chat-composer:focus-within {
+  border-color: color-mix(in srgb, var(--aurora-accent-primary) 48%, var(--aurora-border-strong));
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--aurora-accent-primary) 18%, transparent),
+    0 10px 28px color-mix(in srgb, var(--aurora-accent-primary) 6%, transparent),
+    var(--aurora-highlight-medium);
+}
 .aurora-chat-attachment {
   border: 1px solid var(--aurora-border-default);
   border-radius: 13px;

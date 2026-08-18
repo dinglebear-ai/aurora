@@ -72,11 +72,11 @@ const Source = ({ ref, className, source, index, density = "default", style, hre
           className
         )}
         style={{
-          background: "var(--aurora-control-surface)",
-          border: "1px solid var(--aurora-border-default)",
-          borderRadius: "calc(var(--aurora-radius-1) - 4px)",
+          background: compact ? "color-mix(in srgb, var(--aurora-control-surface) 60%, transparent)" : "var(--aurora-control-surface)",
+          border: `1px solid ${compact ? "color-mix(in srgb, var(--aurora-border-default) 72%, transparent)" : "var(--aurora-border-default)"}`,
+          borderRadius: compact ? "8px" : "calc(var(--aurora-radius-1) - 4px)",
           color: "var(--aurora-text-primary)",
-          boxShadow: "var(--aurora-highlight-medium)",
+          boxShadow: compact ? "none" : "var(--aurora-highlight-medium)",
           ...style,
         }}
       >
@@ -111,7 +111,7 @@ const Source = ({ ref, className, source, index, density = "default", style, hre
               <Badge
                 tone="neutral"
                 fill="outline"
-                className="shrink-0"
+                className={compact ? "shrink-0 !px-1.5 text-[9px]" : "shrink-0"}
               >
                 {source.badge}
               </Badge>
