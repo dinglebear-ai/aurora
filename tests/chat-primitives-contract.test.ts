@@ -62,6 +62,10 @@ test("new chat surfaces preserve Aurora conversation ergonomics", () => {
   assert.ok(block.includes("FILE_MENTIONS"), "composer should expose file mentions")
   assert.ok(block.includes('CompactSelect label="Model"'), "composer should expose a model selector")
   assert.ok(block.includes('CompactSelect label="Reasoning"'), "composer should expose a reasoning selector")
+  assert.ok(block.includes('Reasoning density="compact"'), "assistant turns should demonstrate compact reasoning disclosure")
+  assert.ok(block.includes("aurora-chat-stream-status"), "streaming turns should expose polished live status")
+  assert.ok(block.includes("aurora-chat-attachment__state-badge"), "completed attachments should expose compact state treatment")
+  assert.ok(block.includes("data-chat-select={tone}"), "model and reasoning selectors should keep distinct Aurora tones")
   assert.ok(block.includes('Snippet density="compact"'), "assistant turns should demonstrate snippets")
   assert.ok(block.includes('CodeBlock density="compact"'), "assistant turns should demonstrate code blocks")
   assert.ok(block.includes('Sources density="compact"'), "assistant turns should demonstrate sources and references")
@@ -74,8 +78,10 @@ test("new chat surfaces preserve Aurora conversation ergonomics", () => {
 test("chat developer surfaces keep scrollable code keyboard reachable", () => {
   const snippet = read("registry/aurora/blocks/ai/elements/snippet.tsx")
   const codeBlock = read("registry/aurora/blocks/workspace/code-block/code-block.tsx")
+  const reasoning = read("registry/aurora/blocks/ai/elements/reasoning.tsx")
   assert.ok(snippet.includes("tabIndex={tabIndex ?? 0}"), "scrollable snippets should be keyboard focusable")
   assert.ok(codeBlock.includes("tabIndex={0}"), "scrollable code blocks should be keyboard focusable")
+  assert.ok(reasoning.includes('density?: "default" | "compact"'), "reasoning should support compact chat density")
 })
 
 test("each new chat primitive has a gallery demo", () => {

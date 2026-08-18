@@ -1,8 +1,9 @@
 "use client"
 
 import * as React from "react"
-import { AtSign, Bot, Brain, Check, CheckCheck, Command, Copy, Cpu, FileCode2, FileText, Paperclip, Pencil, RefreshCw, RotateCcw, Send, Sparkles, Square, ThumbsUp, X } from "lucide-react"
+import { Bot, Brain, Check, CheckCheck, Command, Copy, Cpu, FileCode2, FileText, Paperclip, Pencil, RefreshCw, RotateCcw, Send, Sparkles, Square, ThumbsUp, X } from "lucide-react"
 
+import { Reasoning } from "@/registry/aurora/blocks/ai/elements/reasoning"
 import { Snippet } from "@/registry/aurora/blocks/ai/elements/snippet"
 import { Source, Sources } from "@/registry/aurora/blocks/ai/elements/sources"
 import { CodeBlock } from "@/registry/aurora/blocks/workspace/code-block/code-block"
@@ -12,12 +13,12 @@ import { Button } from "@/registry/aurora/ui/button"
 import { Marker, MarkerContent, MarkerIcon } from "@/registry/aurora/ui/marker"
 import { Message, MessageAvatar, MessageContent, MessageFooter, MessageGroup, MessageHeader } from "@/registry/aurora/ui/message"
 import { MessageScroller, MessageScrollerButton, MessageScrollerContent, MessageScrollerItem, MessageScrollerProvider, MessageScrollerViewport } from "@/registry/aurora/ui/message-scroller"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/registry/aurora/ui/select"
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/registry/aurora/ui/select"
 import { Spinner } from "@/registry/aurora/ui/spinner"
 import { Textarea } from "@/registry/aurora/ui/textarea"
 
 type DemoAttachment = { id: string; title: string; description: string; state: AttachmentState }
-type ShowcaseKind = "code" | "sources"
+type ShowcaseKind = "code" | "sources" | "reasoning"
 type DemoMessage = { kind: "message"; id: string; role: "assistant" | "user"; text: string; time: string; streaming?: boolean; scrollAnchor?: boolean; attachments?: DemoAttachment[]; showcase?: ShowcaseKind }
 type DemoMarker = { kind: "marker"; id: string; label: string; variant?: "default" | "separator" | "border"; status?: "thinking" | "ready" | "synced" }
 type DemoThreadItem = DemoMessage | DemoMarker
@@ -60,7 +61,7 @@ const INITIAL_ITEMS: DemoThreadItem[] = [
   { kind: "marker", id: "marker-context", label: "Conversation context synchronized", variant: "border", status: "synced" },
   { kind: "message", id: "assistant-compose", role: "assistant", time: "9:34 PM", text: "Assistant content is now plain conversational prose. Sources stay attached to the turn as compact references instead of becoming another oversized card stack.", showcase: "sources" },
   { kind: "message", id: "user-streaming", role: "user", time: "9:36 PM", text: "Nice. Can I steer while you're still replying?" },
-  { kind: "message", id: "assistant-streaming", role: "assistant", time: "9:37 PM", text: "Yes. Keep typing while I stream. If the composer has text, Send steers the conversation. If it is empty, that same control becomes Stop." },
+  { kind: "message", id: "assistant-streaming", role: "assistant", time: "9:37 PM", text: "Yes. Keep typing while I stream. If the composer has text, Send steers the conversation. If it is empty, that same control becomes Stop.", showcase: "reasoning" },
   { kind: "marker", id: "marker-live", label: "Interactive demo", variant: "separator", status: "ready" },
 ]
 
@@ -76,7 +77,10 @@ function AttachmentCard({ attachment, onOpen, onRemove, compact = false }: { att
   const description = attachment.state === "uploading" ? "Uploading mock file" : attachment.state === "processing" ? "Preparing attachment" : attachment.description
   return (
     <Attachment state={attachment.state} size={compact ? "xs" : "sm"} className={compact ? "max-w-[210px] flex-nowrap" : undefined}>
-      <AttachmentMedia className={compact ? "[&_svg]:!size-3.5" : undefined}>{pending ? <Spinner size="sm" tone="cyan" /> : <FileText aria-hidden="true" />}</AttachmentMedia>
+      <AttachmentMedia className={["relative", compact ? "[&_svg]:!size-3.5" : undefined].filter(Boolean).join(" ")}>
+        {pending ? <Spinner size="sm" tone="cyan" /> : <FileText aria-hidden="true" />}
+        {attachment.state === "done" ? <span className="aurora-chat-attachment__state-badge" aria-hidden="true"><Check /></span> : null}
+      </AttachmentMedia>
       <AttachmentContent><AttachmentTitle>{attachment.title}</AttachmentTitle>{compact ? null : <AttachmentDescription>{description}</AttachmentDescription>}</AttachmentContent>
       {onRemove ? <AttachmentActions><AttachmentAction type="button" className={compact ? "!size-5 rounded-[5px] [&_svg]:!size-3.5" : undefined} aria-label={"Remove " + attachment.title} onClick={() => onRemove(attachment)}><X data-icon="inline-start" aria-hidden="true" /></AttachmentAction></AttachmentActions> : null}
       <AttachmentTrigger aria-label={"Preview " + attachment.title} onClick={() => onOpen(attachment)} />
@@ -89,7 +93,7 @@ function ThreadMarker({ item }: { item: DemoMarker }) {
   return <Marker variant={item.variant} role={item.status === "thinking" ? "status" : undefined} className={item.status === "thinking" ? "my-0.5" : "my-0.5 opacity-75"}>{item.status ? <MarkerIcon>{item.status === "thinking" ? <Spinner size="sm" tone="rose" /> : <Icon aria-hidden="true" />}</MarkerIcon> : null}<MarkerContent>{item.label}</MarkerContent></Marker>
 }
 
-function AssistantShowcase({ kind }: { kind?: ShowcaseKind }) {
+function AssistantShowcase({ kind, reasoning }: { kind?: ShowcaseKind; reasoning: string }) {
   if (kind === "code") {
     return (
       <div className="grid max-w-[640px] gap-2 pt-1 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-start">
@@ -104,6 +108,13 @@ function AssistantShowcase({ kind }: { kind?: ShowcaseKind }) {
         <Source density="compact" index={1} source={{ title: "shadcn chat components", href: "https://ui.shadcn.com/docs/changelog/2026-06-chat-components", badge: "DOCS" }} />
         <Source density="compact" index={2} source={{ title: "message-scroller.tsx", badge: "FILE" }} />
       </Sources>
+    )
+  }
+  if (kind === "reasoning") {
+    return (
+      <div className="max-w-[520px] pt-0.5">
+        <Reasoning density="compact" duration={2} content={`Used ${reasoning.toLowerCase()} reasoning to preserve viewport state, keep the composer unlocked, and choose the least disruptive steering path.`} />
+      </div>
     )
   }
   return null
@@ -134,13 +145,17 @@ function SuggestionPopup({ label, items, activeIndex, onSelect }: { label: strin
 }
 
 function CompactSelect({ label, value, options, onValueChange, icon }: { label: string; value: string; options: string[]; onValueChange: (value: string) => void; icon: React.ReactNode }) {
+  const tone = label === "Model" ? "model" : "reasoning"
   return (
     <Select value={value} onValueChange={onValueChange}>
-      <SelectTrigger aria-label={label} className="!h-6 !w-auto min-w-[94px] gap-1 rounded-full !px-2 !py-0 [&>svg]:!size-3">
+      <SelectTrigger aria-label={label} title={`${label}: ${value}`} data-chat-select={tone} className="aurora-chat-select !h-6 !w-auto min-w-[94px] gap-1 rounded-full !px-2 !py-0 [&>svg]:!size-3">
         <span className="flex min-w-0 items-center gap-1.5">{icon}<SelectValue /></span>
       </SelectTrigger>
-      <SelectContent className="min-w-[150px]">
-        {options.map((option) => <SelectItem key={option} value={option} className="!py-1 text-[11px]">{option}</SelectItem>)}
+      <SelectContent className="min-w-[160px]">
+        <SelectGroup>
+          <SelectLabel className="!px-2 !py-1 text-[9px] uppercase tracking-[0.08em]">{label}</SelectLabel>
+          {options.map((option) => <SelectItem key={option} value={option} className="!py-1 text-[11px]">{option}</SelectItem>)}
+        </SelectGroup>
       </SelectContent>
     </Select>
   )
@@ -289,11 +304,11 @@ function AuroraChatBlock({ title = "Aurora Chat", subtitle = "Composable convers
     const userId = nextId("user")
     const markerId = nextId("thinking")
     const message: DemoMessage = { kind: "message", id: userId, role: "user", time: currentTime(), text: text || "Attached a file for context.", scrollAnchor: true, attachments: composerAttachment ? [{ ...composerAttachment, state: "done" }] : undefined }
-    setItems((current) => [...current, message, { kind: "marker", id: markerId, label: steering ? "Steering the active response" : "Aurora is composing a response", status: "thinking" }])
+    setItems((current) => [...current, message, { kind: "marker", id: markerId, label: steering ? "Steering the active response" : reasoning === "Auto" ? "Aurora is reasoning" : `Aurora is reasoning · ${reasoning}`, status: "thinking" }])
     setValue("")
     setComposerAttachment(null)
     queueMockReply(markerId, steering ? STEER_REPLY : MOCK_REPLY)
-  }, [composerAttachment, editingMessageId, isResponding, queueMockReply, stopResponse, value])
+  }, [composerAttachment, editingMessageId, isResponding, queueMockReply, reasoning, stopResponse, value])
 
   const handleComposerKeyDown = React.useCallback((event: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (slashOpen) {
@@ -318,7 +333,7 @@ function AuroraChatBlock({ title = "Aurora Chat", subtitle = "Composable convers
   }, [schedule])
   const toggleLike = React.useCallback((messageId: string) => setLikedIds((current) => { const next = new Set(current); if (next.has(messageId)) next.delete(messageId); else next.add(messageId); return next }), [])
   const editMessage = React.useCallback((message: DemoMessage) => { setEditingMessageId(message.id); setValue(message.text); window.requestAnimationFrame(() => textareaRef.current?.focus()) }, [])
-  const resetDemo = React.useCallback(() => { clearTimers(); setItems(INITIAL_ITEMS); setValue(""); setComposerAttachment(null); setPreviewAttachment(null); setCopiedId(null); setLikedIds(new Set()); setEditingMessageId(null); setIsResponding(false); setActiveAssistantId(null); setSlashOpen(false); setMentionOpen(false) }, [clearTimers])
+  const resetDemo = React.useCallback(() => { clearTimers(); setItems(INITIAL_ITEMS); setValue(""); setComposerAttachment(null); setPreviewAttachment(null); setCopiedId(null); setLikedIds(new Set()); setEditingMessageId(null); setIsResponding(false); setActiveAssistantId(null); setModel(MODELS[0]); setReasoning(REASONING_LEVELS[0]); setSlashOpen(false); setMentionOpen(false) }, [clearTimers])
 
   const hasComposerPayload = Boolean(value.trim() || composerAttachment)
   const showStopButton = isResponding && !hasComposerPayload && !editingMessageId
@@ -350,7 +365,7 @@ function AuroraChatBlock({ title = "Aurora Chat", subtitle = "Composable convers
                         <Message align={item.role === "user" ? "end" : "start"}>
                           {item.role === "assistant" ? <MessageAvatar aria-label="Aurora" className="!size-[22px] !min-w-[22px] [&_svg]:size-3"><Bot aria-hidden="true" /></MessageAvatar> : null}
                           <MessageContent className="relative gap-1">
-                            {item.role === "assistant" ? <MessageHeader className="min-h-0 px-0"><span style={{ color: "var(--aurora-text-primary)", fontSize: "var(--aurora-type-caption)", fontWeight: "var(--aurora-weight-ui)" }}>Aurora</span></MessageHeader> : null}
+                            {item.role === "assistant" ? <MessageHeader className="min-h-0 gap-1.5 px-0"><span style={{ color: "var(--aurora-text-primary)", fontSize: "var(--aurora-type-caption)", fontWeight: "var(--aurora-weight-ui)" }}>Aurora</span>{item.streaming ? <span className="aurora-chat-stream-status" aria-label="Streaming response"><span className="aurora-chat-stream-dot" aria-hidden="true" />Streaming</span> : null}</MessageHeader> : null}
                             <BubbleGroup>
                               <Bubble variant={item.role === "user" ? "default" : "ghost"} align={item.role === "user" ? "end" : "start"} className={item.role === "assistant" ? "max-w-[64ch]" : "max-w-[86%] sm:max-w-[36ch]"}>
                                 <BubbleContent style={item.role === "user" ? { padding: "7px 10px", lineHeight: "1.45" } : { lineHeight: "1.55" }}>
@@ -360,7 +375,7 @@ function AuroraChatBlock({ title = "Aurora Chat", subtitle = "Composable convers
                               </Bubble>
                               {item.attachments?.length ? <AttachmentGroup className="gap-1.5 py-0.5">{item.attachments.map((attachment) => <AttachmentCard key={attachment.id} attachment={attachment} onOpen={setPreviewAttachment} compact />)}</AttachmentGroup> : null}
                             </BubbleGroup>
-                            {item.role === "assistant" ? <AssistantShowcase kind={item.showcase} /> : null}
+                            {item.role === "assistant" ? <AssistantShowcase kind={item.showcase} reasoning={reasoning} /> : null}
                             {item.role === "assistant" ? (
                               <MessageFooter className="aurora-chat-action-rail pointer-events-none h-0 min-h-0 translate-y-1 gap-0.5 px-0 opacity-0 transition-[opacity,transform] duration-150 group-hover/message:pointer-events-auto group-hover/message:translate-y-0 group-hover/message:opacity-100 group-focus-within/message:pointer-events-auto group-focus-within/message:translate-y-0 group-focus-within/message:opacity-100 [@media(hover:none)]:pointer-events-auto [@media(hover:none)]:translate-y-0 [@media(hover:none)]:opacity-70">
                                 <span className="mr-1" style={{ color: "var(--aurora-text-muted)", fontSize: "10.5px" }}>{item.time}</span>
@@ -411,10 +426,10 @@ function AuroraChatBlock({ title = "Aurora Chat", subtitle = "Composable convers
           <div className="flex min-w-0 items-center gap-1 border-t px-1.5 py-0.5" style={{ borderColor: "color-mix(in srgb, var(--aurora-border-default) 68%, transparent)", background: "linear-gradient(180deg, color-mix(in srgb, var(--aurora-panel-medium) 30%, transparent), color-mix(in srgb, var(--aurora-control-surface) 58%, transparent))" }}>
             <CompactSelect label="Model" value={model} options={MODELS} onValueChange={setModel} icon={<Cpu className="size-3 shrink-0" aria-hidden style={{ color: "var(--axon-orange)" }} />} />
             <CompactSelect label="Reasoning" value={reasoning} options={REASONING_LEVELS} onValueChange={setReasoning} icon={<Brain className="size-3 shrink-0" aria-hidden style={{ color: "var(--aurora-accent-pink)" }} />} />
-            <span className="hidden min-w-0 truncate sm:inline" style={{ color: "var(--aurora-text-muted)", fontSize: "10px" }}><AtSign className="mr-1 inline size-3" aria-hidden />files · / skills</span>
+            <span className="hidden min-w-0 items-center gap-1.5 sm:flex" style={{ color: "var(--aurora-text-muted)", fontSize: "10px" }}><span className="inline-flex items-center gap-1"><kbd className="aurora-chat-kbd">@</kbd>files</span><span aria-hidden="true">·</span><span className="inline-flex items-center gap-1"><kbd className="aurora-chat-kbd">/</kbd>skills</span></span>
             <span className="flex-1" />
             {editingMessageId ? <Button type="button" variant="plain" size="unstyled" className="flex items-center gap-1 rounded-[6px] px-1.5 py-0.5 [&_svg]:size-3" onClick={() => { setEditingMessageId(null); setValue("") }} style={{ color: "var(--aurora-text-muted)", fontSize: "10px" }}><X aria-hidden="true" />Cancel edit</Button> : null}
-            {isResponding ? <span aria-live="polite" style={{ color: "var(--axon-orange)", fontSize: "10px" }}>{activeAssistantId ? "Streaming" : "Thinking"}</span> : null}
+            {isResponding && !activeAssistantId ? <span aria-live="polite" className="aurora-chat-thinking-label"><span className="aurora-chat-thinking-dots" aria-hidden="true"><span /><span /><span /></span>{reasoning === "Auto" ? "Thinking" : reasoning}</span> : null}
           </div>
         </div>
       </form>

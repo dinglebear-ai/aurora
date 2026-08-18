@@ -26,6 +26,8 @@ export interface ReasoningProps {
   duration?: number
   /** Start expanded. */
   defaultOpen?: boolean
+  /** Density for embedded chat/workspace reasoning surfaces. */
+  density?: "default" | "compact"
   /** Reasoning body. Prefer children; `content` is kept for back-compat. */
   content?: string
   children?: React.ReactNode
@@ -50,7 +52,8 @@ function Cursor() {
   )
 }
 
-const Reasoning = function Reasoning({ ref, isStreaming, duration, defaultOpen, content, children }: ReasoningProps & { ref?: React.Ref<HTMLDivElement> }) {
+const Reasoning = function Reasoning({ ref, isStreaming, duration, defaultOpen, density = "default", content, children }: ReasoningProps & { ref?: React.Ref<HTMLDivElement> }) {
+    const compact = density === "compact"
     const [open, setOpen] = React.useState(defaultOpen ?? false)
 
     const label =
@@ -70,8 +73,8 @@ const Reasoning = function Reasoning({ ref, isStreaming, duration, defaultOpen, 
             display: "inline-flex",
             alignItems: "center",
             flexWrap: "wrap",
-            gap: "8px",
-            padding: "4px 0",
+            gap: compact ? "5px" : "8px",
+            padding: compact ? "2px 0" : "4px 0",
             maxWidth: "100%",
             minHeight: 0,
             background: "none",
@@ -81,7 +84,7 @@ const Reasoning = function Reasoning({ ref, isStreaming, duration, defaultOpen, 
           }}
         >
           <Brain
-            size={16}
+            size={compact ? 13 : 16}
             strokeWidth={1.8}
             aria-hidden="true"
             style={{ color: AXON, flexShrink: 0 }}
@@ -89,7 +92,7 @@ const Reasoning = function Reasoning({ ref, isStreaming, duration, defaultOpen, 
 
           <span
             style={{
-              fontSize: "15px",
+              fontSize: compact ? "11px" : "15px",
               fontWeight: 700,
               letterSpacing: 0,
               color: isStreaming ? AXON : "var(--aurora-text-primary)",
@@ -100,13 +103,13 @@ const Reasoning = function Reasoning({ ref, isStreaming, duration, defaultOpen, 
           </span>
 
           {isStreaming && (
-            <span aria-hidden="true" style={{ color: AXON, fontSize: "15px", lineHeight: 1 }}>
+            <span aria-hidden="true" style={{ color: AXON, fontSize: compact ? "11px" : "15px", lineHeight: 1 }}>
               •
             </span>
           )}
 
           <ChevronDown
-            size={16}
+            size={compact ? 13 : 16}
             aria-hidden="true"
             style={{
               color: "var(--aurora-text-muted)",
@@ -120,11 +123,12 @@ const Reasoning = function Reasoning({ ref, isStreaming, duration, defaultOpen, 
         {open && (
           <div
             style={{
-              borderLeft: `3px solid ${AXON}`,
-              paddingLeft: "16px",
-              marginLeft: "8px",
-              fontSize: "var(--aurora-type-body)",
-              lineHeight: "var(--aurora-line-body)",
+              borderLeft: `${compact ? 2 : 3}px solid ${AXON}`,
+              paddingLeft: compact ? "9px" : "16px",
+              marginLeft: compact ? "5px" : "8px",
+              marginTop: compact ? "3px" : undefined,
+              fontSize: compact ? "var(--aurora-type-caption)" : "var(--aurora-type-body)",
+              lineHeight: compact ? "1.5" : "var(--aurora-line-body)",
               color: "var(--aurora-text-muted)",
               whiteSpace: "pre-wrap",
             }}
