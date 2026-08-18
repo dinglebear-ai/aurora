@@ -365,7 +365,7 @@ function AuroraChatBlock({ title = "Aurora Chat", subtitle = "Composable convers
                         <Message align={item.role === "user" ? "end" : "start"}>
                           {item.role === "assistant" ? <MessageAvatar aria-label="Aurora" className="!size-[22px] !min-w-[22px] [&_svg]:size-3"><Bot aria-hidden="true" /></MessageAvatar> : null}
                           <MessageContent className="relative gap-1">
-                            {item.role === "assistant" ? <MessageHeader className="min-h-0 gap-1.5 px-0"><span style={{ color: "var(--aurora-text-primary)", fontSize: "var(--aurora-type-caption)", fontWeight: "var(--aurora-weight-ui)" }}>Aurora</span>{item.streaming ? <span className="aurora-chat-stream-status" aria-label="Streaming response"><span className="aurora-chat-stream-dot" aria-hidden="true" />Streaming</span> : null}</MessageHeader> : null}
+                            {item.role === "assistant" ? <MessageHeader className="min-h-0 gap-1.5 px-0"><span style={{ color: "var(--aurora-text-primary)", fontSize: "var(--aurora-type-caption)", fontWeight: "var(--aurora-weight-ui)" }}>Aurora</span>{item.streaming ? <span className="aurora-chat-stream-status" role="status"><span className="aurora-chat-stream-dot" aria-hidden="true" />Streaming</span> : null}</MessageHeader> : null}
                             <BubbleGroup>
                               <Bubble variant={item.role === "user" ? "default" : "ghost"} align={item.role === "user" ? "end" : "start"} className={item.role === "assistant" ? "max-w-[64ch]" : "max-w-[86%] sm:max-w-[36ch]"}>
                                 <BubbleContent style={item.role === "user" ? { padding: "7px 10px", lineHeight: "1.45" } : { lineHeight: "1.55" }}>
