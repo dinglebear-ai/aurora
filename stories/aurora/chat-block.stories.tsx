@@ -30,6 +30,7 @@ export const InteractiveFlow: Story = {
     await expect(canvas.getByText("Sources & references")).toBeInTheDocument()
     await expect(canvas.getByRole("combobox", { name: "Model" })).toBeInTheDocument()
     await expect(canvas.getByRole("combobox", { name: "Reasoning" })).toBeInTheDocument()
+    await expect(canvas.getByRole("button", { name: /Reasoned for 2s/i })).toBeInTheDocument()
 
     await userEvent.type(input, "/rev")
     const skills = canvas.getByRole("listbox", { name: "Skills and slash commands" })
@@ -71,7 +72,20 @@ export const StopFlow: Story = {
     await userEvent.click(canvas.getByRole("button", { name: "Send message" }))
     const stop = canvas.getByRole("button", { name: "Stop response" })
     await userEvent.click(stop)
-    await expect(canvas.queryByText("Aurora is composing a response")).not.toBeInTheDocument()
+    await expect(canvas.queryByText("Aurora is reasoning")).not.toBeInTheDocument()
     await expect(input).not.toBeDisabled()
+  },
+}
+
+export const AttachmentLifecycle: Story = {
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await userEvent.click(canvas.getByRole("button", { name: "Add mock attachment" }))
+    const attachment = canvasElement.querySelector<HTMLElement>('.aurora-chat-attachment[data-state="uploading"]')
+    await expect(attachment).toBeInTheDocument()
+    await expect(attachment).toHaveAttribute("data-state", "uploading")
+    await waitFor(() => expect(attachment).toHaveAttribute("data-state", "processing"), { timeout: 1200 })
+    await waitFor(() => expect(attachment).toHaveAttribute("data-state", "done"), { timeout: 2200 })
+    await expect(attachment?.querySelector(".aurora-chat-attachment__state-badge")).toBeInTheDocument()
   },
 }

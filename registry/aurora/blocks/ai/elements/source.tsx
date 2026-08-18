@@ -64,7 +64,7 @@ const Source = ({ ref, className, source, index, density = "default", style, hre
         aria-disabled={isLinked ? undefined : true}
         aria-label={host ? `${source.title}, ${host}` : source.title}
         className={cn(
-          compact ? "group grid grid-cols-[auto_minmax(0,1fr)_auto] items-start gap-2 p-2 no-underline" : "group grid grid-cols-[auto_minmax(0,1fr)_auto] items-start gap-3 p-3.5 no-underline",
+          compact ? "group grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-1.5 px-2 py-1.5 no-underline" : "group grid grid-cols-[auto_minmax(0,1fr)_auto] items-start gap-3 p-3.5 no-underline",
           "transition-[background,border-color,box-shadow,transform] duration-150 ease-out",
           "outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--aurora-focus-ring)] focus-visible:ring-offset-0",
           isLinked &&
@@ -82,7 +82,7 @@ const Source = ({ ref, className, source, index, density = "default", style, hre
       >
         {index != null ? (
           <span
-            className={compact ? "inline-flex size-5 shrink-0 items-center justify-center aurora-text-control" : "inline-flex size-7 shrink-0 items-center justify-center aurora-text-control"}
+            className={compact ? "inline-flex size-[18px] shrink-0 items-center justify-center aurora-text-control" : "inline-flex size-7 shrink-0 items-center justify-center aurora-text-control"}
             aria-hidden
             style={{
               borderRadius: "calc(var(--aurora-radius-1) - 6px)",
@@ -99,11 +99,11 @@ const Source = ({ ref, className, source, index, density = "default", style, hre
           <span className="shrink-0" aria-hidden style={{ width: 0 }} />
         )}
 
-        <span className="grid min-w-0 gap-1.5">
-          <span className="flex min-w-0 items-center gap-2">
+        <span className={compact ? "grid min-w-0 gap-0.5" : "grid min-w-0 gap-1.5"}>
+          <span className={compact ? "flex min-w-0 items-center gap-1.5" : "flex min-w-0 items-center gap-2"}>
             <span
               className="truncate aurora-text-control"
-              style={{ color: "var(--aurora-text-primary)", fontSize: compact ? 12 : 16, fontWeight: 700 }}
+              style={{ color: "var(--aurora-text-primary)", fontSize: compact ? 11.5 : 16, fontWeight: compact ? 650 : 700 }}
             >
               {source.title}
             </span>
@@ -111,7 +111,7 @@ const Source = ({ ref, className, source, index, density = "default", style, hre
               <Badge
                 tone="neutral"
                 fill="outline"
-                className={compact ? "shrink-0 !px-1.5 text-[9px]" : "shrink-0"}
+                className={compact ? "shrink-0 !px-1.5 text-[8px] tracking-[0.06em]" : "shrink-0"}
               >
                 {source.badge}
               </Badge>
@@ -119,10 +119,10 @@ const Source = ({ ref, className, source, index, density = "default", style, hre
           </span>
           {host ? (
             <span
-              className="flex min-w-0 items-center gap-1.5 aurora-text-meta"
+              className={compact ? "flex min-w-0 items-center gap-1 aurora-text-meta text-[9.5px]" : "flex min-w-0 items-center gap-1.5 aurora-text-meta"}
               style={{ color: "var(--aurora-text-muted)" }}
             >
-              <Globe className={compact ? "size-3 shrink-0" : "size-3.5 shrink-0"} aria-hidden />
+              <Globe className={compact ? "size-[10px] shrink-0" : "size-3.5 shrink-0"} aria-hidden />
               <span className="truncate">{host}</span>
             </span>
           ) : null}

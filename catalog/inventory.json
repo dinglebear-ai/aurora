@@ -5489,7 +5489,8 @@
         "@aurora/aurora-marker",
         "@aurora/aurora-code-block",
         "@aurora/aurora-ai-snippet",
-        "@aurora/aurora-ai-sources"
+        "@aurora/aurora-ai-sources",
+        "@aurora/aurora-ai-reasoning"
       ],
       "fixtureId": null,
       "previewSlug": "chat-block",
