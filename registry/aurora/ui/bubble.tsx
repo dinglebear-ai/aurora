@@ -5,7 +5,7 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const bubbleVariants = cva(
-  "aurora-bubble group/bubble relative flex w-fit max-w-[82%] min-w-0 flex-col gap-1 group-data-[align=end]/message:self-end data-[align=end]:self-end data-[variant=ghost]:max-w-full",
+  "aurora-bubble group/bubble relative flex w-fit max-w-[42ch] min-w-0 flex-col gap-1 group-data-[align=end]/message:self-end data-[align=end]:self-end data-[variant=ghost]:max-w-full",
   {
     variants: {
       variant: {
@@ -28,7 +28,7 @@ function BubbleGroup({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="bubble-group"
-      className={cn("flex min-w-0 flex-col gap-2", className)}
+      className={cn("flex min-w-0 flex-col gap-1.5", className)}
       {...props}
     />
   )
@@ -64,7 +64,7 @@ function BubbleContent({
       data-slot="bubble-content"
       className={cn(
         "aurora-bubble__content w-fit max-w-full min-w-0 overflow-hidden break-words",
-        "group-data-[align=end]/bubble:self-end",
+        "group-data-[align=start]/bubble:rounded-[16px_16px_16px_6px] group-data-[align=end]/bubble:self-end group-data-[align=end]/bubble:rounded-[16px_16px_6px_16px]",
         className
       )}
       {...props}
