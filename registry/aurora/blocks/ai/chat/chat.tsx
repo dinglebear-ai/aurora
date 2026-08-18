@@ -77,7 +77,7 @@ function AttachmentCard({ attachment, onOpen, onRemove, compact = false }: { att
   const description = attachment.state === "uploading" ? "Uploading mock file" : attachment.state === "processing" ? "Preparing attachment" : attachment.description
   return (
     <Attachment state={attachment.state} size={compact ? "xs" : "sm"} className={compact ? "max-w-[210px] flex-nowrap" : undefined}>
-      <AttachmentMedia className={["relative", compact ? "[&_svg]:!size-3.5" : undefined].filter(Boolean).join(" ")}>
+      <AttachmentMedia className={["relative", compact ? "[&>svg]:!size-3.5" : undefined].filter(Boolean).join(" ")}>
         {pending ? <Spinner size="sm" tone="cyan" /> : <FileText aria-hidden="true" />}
         {attachment.state === "done" ? <span className="aurora-chat-attachment__state-badge" aria-hidden="true"><Check /></span> : null}
       </AttachmentMedia>
