@@ -12,6 +12,8 @@ import { Source, type SourceItem, type SourceProps } from "@/registry/aurora/blo
 
 export interface SourcesProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "title"> {
   title?: React.ReactNode
+  /** Compact density for citations embedded inside chat turns. */
+  density?: "default" | "compact"
   /** Render the count badge + chevron and allow the body to collapse. */
   collapsible?: boolean
   /** Control the collapsed state (uncontrolled defaults to expanded). */
@@ -61,6 +63,7 @@ const Sources = (
     { ref,
       className,
       title = "Sources",
+      density = "default",
       collapsible = false,
       open: openProp,
       defaultOpen = true,
@@ -70,6 +73,7 @@ const Sources = (
       ...props
     }: SourcesProps & { ref?: React.Ref<HTMLDivElement> }
   ) => {
+    const compact = density === "compact"
     const isControlled = openProp !== undefined
     const [openState, setOpenState] = React.useState(defaultOpen)
     const open = isControlled ? openProp : openState
@@ -84,17 +88,17 @@ const Sources = (
 
     const headerInner = (
       <>
-        <FileText className="size-[18px] shrink-0" aria-hidden style={{ color: "var(--aurora-accent-pink)" }} />
+        <FileText className={compact ? "size-3.5 shrink-0" : "size-[18px] shrink-0"} aria-hidden style={{ color: "var(--aurora-accent-pink)" }} />
         <span
           className="aurora-text-label"
-          style={{ color: "var(--aurora-text-primary)", fontSize: 16, fontWeight: 700 }}
+          style={{ color: "var(--aurora-text-primary)", fontSize: compact ? 12 : 16, fontWeight: 700 }}
         >
           {title}
         </span>
         {collapsible ? <CountBadge count={count} /> : null}
         {collapsible ? (
           <ChevronDown
-            className="ml-auto size-[18px] shrink-0 transition-transform"
+            className={compact ? "ml-auto size-3.5 shrink-0 transition-transform" : "ml-auto size-[18px] shrink-0 transition-transform"}
             aria-hidden
             style={{
               color: "var(--aurora-text-muted)",
@@ -108,7 +112,7 @@ const Sources = (
     return (
       <div
         ref={ref}
-        className={["grid gap-3 p-4", className].filter(Boolean).join(" ")}
+        className={[compact ? "grid gap-2 p-2.5" : "grid gap-3 p-4", className].filter(Boolean).join(" ")}
         style={panelStyle(style)}
         {...props}
       >
@@ -119,15 +123,16 @@ const Sources = (
             size="unstyled"
             onClick={toggle}
             aria-expanded={open}
-            className="flex items-center gap-2.5 bg-transparent p-0 text-left outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--aurora-focus-ring)] focus-visible:ring-offset-0"
+            className={compact ? "flex items-center gap-1.5 bg-transparent p-0 text-left outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--aurora-focus-ring)] focus-visible:ring-offset-0" : "flex items-center gap-2.5 bg-transparent p-0 text-left outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--aurora-focus-ring)] focus-visible:ring-offset-0"}
+            data-density={density}
             style={{ borderRadius: "var(--aurora-radius-1)", cursor: "pointer", color: "inherit" }}
           >
             {headerInner}
           </Button>
         ) : (
-          <div className="flex items-center gap-2.5">{headerInner}</div>
+          <div className={compact ? "flex items-center gap-1.5" : "flex items-center gap-2.5"}>{headerInner}</div>
         )}
-        {!collapsible || open ? <div className="grid gap-2.5">{children}</div> : null}
+        {!collapsible || open ? <div className={compact ? "grid gap-1.5" : "grid gap-2.5"}>{children}</div> : null}
       </div>
     )
   }

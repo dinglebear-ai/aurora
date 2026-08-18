@@ -17,6 +17,8 @@ export interface CodeBlockProps {
   filename?: string
   showLineNumbers?: boolean
   variant?: "default" | "diff"
+  /** Compact density for embedding a full code block inside chat. */
+  density?: "default" | "compact"
 }
 
 export interface CodeChipProps {
@@ -235,7 +237,7 @@ function highlightLine(line: string, rules: Rule[]): React.ReactNode {
 // Copy button
 // ---------------------------------------------------------------------------
 
-function CopyButton({ code }: { code: string }) {
+function CopyButton({ code, compact = false }: { code: string; compact?: boolean }) {
   const { copied, error, copy } = useClipboard(2000)
   const handleCopy = React.useCallback(() => void copy(code), [code, copy])
 
@@ -243,7 +245,8 @@ function CopyButton({ code }: { code: string }) {
     <Button
       type="button"
       variant="plain"
-      size="sm"
+      size={compact ? "unstyled" : "sm"}
+      className={compact ? "flex size-6 items-center justify-center rounded-[6px] [&_svg]:!size-3.5" : undefined}
       onClick={handleCopy}
       aria-label={copied ? "Copied" : error ? "Unable to copy" : "Copy code"}
       title={copied ? "Copied" : error ? "Unable to copy" : "Copy to clipboard"}
@@ -257,17 +260,8 @@ function CopyButton({ code }: { code: string }) {
         flexShrink: 0,
       }}
     >
-      {copied ? (
-        <>
-          <Check size={15} strokeWidth={1.75} aria-hidden />
-          Copied
-        </>
-      ) : (
-        <>
-          <Copy size={15} strokeWidth={1.65} aria-hidden />
-          Copy
-        </>
-      )}
+      {copied ? <Check size={15} strokeWidth={1.75} aria-hidden /> : <Copy size={15} strokeWidth={1.65} aria-hidden />}
+      {compact ? <span className="sr-only">{copied ? "Copied" : "Copy"}</span> : (copied ? "Copied" : "Copy")}
     </Button>
   )
 }
@@ -282,7 +276,9 @@ export function CodeBlock({
   filename,
   showLineNumbers = false,
   variant = "default",
+  density = "default",
 }: CodeBlockProps) {
+  const compact = density === "compact"
   const rules = getRules(language)
   const isDiff = variant === "diff" || language === "diff"
 
@@ -331,7 +327,7 @@ export function CodeBlock({
           display: "flex",
           alignItems: "center",
           gap: "10px",
-          padding: "10px 16px",
+          padding: compact ? "6px 8px" : "10px 16px",
           minWidth: 0,
           background: "var(--aurora-panel-medium)",
           borderBottom: "1px solid var(--aurora-border-default)",
@@ -343,7 +339,7 @@ export function CodeBlock({
           style={{
             display: "inline-flex",
             alignItems: "center",
-            fontSize: "14px",
+            fontSize: compact ? "11px" : "14px",
             color: "var(--aurora-text-muted)",
             fontFamily: "var(--aurora-font-mono)",
             minWidth: 0,
@@ -357,7 +353,7 @@ export function CodeBlock({
 
         <div style={{ flex: 1 }} />
 
-        <CopyButton code={code} />
+        <CopyButton code={code} compact={compact} />
       </div>
 
       {/* Code body */}
@@ -366,8 +362,8 @@ export function CodeBlock({
           overflowX: "auto",
           overflowY: "auto",
           minWidth: 0,
-          maxHeight: "480px",
-          padding: "16px 0",
+          maxHeight: compact ? "240px" : "480px",
+          padding: compact ? "8px 0" : "16px 0",
         }}
       >
         {isDiff ? (
@@ -377,8 +373,8 @@ export function CodeBlock({
               width: "100%",
               borderCollapse: "collapse",
               fontFamily: "var(--aurora-font-mono)",
-              fontSize: "15px",
-              lineHeight: "1.7",
+              fontSize: compact ? "12px" : "15px",
+              lineHeight: compact ? "1.5" : "1.7",
             }}
           >
             <tbody>
@@ -390,7 +386,7 @@ export function CodeBlock({
                   {showLineNumbers && (
                     <td
                       style={{
-                        padding: "0 10px",
+                        padding: compact ? "0 6px" : "0 10px",
                         userSelect: "none",
                         color: "var(--aurora-text-muted)",
                         fontSize: "11px",
@@ -407,7 +403,7 @@ export function CodeBlock({
                   )}
                   <td
                     style={{
-                      padding: "0 20px",
+                      padding: compact ? "0 10px" : "0 20px",
                       whiteSpace: "pre",
                       color: diffLineColor(line.type),
                     }}
@@ -425,8 +421,8 @@ export function CodeBlock({
               width: "100%",
               borderCollapse: "collapse",
               fontFamily: "var(--aurora-font-mono)",
-              fontSize: "15px",
-              lineHeight: "1.7",
+              fontSize: compact ? "12px" : "15px",
+              lineHeight: compact ? "1.5" : "1.7",
             }}
           >
             <tbody>
@@ -435,7 +431,7 @@ export function CodeBlock({
                   {showLineNumbers && (
                     <td
                       style={{
-                        padding: "0 10px",
+                        padding: compact ? "0 6px" : "0 10px",
                         userSelect: "none",
                         color: "var(--aurora-text-muted)",
                         fontSize: "11px",
@@ -450,7 +446,7 @@ export function CodeBlock({
                       {i + 1}
                     </td>
                   )}
-                  <td style={{ padding: "0 20px", whiteSpace: "pre" }}>
+                  <td style={{ padding: compact ? "0 10px" : "0 20px", whiteSpace: "pre" }}>
                     {highlightLine(line, rules)}
                   </td>
                 </tr>

@@ -10,6 +10,8 @@ export interface SnippetProps extends React.HTMLAttributes<HTMLPreElement> {
   code: string
   /** Short language identifier shown in the header chip (e.g. "ts", "tsx", "py"). */
   language?: string
+  /** Compact density for embedding snippets inside chat turns. */
+  density?: "default" | "compact"
 }
 
 /**
@@ -109,7 +111,7 @@ function highlight(code: string): React.ReactNode[] {
   return out
 }
 
-function CopyIconButton({ value }: { value: string }) {
+function CopyIconButton({ value, compact = false }: { value: string; compact?: boolean }) {
   const { copied, error, copy } = useClipboard(1200)
   const handleCopy = React.useCallback(() => void copy(value), [copy, value])
 
@@ -118,6 +120,7 @@ function CopyIconButton({ value }: { value: string }) {
       type="button"
       variant="ghost"
       size="icon"
+      className={compact ? "!size-6 [&_svg]:!size-3.5" : undefined}
       onClick={handleCopy}
       aria-label={copied ? "Copied to clipboard" : error ? "Unable to copy code" : "Copy code"}
     >
@@ -135,7 +138,9 @@ function CopyIconButton({ value }: { value: string }) {
  * architecture: `forwardRef` to the underlying `<pre>`, `displayName`, full
  * prop spread, and an accessible copy affordance.
  */
-const Snippet = ({ ref, code, language = "tsx", className, style, ...props }: SnippetProps & { ref?: React.Ref<HTMLPreElement> }) => (
+const Snippet = ({ ref, code, language = "tsx", density = "default", className, style, ...props }: SnippetProps & { ref?: React.Ref<HTMLPreElement> }) => {
+  const compact = density === "compact"
+  return (
     <div
       className={className}
       style={{
@@ -150,29 +155,30 @@ const Snippet = ({ ref, code, language = "tsx", className, style, ...props }: Sn
       <div
         className="flex items-center justify-between gap-3"
         style={{
-          padding: "12px 14px",
+          padding: compact ? "6px 8px" : "12px 14px",
           borderBottom: "1px solid var(--aurora-border-default)",
           background:
             "linear-gradient(180deg, color-mix(in srgb, var(--aurora-panel-strong-top) 70%, transparent), transparent)",
         }}
       >
         <div className="flex items-center gap-2.5">
-          <CodeXml className="size-4" aria-hidden style={{ color: "var(--aurora-text-muted)" }} />
+          <CodeXml className={compact ? "size-3.5" : "size-4"} aria-hidden style={{ color: "var(--aurora-text-muted)" }} />
           <Badge tone="rose" size="sm">
             {language}
           </Badge>
         </div>
-        <CopyIconButton value={code} />
+        <CopyIconButton value={code} compact={compact} />
       </div>
       <pre
         ref={ref}
         className="overflow-auto aurora-text-code"
         style={{
           margin: 0,
-          padding: "16px 18px",
+          padding: compact ? "8px 10px" : "16px 18px",
           background: "transparent",
           color: "var(--aurora-text-primary)",
-          lineHeight: 1.7,
+          fontSize: compact ? "12px" : undefined,
+          lineHeight: compact ? 1.5 : 1.7,
           whiteSpace: "pre",
         }}
         {...props}
@@ -181,6 +187,7 @@ const Snippet = ({ ref, code, language = "tsx", className, style, ...props }: Sn
       </pre>
     </div>
   )
+}
 Snippet.displayName = "Snippet"
 
 export { Snippet }

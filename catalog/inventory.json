@@ -5456,7 +5456,7 @@
     {
       "id": "aurora-chat-block",
       "title": "Aurora Interactive Chat",
-      "description": "Fully interactive mock chat combining Aurora MessageScroller, Message, Bubble, Chat Attachment, and Marker primitives with streaming, reactions, retry, copy, attachment preview, and composer interactions.",
+      "description": "Interactive Aurora chat workspace combining the new conversation primitives with steerable streaming, editable user turns, hover actions, code and source surfaces, model/reasoning selection, slash-command skills, file mentions, and an in-field composer.",
       "registryType": "registry:block",
       "group": "Chat Primitives",
       "categories": [
@@ -5481,11 +5481,15 @@
         "@aurora/aurora-button",
         "@aurora/aurora-spinner",
         "@aurora/aurora-textarea",
+        "@aurora/aurora-select",
         "@aurora/aurora-message-scroller",
         "@aurora/aurora-message",
         "@aurora/aurora-bubble",
         "@aurora/aurora-chat-attachment",
-        "@aurora/aurora-marker"
+        "@aurora/aurora-marker",
+        "@aurora/aurora-code-block",
+        "@aurora/aurora-ai-snippet",
+        "@aurora/aurora-ai-sources"
       ],
       "fixtureId": null,
       "previewSlug": "chat-block",
@@ -5493,8 +5497,8 @@
       "mobileReadiness": "adaptive",
       "mobileReadinessReason": "Shared React implementation with responsive layout or interaction changes for phone and tablet widths.",
       "capabilities": [
-        "clipboard",
         "file-system",
+        "keyboard",
         "safe-area",
         "touch",
         "webview"

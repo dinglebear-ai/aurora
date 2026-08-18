@@ -26,6 +26,23 @@ export const InteractiveFlow: Story = {
     const canvas = within(canvasElement)
     const input = canvas.getByRole("textbox", { name: "Message" })
 
+    await expect(canvas.getByText("steering.ts")).toBeInTheDocument()
+    await expect(canvas.getByText("Sources & references")).toBeInTheDocument()
+    await expect(canvas.getByRole("combobox", { name: "Model" })).toBeInTheDocument()
+    await expect(canvas.getByRole("combobox", { name: "Reasoning" })).toBeInTheDocument()
+
+    await userEvent.type(input, "/rev")
+    const skills = canvas.getByRole("listbox", { name: "Skills and slash commands" })
+    await userEvent.click(within(skills).getByRole("option", { name: /review/i }))
+    await expect(input).toHaveValue("/review ")
+    await userEvent.clear(input)
+
+    await userEvent.type(input, "@chat")
+    const files = canvas.getByRole("listbox", { name: "File mentions" })
+    await userEvent.click(within(files).getByRole("option", { name: /chat\.tsx/i }))
+    await expect(input).toHaveValue("@chat.tsx ")
+    await userEvent.clear(input)
+
     await userEvent.click(canvas.getByRole("button", { name: "Add mock attachment" }))
     await expect(canvas.getByText("gateway-health.json")).toBeInTheDocument()
     await userEvent.click(canvas.getByRole("button", { name: "Remove gateway-health.json" }))
@@ -33,11 +50,28 @@ export const InteractiveFlow: Story = {
     await userEvent.type(input, "Show the streaming behavior.")
     await userEvent.click(canvas.getByRole("button", { name: "Send message" }))
     await expect(canvas.getByText("Show the streaming behavior.")).toBeInTheDocument()
-    await expect(canvas.getByText("Aurora is composing a response")).toBeInTheDocument()
+    await expect(canvas.getByRole("button", { name: "Stop response" })).toBeInTheDocument()
+
+    await userEvent.type(input, "Keep it concise.")
+    await userEvent.click(canvas.getByRole("button", { name: "Send steering message" }))
+    await expect(canvas.getByText("Keep it concise.")).toBeInTheDocument()
 
     await waitFor(
-      () => expect(canvas.getByText(/Exactly\. This response is streaming/)).toBeInTheDocument(),
+      () => expect(canvas.getByText(/Steering applied\./)).toBeInTheDocument(),
       { timeout: 3000 }
     )
+  },
+}
+
+export const StopFlow: Story = {
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getByRole("textbox", { name: "Message" })
+    await userEvent.type(input, "Start a response I can stop.")
+    await userEvent.click(canvas.getByRole("button", { name: "Send message" }))
+    const stop = canvas.getByRole("button", { name: "Stop response" })
+    await userEvent.click(stop)
+    await expect(canvas.queryByText("Aurora is composing a response")).not.toBeInTheDocument()
+    await expect(input).not.toBeDisabled()
   },
 }
