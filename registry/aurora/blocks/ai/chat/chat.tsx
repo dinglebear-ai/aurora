@@ -31,7 +31,7 @@ const INITIAL_ITEMS: DemoThreadItem[] = [
 const MOCK_REPLY = "Exactly. This response is streaming through the Aurora mock while MessageScroller watches whether you are pinned to the end. Scroll upward during the stream and it stops following you. The jump control appears so you can return to the latest turn on your own terms."
 const RETRY_REPLY = "Retried locally. The message body is streaming again without replacing the surrounding layout, attachments, markers, or reaction controls. That separation is the useful part of the new primitive model."
 
-function nextId(prefix: string) { return prefix + "-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 7) }
+function nextId(prefix: string) { return `${prefix}-${crypto.randomUUID()}` }
 function currentTime() { return new Intl.DateTimeFormat(undefined, { hour: "numeric", minute: "2-digit" }).format(new Date()) }
 
 function AttachmentCard({ attachment, onOpen, onRemove }: { attachment: DemoAttachment; onOpen: (attachment: DemoAttachment) => void; onRemove?: (attachment: DemoAttachment) => void }) {

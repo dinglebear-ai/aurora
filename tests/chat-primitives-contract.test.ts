@@ -37,6 +37,7 @@ test("interactive chat block composes all five primitive families and stays loca
   }
   assert.equal(/\bfetch\s*\(/.test(source), false)
   assert.equal(/XMLHttpRequest/.test(source), false)
+  assert.equal(/Math\.random\s*\(/.test(source), false)
 })
 
 test("each new chat primitive has a gallery demo", () => {
