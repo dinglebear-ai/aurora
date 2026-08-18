@@ -68,6 +68,26 @@ test("component catalog supports search, pagination, and a live drawer", async (
   await expect(page).toHaveURL(/c=buttons/)
 })
 
+test("chat autocomplete popovers accept real pointer clicks above the transcript", async ({ page }) => {
+  await page.goto("/gallery/chat-block")
+  const input = page.getByRole("textbox", { name: "Message" })
+
+  await input.click()
+  await input.pressSequentially("/rev", { delay: 20 })
+  const skills = page.getByRole("listbox", { name: "Skills and slash commands" })
+  await expect(skills).toBeVisible()
+  await skills.getByRole("option").filter({ hasText: "/review" }).click()
+  await expect(input).toHaveValue("/review ")
+
+  await input.press("ControlOrMeta+A")
+  await input.press("Backspace")
+  await input.pressSequentially("@chat", { delay: 20 })
+  const files = page.getByRole("listbox", { name: "File mentions" })
+  await expect(files).toBeVisible()
+  await files.getByRole("option").filter({ hasText: "chat.tsx" }).click()
+  await expect(input).toHaveValue("@chat.tsx ")
+})
+
 test("tenant host routing and CSP contracts are enforced", async ({ request }) => {
   const tenant = await request.get("/", { headers: { host: "dinglebear.ai", accept: "text/html" } })
   expect(tenant.ok()).toBe(true)
