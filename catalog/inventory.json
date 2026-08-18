@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "counts": {
-    "registryItems": 176,
-    "galleryPreviews": 153,
+    "registryItems": 182,
+    "galleryPreviews": 159,
     "sharedFixtures": 23,
     "metadataOnly": 15
   },
@@ -14,6 +14,7 @@
     "Navigation",
     "Data",
     "Overlays",
+    "Chat Primitives",
     "Chat & AI",
     "Runtime & Execution",
     "Media & Voice",
@@ -5267,6 +5268,233 @@
       "mobileReadinessReason": "Shared React implementation with responsive layout or interaction changes for phone and tablet widths.",
       "capabilities": [
         "external-browser",
+        "safe-area",
+        "touch",
+        "webview"
+      ]
+    },
+    {
+      "id": "aurora-message-scroller",
+      "title": "Aurora Message Scroller",
+      "description": "Conversation viewport primitive with pinned-end streaming follow, user-scroll yielding, anchored turns, preserved prepends, jump controls, and visibility hooks.",
+      "registryType": "registry:ui",
+      "group": "Chat Primitives",
+      "categories": [
+        "aurora",
+        "ui",
+        "chat",
+        "ai"
+      ],
+      "sourcePath": "registry/aurora/ui/message-scroller.tsx",
+      "installTarget": "@ui/aurora/message-scroller.tsx",
+      "installUrl": "https://aurora.tootie.tv/r/aurora-message-scroller.json",
+      "files": [
+        "registry/aurora/ui/message-scroller.tsx"
+      ],
+      "dependencies": [
+        "lucide-react@^1.24.0"
+      ],
+      "registryDependencies": [
+        "@aurora/aurora-tokens",
+        "@aurora/aurora-button",
+        "@aurora/aurora-components"
+      ],
+      "fixtureId": null,
+      "previewSlug": "message-scroller",
+      "demoModule": "message-scroller-demo",
+      "mobileReadiness": "ready",
+      "mobileReadinessReason": "Shared React primitive suitable for browser, Tauri desktop, and Tauri mobile WebViews.",
+      "capabilities": [
+        "touch",
+        "webview"
+      ]
+    },
+    {
+      "id": "aurora-message",
+      "title": "Aurora Message",
+      "description": "Composable chat-message structure for alignment, avatar, content, header, footer, and grouped turns.",
+      "registryType": "registry:ui",
+      "group": "Chat Primitives",
+      "categories": [
+        "aurora",
+        "ui",
+        "chat",
+        "ai"
+      ],
+      "sourcePath": "registry/aurora/ui/message.tsx",
+      "installTarget": "@ui/aurora/message.tsx",
+      "installUrl": "https://aurora.tootie.tv/r/aurora-message.json",
+      "files": [
+        "registry/aurora/ui/message.tsx"
+      ],
+      "dependencies": [],
+      "registryDependencies": [
+        "@aurora/aurora-tokens",
+        "@aurora/aurora-components"
+      ],
+      "fixtureId": null,
+      "previewSlug": "message-primitive",
+      "demoModule": "message-primitive-demo",
+      "mobileReadiness": "ready",
+      "mobileReadinessReason": "Shared React primitive suitable for browser, Tauri desktop, and Tauri mobile WebViews.",
+      "capabilities": [
+        "touch",
+        "webview"
+      ]
+    },
+    {
+      "id": "aurora-bubble",
+      "title": "Aurora Bubble",
+      "description": "Message presentation primitive with Aurora default, secondary, muted, tinted, outline, ghost, and destructive variants plus reaction positioning.",
+      "registryType": "registry:ui",
+      "group": "Chat Primitives",
+      "categories": [
+        "aurora",
+        "ui",
+        "chat",
+        "ai"
+      ],
+      "sourcePath": "registry/aurora/ui/bubble.tsx",
+      "installTarget": "@ui/aurora/bubble.tsx",
+      "installUrl": "https://aurora.tootie.tv/r/aurora-bubble.json",
+      "files": [
+        "registry/aurora/ui/bubble.tsx"
+      ],
+      "dependencies": [
+        "@radix-ui/react-slot@^1.3.0",
+        "class-variance-authority@^0.7.1"
+      ],
+      "registryDependencies": [
+        "@aurora/aurora-tokens",
+        "@aurora/aurora-components"
+      ],
+      "fixtureId": null,
+      "previewSlug": "bubble",
+      "demoModule": "bubble-demo",
+      "mobileReadiness": "ready",
+      "mobileReadinessReason": "Shared React primitive suitable for browser, Tauri desktop, and Tauri mobile WebViews.",
+      "capabilities": [
+        "touch",
+        "webview"
+      ]
+    },
+    {
+      "id": "aurora-chat-attachment",
+      "title": "Aurora Chat Attachment",
+      "description": "Composable conversation attachment primitive with upload and processing states, media, metadata, actions, full-card triggers, groups, sizes, and orientations.",
+      "registryType": "registry:ui",
+      "group": "Chat Primitives",
+      "categories": [
+        "aurora",
+        "ui",
+        "chat",
+        "files",
+        "ai"
+      ],
+      "sourcePath": "registry/aurora/ui/attachment.tsx",
+      "installTarget": "@ui/aurora/attachment.tsx",
+      "installUrl": "https://aurora.tootie.tv/r/aurora-chat-attachment.json",
+      "files": [
+        "registry/aurora/ui/attachment.tsx"
+      ],
+      "dependencies": [
+        "@radix-ui/react-slot@^1.3.0",
+        "class-variance-authority@^0.7.1"
+      ],
+      "registryDependencies": [
+        "@aurora/aurora-tokens",
+        "@aurora/aurora-button",
+        "@aurora/aurora-components"
+      ],
+      "fixtureId": null,
+      "previewSlug": "chat-attachment",
+      "demoModule": "chat-attachment-demo",
+      "mobileReadiness": "ready",
+      "mobileReadinessReason": "Shared React primitive suitable for browser, Tauri desktop, and Tauri mobile WebViews.",
+      "capabilities": [
+        "file-system",
+        "touch",
+        "webview"
+      ]
+    },
+    {
+      "id": "aurora-marker",
+      "title": "Aurora Marker",
+      "description": "Timeline and status marker primitive for chat separators, bordered events, icons, and accessible status content.",
+      "registryType": "registry:ui",
+      "group": "Chat Primitives",
+      "categories": [
+        "aurora",
+        "ui",
+        "chat",
+        "ai"
+      ],
+      "sourcePath": "registry/aurora/ui/marker.tsx",
+      "installTarget": "@ui/aurora/marker.tsx",
+      "installUrl": "https://aurora.tootie.tv/r/aurora-marker.json",
+      "files": [
+        "registry/aurora/ui/marker.tsx"
+      ],
+      "dependencies": [
+        "@radix-ui/react-slot@^1.3.0",
+        "class-variance-authority@^0.7.1"
+      ],
+      "registryDependencies": [
+        "@aurora/aurora-tokens",
+        "@aurora/aurora-components"
+      ],
+      "fixtureId": null,
+      "previewSlug": "marker",
+      "demoModule": "marker-demo",
+      "mobileReadiness": "ready",
+      "mobileReadinessReason": "Shared React primitive suitable for browser, Tauri desktop, and Tauri mobile WebViews.",
+      "capabilities": [
+        "touch",
+        "webview"
+      ]
+    },
+    {
+      "id": "aurora-chat-block",
+      "title": "Aurora Interactive Chat",
+      "description": "Fully interactive mock chat combining Aurora MessageScroller, Message, Bubble, Chat Attachment, and Marker primitives with streaming, reactions, retry, copy, attachment preview, and composer interactions.",
+      "registryType": "registry:block",
+      "group": "Chat Primitives",
+      "categories": [
+        "aurora",
+        "block",
+        "ai",
+        "chat",
+        "application"
+      ],
+      "sourcePath": "registry/aurora/blocks/ai/chat/chat.tsx",
+      "installTarget": "@components/aurora/chat-block.tsx",
+      "installUrl": "https://aurora.tootie.tv/r/aurora-chat-block.json",
+      "files": [
+        "registry/aurora/blocks/ai/chat/chat.tsx"
+      ],
+      "dependencies": [
+        "lucide-react@^1.24.0"
+      ],
+      "registryDependencies": [
+        "@aurora/aurora-tokens",
+        "@aurora/aurora-components",
+        "@aurora/aurora-button",
+        "@aurora/aurora-spinner",
+        "@aurora/aurora-textarea",
+        "@aurora/aurora-message-scroller",
+        "@aurora/aurora-message",
+        "@aurora/aurora-bubble",
+        "@aurora/aurora-chat-attachment",
+        "@aurora/aurora-marker"
+      ],
+      "fixtureId": null,
+      "previewSlug": "chat-block",
+      "demoModule": "chat-block-demo",
+      "mobileReadiness": "adaptive",
+      "mobileReadinessReason": "Shared React implementation with responsive layout or interaction changes for phone and tablet widths.",
+      "capabilities": [
+        "clipboard",
+        "file-system",
         "safe-area",
         "touch",
         "webview"

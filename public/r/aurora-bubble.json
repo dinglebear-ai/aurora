@@ -1,0 +1,39 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "aurora-bubble",
+  "title": "Aurora Bubble",
+  "author": "jmagar <https://github.com/jmagar>",
+  "description": "Message presentation primitive with Aurora default, secondary, muted, tinted, outline, ghost, and destructive variants plus reaction positioning.",
+  "dependencies": [
+    "@radix-ui/react-slot@^1.3.0",
+    "class-variance-authority@^0.7.1"
+  ],
+  "registryDependencies": [
+    "@aurora/aurora-tokens",
+    "@aurora/aurora-components"
+  ],
+  "files": [
+    {
+      "path": "registry/aurora/ui/bubble.tsx",
+      "content": "import * as React from \"react\"\nimport { Slot } from \"@radix-ui/react-slot\"\nimport { cva, type VariantProps } from \"class-variance-authority\"\n\nimport { cn } from \"@/lib/utils\"\n\nconst bubbleVariants = cva(\n  \"aurora-bubble group/bubble relative flex w-fit max-w-[82%] min-w-0 flex-col gap-1 group-data-[align=end]/message:self-end data-[align=end]:self-end data-[variant=ghost]:max-w-full\",\n  {\n    variants: {\n      variant: {\n        default: \"aurora-bubble--default\",\n        secondary: \"aurora-bubble--secondary\",\n        muted: \"aurora-bubble--muted\",\n        tinted: \"aurora-bubble--tinted\",\n        outline: \"aurora-bubble--outline\",\n        ghost: \"aurora-bubble--ghost\",\n        destructive: \"aurora-bubble--destructive\",\n      },\n    },\n    defaultVariants: {\n      variant: \"default\",\n    },\n  }\n)\n\nfunction BubbleGroup({ className, ...props }: React.ComponentProps<\"div\">) {\n  return (\n    <div\n      data-slot=\"bubble-group\"\n      className={cn(\"flex min-w-0 flex-col gap-2\", className)}\n      {...props}\n    />\n  )\n}\n\nfunction Bubble({\n  variant = \"default\",\n  align = \"start\",\n  className,\n  ...props\n}: React.ComponentProps<\"div\"> &\n  VariantProps<typeof bubbleVariants> & { align?: \"start\" | \"end\" }) {\n  return (\n    <div\n      data-slot=\"bubble\"\n      data-variant={variant}\n      data-align={align}\n      className={cn(bubbleVariants({ variant }), className)}\n      {...props}\n    />\n  )\n}\n\nfunction BubbleContent({\n  asChild = false,\n  className,\n  ...props\n}: React.ComponentProps<\"div\"> & { asChild?: boolean }) {\n  const Comp = asChild ? Slot : \"div\"\n\n  return (\n    <Comp\n      data-slot=\"bubble-content\"\n      className={cn(\n        \"aurora-bubble__content w-fit max-w-full min-w-0 overflow-hidden break-words\",\n        \"group-data-[align=end]/bubble:self-end\",\n        className\n      )}\n      {...props}\n    />\n  )\n}\n\nconst bubbleReactionsVariants = cva(\n  \"aurora-bubble__reactions absolute flex w-fit shrink-0 items-center justify-center gap-1\",\n  {\n    variants: {\n      side: {\n        top: \"top-0 -translate-y-3/4\",\n        bottom: \"bottom-0 translate-y-3/4\",\n      },\n      align: {\n        start: \"left-3\",\n        end: \"right-3\",\n      },\n    },\n    defaultVariants: {\n      side: \"bottom\",\n      align: \"end\",\n    },\n  }\n)\n\nfunction BubbleReactions({\n  side = \"bottom\",\n  align = \"end\",\n  className,\n  ...props\n}: React.ComponentProps<\"div\"> & {\n  align?: \"start\" | \"end\"\n  side?: \"top\" | \"bottom\"\n}) {\n  return (\n    <div\n      data-slot=\"bubble-reactions\"\n      data-align={align}\n      data-side={side}\n      className={cn(bubbleReactionsVariants({ side, align }), className)}\n      {...props}\n    />\n  )\n}\n\nexport { BubbleGroup, Bubble, BubbleContent, BubbleReactions, bubbleVariants }\n",
+      "type": "registry:ui",
+      "target": "@ui/aurora/bubble.tsx"
+    }
+  ],
+  "meta": {
+    "namespace": "@aurora",
+    "style": "aurora",
+    "family": "ui",
+    "requiresTokens": true,
+    "sourcePath": "registry/aurora/ui/bubble.tsx",
+    "installTarget": "@ui/aurora/bubble.tsx"
+  },
+  "docs": "Aurora Bubble primitive for chat presentation. BubbleContent supports asChild through Radix Slot, while BubbleReactions positions compact reaction controls without coupling them to message data.\n\nRegistry dependencies: aurora-tokens, aurora-components.",
+  "categories": [
+    "aurora",
+    "ui",
+    "chat",
+    "ai"
+  ],
+  "type": "registry:ui"
+}

@@ -35,6 +35,8 @@ overrides:
   # GHSA-88fw-hqm2-52qc / hvrm / w62v / xgm2 — hono vulns via shadcn's MCP SDK dependency (dev/build tooling only)
   "hono@<4.12.27": "4.12.27"
   "js-yaml@<4.3.0": "4.3.0"
+  # GHSA-2v37-7h3g-55p8 — PostCSS accepts ^3.3.16; force the patched nanoid release.
+  "postcss>nanoid": "3.3.18"
   "path-to-regexp@>=8.0.0 <8.4.0": "8.4.0"
   "picomatch@<3": "2.3.2"
   "picomatch@>=4.0.0 <4.0.4": "4.0.4"

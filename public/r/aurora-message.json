@@ -1,0 +1,36 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "aurora-message",
+  "title": "Aurora Message",
+  "author": "jmagar <https://github.com/jmagar>",
+  "description": "Composable chat-message structure for alignment, avatar, content, header, footer, and grouped turns.",
+  "dependencies": [],
+  "registryDependencies": [
+    "@aurora/aurora-tokens",
+    "@aurora/aurora-components"
+  ],
+  "files": [
+    {
+      "path": "registry/aurora/ui/message.tsx",
+      "content": "import * as React from \"react\"\n\nimport { cn } from \"@/lib/utils\"\n\nexport type MessageAlign = \"start\" | \"end\"\n\nfunction MessageGroup({ className, ...props }: React.ComponentProps<\"div\">) {\n  return (\n    <div\n      data-slot=\"message-group\"\n      className={cn(\"flex min-w-0 flex-col gap-2\", className)}\n      {...props}\n    />\n  )\n}\n\nfunction Message({\n  className,\n  align = \"start\",\n  ...props\n}: React.ComponentProps<\"div\"> & { align?: MessageAlign }) {\n  return (\n    <div\n      data-slot=\"message\"\n      data-align={align}\n      className={cn(\n        \"group/message relative flex w-full min-w-0 gap-2 text-sm data-[align=end]:flex-row-reverse\",\n        className\n      )}\n      {...props}\n    />\n  )\n}\n\nfunction MessageAvatar({ className, role, ...props }: React.ComponentProps<\"div\">) {\n  const ariaLabel = props[\"aria-label\"]\n\n  return (\n    <div\n      data-slot=\"message-avatar\"\n      role={role ?? (ariaLabel ? \"img\" : undefined)}\n      className={cn(\n        \"aurora-message__avatar flex min-w-8 shrink-0 items-center justify-center self-end overflow-hidden rounded-full\",\n        \"group-has-data-[slot=message-footer]/message:-translate-y-8\",\n        className\n      )}\n      {...props}\n    />\n  )\n}\n\nfunction MessageContent({ className, ...props }: React.ComponentProps<\"div\">) {\n  return (\n    <div\n      data-slot=\"message-content\"\n      className={cn(\n        \"flex w-full min-w-0 flex-col gap-2.5 break-words\",\n        \"group-data-[align=end]/message:*:data-[slot]:self-end\",\n        className\n      )}\n      {...props}\n    />\n  )\n}\n\nfunction MessageHeader({ className, ...props }: React.ComponentProps<\"div\">) {\n  return (\n    <div\n      data-slot=\"message-header\"\n      className={cn(\"aurora-message__meta flex max-w-full min-w-0 items-center px-3\", className)}\n      {...props}\n    />\n  )\n}\n\nfunction MessageFooter({ className, ...props }: React.ComponentProps<\"div\">) {\n  return (\n    <div\n      data-slot=\"message-footer\"\n      className={cn(\n        \"aurora-message__meta flex max-w-full min-w-0 items-center gap-1 px-3\",\n        \"group-data-[align=end]/message:justify-end\",\n        className\n      )}\n      {...props}\n    />\n  )\n}\n\nexport { MessageGroup, Message, MessageAvatar, MessageContent, MessageFooter, MessageHeader }\n",
+      "type": "registry:ui",
+      "target": "@ui/aurora/message.tsx"
+    }
+  ],
+  "meta": {
+    "namespace": "@aurora",
+    "style": "aurora",
+    "family": "ui",
+    "requiresTokens": true,
+    "sourcePath": "registry/aurora/ui/message.tsx",
+    "installTarget": "@ui/aurora/message.tsx"
+  },
+  "docs": "Aurora structural Message primitive. Compose MessageGroup, Message, MessageAvatar, MessageContent, MessageHeader, and MessageFooter, then choose visual presentation independently with aurora-bubble.\n\nRegistry dependencies: aurora-tokens, aurora-components.",
+  "categories": [
+    "aurora",
+    "ui",
+    "chat",
+    "ai"
+  ],
+  "type": "registry:ui"
+}

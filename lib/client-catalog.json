@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "counts": {
-    "registryItems": 176,
-    "catalogItems": 162,
-    "groups": 15
+    "registryItems": 182,
+    "catalogItems": 168,
+    "groups": 16
   },
   "groups": [
     "Foundations",
@@ -13,6 +13,7 @@
     "Navigation",
     "Data",
     "Overlays",
+    "Chat Primitives",
     "Chat & AI",
     "Runtime & Execution",
     "Media & Voice",
@@ -582,6 +583,54 @@
       "description": "Two-tab share/export dialog: Share tab with copy-link URL input, collaborator rows (avatar + name + role dropdown), and email invite form; Export tab with format radio group (HTML, PDF, PNG, Markdown), inline share chip, and a gradient download button.",
       "registry": "aurora-share-dialog",
       "installUrl": "https://aurora.tootie.tv/r/aurora-share-dialog.json"
+    },
+    {
+      "slug": "chat-block",
+      "label": "Interactive Chat",
+      "group": "Chat Primitives",
+      "description": "Fully interactive mock chat combining Aurora MessageScroller, Message, Bubble, Chat Attachment, and Marker primitives with streaming, reactions, retry, copy, attachment preview, and composer interactions.",
+      "registry": "aurora-chat-block",
+      "installUrl": "https://aurora.tootie.tv/r/aurora-chat-block.json"
+    },
+    {
+      "slug": "message-scroller",
+      "label": "Message Scroller",
+      "group": "Chat Primitives",
+      "description": "Conversation viewport primitive with pinned-end streaming follow, user-scroll yielding, anchored turns, preserved prepends, jump controls, and visibility hooks.",
+      "registry": "aurora-message-scroller",
+      "installUrl": "https://aurora.tootie.tv/r/aurora-message-scroller.json"
+    },
+    {
+      "slug": "message-primitive",
+      "label": "Message",
+      "group": "Chat Primitives",
+      "description": "Composable chat-message structure for alignment, avatar, content, header, footer, and grouped turns.",
+      "registry": "aurora-message",
+      "installUrl": "https://aurora.tootie.tv/r/aurora-message.json"
+    },
+    {
+      "slug": "bubble",
+      "label": "Bubble",
+      "group": "Chat Primitives",
+      "description": "Message presentation primitive with Aurora default, secondary, muted, tinted, outline, ghost, and destructive variants plus reaction positioning.",
+      "registry": "aurora-bubble",
+      "installUrl": "https://aurora.tootie.tv/r/aurora-bubble.json"
+    },
+    {
+      "slug": "chat-attachment",
+      "label": "Attachment",
+      "group": "Chat Primitives",
+      "description": "Composable conversation attachment primitive with upload and processing states, media, metadata, actions, full-card triggers, groups, sizes, and orientations.",
+      "registry": "aurora-chat-attachment",
+      "installUrl": "https://aurora.tootie.tv/r/aurora-chat-attachment.json"
+    },
+    {
+      "slug": "marker",
+      "label": "Marker",
+      "group": "Chat Primitives",
+      "description": "Timeline and status marker primitive for chat separators, bordered events, icons, and accessible status content.",
+      "registry": "aurora-marker",
+      "installUrl": "https://aurora.tootie.tv/r/aurora-marker.json"
     },
     {
       "slug": "prompt-input",
