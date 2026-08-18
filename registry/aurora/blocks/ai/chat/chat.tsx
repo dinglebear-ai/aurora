@@ -148,8 +148,8 @@ function CompactSelect({ label, value, options, onValueChange, icon }: { label: 
   const tone = label === "Model" ? "model" : "reasoning"
   return (
     <Select value={value} onValueChange={onValueChange}>
-      <SelectTrigger aria-label={label} title={`${label}: ${value}`} data-chat-select={tone} className="aurora-chat-select !h-6 !w-auto min-w-[94px] gap-1 rounded-full !px-2 !py-0 [&>svg]:!size-3">
-        <span className="flex min-w-0 items-center gap-1.5">{icon}<SelectValue /></span>
+      <SelectTrigger aria-label={label} title={`${label}: ${value}`} data-chat-select={tone} className="aurora-chat-select !h-6 !w-auto min-w-0 max-w-[44%] flex-1 gap-1 rounded-full !px-1.5 !py-0 sm:min-w-[94px] sm:max-w-none sm:flex-none sm:!px-2 [&>svg]:!size-3">
+        <span className="flex min-w-0 items-center gap-1 overflow-hidden sm:gap-1.5">{icon}<SelectValue className="truncate" /></span>
       </SelectTrigger>
       <SelectContent className="min-w-[160px]">
         <SelectGroup>
@@ -339,7 +339,7 @@ function AuroraChatBlock({ title = "Aurora Chat", subtitle = "Composable convers
   const showStopButton = isResponding && !hasComposerPayload && !editingMessageId
 
   return (
-    <section aria-label="Interactive Aurora chat demo" className={["flex h-[min(720px,78vh)] min-h-[560px] w-full min-w-0 flex-col overflow-hidden rounded-[18px] border", className].filter(Boolean).join(" ")} style={{ borderColor: "color-mix(in srgb, var(--aurora-border-strong) 88%, transparent)", background: "linear-gradient(180deg, color-mix(in srgb, var(--aurora-page-bg) 96%, var(--aurora-panel-medium)), var(--aurora-page-bg))", boxShadow: "var(--aurora-shadow-strong), var(--aurora-highlight-strong)" }}>
+    <section aria-label="Interactive Aurora chat demo" className={["aurora-chat-block flex h-[min(680px,78svh)] min-h-[520px] w-full min-w-0 flex-col overflow-hidden rounded-[14px] border sm:h-[min(720px,78vh)] sm:min-h-[560px] sm:rounded-[18px]", className].filter(Boolean).join(" ")} style={{ borderColor: "color-mix(in srgb, var(--aurora-border-strong) 88%, transparent)", background: "linear-gradient(180deg, color-mix(in srgb, var(--aurora-page-bg) 96%, var(--aurora-panel-medium)), var(--aurora-page-bg))", boxShadow: "var(--aurora-shadow-strong), var(--aurora-highlight-strong)" }}>
       <header className="flex shrink-0 items-center justify-between gap-3 border-b px-3 py-1.5 sm:px-3.5" style={{ borderColor: "color-mix(in srgb, var(--aurora-border-strong) 78%, transparent)", background: "linear-gradient(180deg, color-mix(in srgb, var(--aurora-panel-strong) 98%, transparent), color-mix(in srgb, var(--aurora-panel-medium) 92%, transparent))", boxShadow: "inset 0 -1px color-mix(in srgb, var(--aurora-highlight-medium) 55%, transparent)" }}>
         <div className="flex min-w-0 items-center gap-2">
           <span className="flex size-[26px] shrink-0 items-center justify-center rounded-[8px] border [&_svg]:size-3.5" style={{ borderColor: "color-mix(in srgb, var(--axon-orange) 36%, var(--aurora-border-default))", background: "color-mix(in srgb, var(--axon-orange) 10%, var(--aurora-panel-medium))", color: "var(--axon-orange)" }}><Sparkles aria-hidden="true" /></span>
@@ -357,15 +357,15 @@ function AuroraChatBlock({ title = "Aurora Chat", subtitle = "Composable convers
         <MessageScrollerProvider autoScroll scrollPreviousItemPeek={48}>
           <MessageScroller>
             <MessageScrollerViewport>
-              <MessageScrollerContent className="gap-3.5 px-3.5 py-3 sm:px-4">
+              <MessageScrollerContent className="gap-2.5 px-2.5 py-2.5 sm:gap-3.5 sm:px-4 sm:py-3">
                 {items.map((item) => (
                   <MessageScrollerItem key={item.id} messageId={item.id} scrollAnchor={item.kind === "message" ? item.scrollAnchor : false}>
                     {item.kind === "marker" ? <ThreadMarker item={item} /> : (
                       <MessageGroup className="gap-1">
                         <Message align={item.role === "user" ? "end" : "start"}>
-                          {item.role === "assistant" ? <MessageAvatar aria-label="Aurora" className="!size-[22px] !min-w-[22px] [&_svg]:size-3"><Bot aria-hidden="true" /></MessageAvatar> : null}
+                          {item.role === "assistant" ? <MessageAvatar aria-label="Aurora" className="!size-5 !min-w-5 sm:!size-[22px] sm:!min-w-[22px] [&_svg]:size-[11px] sm:[&_svg]:size-3"><Bot aria-hidden="true" /></MessageAvatar> : null}
                           <MessageContent className="relative gap-1">
-                            {item.role === "assistant" ? <MessageHeader className="min-h-0 gap-1.5 px-0"><span style={{ color: "var(--aurora-text-primary)", fontSize: "var(--aurora-type-caption)", fontWeight: "var(--aurora-weight-ui)" }}>Aurora</span>{item.streaming ? <span className="aurora-chat-stream-status" role="status"><span className="aurora-chat-stream-dot" aria-hidden="true" />Streaming</span> : null}</MessageHeader> : null}
+                            {item.role === "assistant" ? <MessageHeader className="min-h-0 gap-1 px-0 sm:gap-1.5"><span style={{ color: "var(--aurora-text-primary)", fontSize: "var(--aurora-type-caption)", fontWeight: "var(--aurora-weight-ui)" }}>Aurora</span>{item.streaming ? <span className="aurora-chat-stream-status" role="status"><span className="aurora-chat-stream-dot" aria-hidden="true" />Streaming</span> : null}</MessageHeader> : null}
                             <BubbleGroup>
                               <Bubble variant={item.role === "user" ? "default" : "ghost"} align={item.role === "user" ? "end" : "start"} className={item.role === "assistant" ? "max-w-[64ch]" : "max-w-[86%] sm:max-w-[36ch]"}>
                                 <BubbleContent style={item.role === "user" ? { padding: "7px 10px", lineHeight: "1.45" } : { lineHeight: "1.55" }}>
@@ -377,14 +377,14 @@ function AuroraChatBlock({ title = "Aurora Chat", subtitle = "Composable convers
                             </BubbleGroup>
                             {item.role === "assistant" ? <AssistantShowcase kind={item.showcase} reasoning={reasoning} /> : null}
                             {item.role === "assistant" ? (
-                              <MessageFooter className="aurora-chat-action-rail pointer-events-none h-0 min-h-0 translate-y-1 gap-0.5 px-0 opacity-0 transition-[opacity,transform] duration-150 group-hover/message:pointer-events-auto group-hover/message:translate-y-0 group-hover/message:opacity-100 group-focus-within/message:pointer-events-auto group-focus-within/message:translate-y-0 group-focus-within/message:opacity-100 [@media(hover:none)]:pointer-events-auto [@media(hover:none)]:translate-y-0 [@media(hover:none)]:opacity-70">
+                              <MessageFooter className="aurora-chat-action-rail pointer-events-auto h-[18px] min-h-[18px] translate-y-0 gap-0.5 px-0 opacity-70 transition-[opacity,transform] duration-150 sm:pointer-events-none sm:h-0 sm:min-h-0 sm:translate-y-1 sm:opacity-0 sm:group-hover/message:pointer-events-auto sm:group-hover/message:translate-y-0 sm:group-hover/message:opacity-100 sm:group-focus-within/message:pointer-events-auto sm:group-focus-within/message:translate-y-0 sm:group-focus-within/message:opacity-100 [@media(hover:none)]:pointer-events-auto [@media(hover:none)]:h-[18px] [@media(hover:none)]:min-h-[18px] [@media(hover:none)]:translate-y-0 [@media(hover:none)]:opacity-70">
                                 <span className="mr-1" style={{ color: "var(--aurora-text-muted)", fontSize: "10.5px" }}>{item.time}</span>
                                 <Button type="button" variant="plain" size="unstyled" className="flex size-[18px] items-center justify-center rounded-[5px] transition-colors hover:bg-[var(--aurora-hover-bg)] [&_svg]:!size-3" aria-label={copiedId === item.id ? "Copied" : "Copy message"} onClick={() => copyMessage(item)}>{copiedId === item.id ? <Check aria-hidden="true" /> : <Copy aria-hidden="true" />}</Button>
                                 <Button type="button" variant="plain" size="unstyled" className="flex size-[18px] items-center justify-center rounded-[5px] transition-colors hover:bg-[var(--aurora-hover-bg)] [&_svg]:!size-3" aria-label="Retry message" disabled={isResponding} onClick={() => retryMessage(item.id)}><RotateCcw aria-hidden="true" /></Button>
                                 <Button type="button" variant="plain" size="unstyled" className="flex size-[18px] items-center justify-center rounded-[5px] transition-colors hover:bg-[var(--aurora-hover-bg)] [&_svg]:!size-3" aria-label={likedIds.has(item.id) ? "Remove reaction" : "Like message"} aria-pressed={likedIds.has(item.id)} onClick={() => toggleLike(item.id)} style={{ color: likedIds.has(item.id) ? "var(--aurora-accent-primary)" : "var(--aurora-text-muted)" }}><ThumbsUp aria-hidden="true" /></Button>
                               </MessageFooter>
                             ) : (
-                              <MessageFooter className="aurora-chat-action-rail pointer-events-none h-0 min-h-0 translate-y-1 justify-end gap-0.5 px-0 opacity-0 transition-[opacity,transform] duration-150 group-hover/message:pointer-events-auto group-hover/message:translate-y-0 group-hover/message:opacity-100 group-focus-within/message:pointer-events-auto group-focus-within/message:translate-y-0 group-focus-within/message:opacity-100 [@media(hover:none)]:pointer-events-auto [@media(hover:none)]:translate-y-0 [@media(hover:none)]:opacity-70">
+                              <MessageFooter className="aurora-chat-action-rail pointer-events-auto h-[18px] min-h-[18px] translate-y-0 justify-end gap-0.5 px-0 opacity-70 transition-[opacity,transform] duration-150 sm:pointer-events-none sm:h-0 sm:min-h-0 sm:translate-y-1 sm:opacity-0 sm:group-hover/message:pointer-events-auto sm:group-hover/message:translate-y-0 sm:group-hover/message:opacity-100 sm:group-focus-within/message:pointer-events-auto sm:group-focus-within/message:translate-y-0 sm:group-focus-within/message:opacity-100 [@media(hover:none)]:pointer-events-auto [@media(hover:none)]:h-[18px] [@media(hover:none)]:min-h-[18px] [@media(hover:none)]:translate-y-0 [@media(hover:none)]:opacity-70">
                                 <span className="mr-1" style={{ color: "var(--aurora-text-muted)", fontSize: "10.5px" }}>{item.time}</span>
                                 <Button type="button" variant="plain" size="unstyled" className="flex size-[18px] items-center justify-center rounded-[5px] transition-colors hover:bg-[var(--aurora-hover-bg)] [&_svg]:!size-3" aria-label="Edit message" onClick={() => editMessage(item)}><Pencil aria-hidden="true" /></Button>
                               </MessageFooter>
@@ -397,8 +397,8 @@ function AuroraChatBlock({ title = "Aurora Chat", subtitle = "Composable convers
                 ))}
               </MessageScrollerContent>
             </MessageScrollerViewport>
-            <MessageScrollerButton direction="start" className="!size-6 rounded-[7px] [&_svg]:!size-3.5" />
-            <MessageScrollerButton direction="end" variant="aurora" className="!size-6 rounded-[7px] [&_svg]:!size-3.5" />
+            <MessageScrollerButton direction="start" className="!size-[22px] rounded-[6px] sm:!size-6 sm:rounded-[7px] [&_svg]:!size-3 sm:[&_svg]:!size-3.5" />
+            <MessageScrollerButton direction="end" variant="aurora" className="!size-[22px] rounded-[6px] sm:!size-6 sm:rounded-[7px] [&_svg]:!size-3 sm:[&_svg]:!size-3.5" />
           </MessageScroller>
         </MessageScrollerProvider>
       </div>
@@ -409,7 +409,7 @@ function AuroraChatBlock({ title = "Aurora Chat", subtitle = "Composable convers
         <Button type="button" variant="ghost" size="icon" className="!size-6 [&_svg]:!size-3.5" aria-label="Close preview" onClick={() => setPreviewAttachment(null)}><X aria-hidden="true" /></Button>
       </div> : null}
 
-      <form className="relative z-30 shrink-0 border-t p-1.5" style={{ borderColor: "var(--aurora-border-default)", background: "color-mix(in srgb, var(--aurora-panel-strong) 94%, transparent)" }} onSubmit={(event) => { event.preventDefault(); if (!showStopButton) submitMessage() }}>
+      <form className="relative z-30 shrink-0 border-t p-1 sm:p-1.5" style={{ borderColor: "var(--aurora-border-default)", background: "color-mix(in srgb, var(--aurora-panel-strong) 94%, transparent)" }} onSubmit={(event) => { event.preventDefault(); if (!showStopButton) submitMessage() }}>
         <SuggestionPopup label="Skills and slash commands" items={slashOpen ? filteredSlash : []} activeIndex={slashActiveIndex} onSelect={insertSlashCommand} />
         <SuggestionPopup label="File mentions" items={mentionOpen ? filteredMentions : []} activeIndex={mentionActiveIndex} onSelect={insertMention} />
         {composerAttachment ? <AttachmentGroup className="mb-1.5 gap-1 py-0"><AttachmentCard attachment={composerAttachment} onOpen={setPreviewAttachment} onRemove={() => setComposerAttachment(null)} compact /></AttachmentGroup> : null}
@@ -423,7 +423,7 @@ function AuroraChatBlock({ title = "Aurora Chat", subtitle = "Composable convers
               <Button type="submit" variant="rose" size="icon" filled className="absolute bottom-1 right-1 z-10 !size-6 rounded-[7px] [&_svg]:!size-3.5" aria-label={editingMessageId ? "Save edited message" : isResponding ? "Send steering message" : "Send message"} disabled={!hasComposerPayload}><Send aria-hidden="true" /></Button>
             )}
           </div>
-          <div className="flex min-w-0 items-center gap-1 border-t px-1.5 py-0.5" style={{ borderColor: "color-mix(in srgb, var(--aurora-border-default) 68%, transparent)", background: "linear-gradient(180deg, color-mix(in srgb, var(--aurora-panel-medium) 30%, transparent), color-mix(in srgb, var(--aurora-control-surface) 58%, transparent))" }}>
+          <div className="flex min-w-0 items-center gap-1 overflow-hidden border-t px-1 py-0.5 sm:px-1.5" style={{ borderColor: "color-mix(in srgb, var(--aurora-border-default) 68%, transparent)", background: "linear-gradient(180deg, color-mix(in srgb, var(--aurora-panel-medium) 30%, transparent), color-mix(in srgb, var(--aurora-control-surface) 58%, transparent))" }}>
             <CompactSelect label="Model" value={model} options={MODELS} onValueChange={setModel} icon={<Cpu className="size-3 shrink-0" aria-hidden style={{ color: "var(--axon-orange)" }} />} />
             <CompactSelect label="Reasoning" value={reasoning} options={REASONING_LEVELS} onValueChange={setReasoning} icon={<Brain className="size-3 shrink-0" aria-hidden style={{ color: "var(--aurora-accent-pink)" }} />} />
             <span className="hidden min-w-0 items-center gap-1.5 sm:flex" style={{ color: "var(--aurora-text-muted)", fontSize: "10px" }}><span className="inline-flex items-center gap-1"><kbd className="aurora-chat-kbd">@</kbd>files</span><span aria-hidden="true">·</span><span className="inline-flex items-center gap-1"><kbd className="aurora-chat-kbd">/</kbd>skills</span></span>

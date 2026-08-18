@@ -682,6 +682,17 @@
 }
 .aurora-message-scroller__button[data-direction="end"][data-active="false"] { transform: translate(-50%, 10px) scale(.94); }
 .aurora-message-scroller__button[data-direction="start"][data-active="false"] { transform: translate(-50%, -10px) scale(.94); }
+@media (max-width: 639px) {
+  .aurora-chat-block .aurora-message-scroller__button {
+    left: auto;
+    right: 10px;
+    transform: none;
+  }
+  .aurora-chat-block .aurora-message-scroller__button[data-direction="end"] { bottom: 8px; }
+  .aurora-chat-block .aurora-message-scroller__button[data-direction="start"] { top: 8px; }
+  .aurora-chat-block .aurora-message-scroller__button[data-direction="end"][data-active="false"] { transform: translateY(8px) scale(.94); }
+  .aurora-chat-block .aurora-message-scroller__button[data-direction="start"][data-active="false"] { transform: translateY(-8px) scale(.94); }
+}
 
   /* ─── chat-sidebar ─── */
 .aurora-chat-sidebar {
