@@ -56,8 +56,10 @@ function MessageScrollerProvider({
   autoScroll = true,
   scrollPreviousItemPeek = 48,
 }: MessageScrollerProviderProps) {
-  const [viewport, setViewport] = React.useState<HTMLDivElement | null>(null)
-  const [content, setContent] = React.useState<HTMLDivElement | null>(null)
+  const viewportRef = React.useRef<HTMLDivElement | null>(null)
+  const contentRef = React.useRef<HTMLDivElement | null>(null)
+  const [viewport, setViewportNode] = React.useState<HTMLDivElement | null>(null)
+  const [content, setContentNode] = React.useState<HTMLDivElement | null>(null)
   const [isAtStart, setIsAtStart] = React.useState(true)
   const [isAtEnd, setIsAtEnd] = React.useState(true)
   const [isScrollable, setIsScrollable] = React.useState(false)
@@ -68,18 +70,29 @@ function MessageScrollerProvider({
   const autoScrollTimerRef = React.useRef<number | null>(null)
   const previousHeightRef = React.useRef(0)
 
+  const setViewport = React.useCallback((node: HTMLDivElement | null) => {
+    viewportRef.current = node
+    setViewportNode(node)
+  }, [])
+
+  const setContent = React.useCallback((node: HTMLDivElement | null) => {
+    contentRef.current = node
+    setContentNode(node)
+  }, [])
+
   const updateMetrics = React.useCallback(() => {
-    if (!viewport) return
+    const viewportNode = viewportRef.current
+    if (!viewportNode) return
     const tolerance = 3
-    const scrollable = viewport.scrollHeight > viewport.clientHeight + tolerance
-    const atStart = viewport.scrollTop <= tolerance
-    const atEnd = viewport.scrollHeight - viewport.clientHeight - viewport.scrollTop <= tolerance
+    const scrollable = viewportNode.scrollHeight > viewportNode.clientHeight + tolerance
+    const atStart = viewportNode.scrollTop <= tolerance
+    const atEnd = viewportNode.scrollHeight - viewportNode.clientHeight - viewportNode.scrollTop <= tolerance
 
     setIsScrollable(scrollable)
     setIsAtStart(atStart)
     setIsAtEnd(atEnd)
     if (atEnd) followEndRef.current = true
-  }, [viewport])
+  }, [])
 
   const markProgrammaticScroll = React.useCallback(() => {
     programmaticRef.current = true
@@ -94,55 +107,55 @@ function MessageScrollerProvider({
 
   const scrollTo = React.useCallback(
     (direction: ScrollDirection, options: ScrollOptions = {}) => {
-      if (!viewport) return
+      const viewportNode = viewportRef.current
+      if (!viewportNode) return
       const behavior = options.behavior ?? "smooth"
       markProgrammaticScroll()
       followEndRef.current = direction === "end"
-      viewport.scrollTo({
-        top: direction === "end" ? viewport.scrollHeight : 0,
+      viewportNode.scrollTo({
+        top: direction === "end" ? viewportNode.scrollHeight : 0,
         behavior,
       })
     },
-    [markProgrammaticScroll, viewport]
+    [markProgrammaticScroll]
   )
 
   const scrollToMessage = React.useCallback(
     (messageId: string, options: MessageScrollOptions = {}) => {
-      if (!viewport) return
+      const viewportNode = viewportRef.current
+      if (!viewportNode) return
       const node = itemsRef.current.get(messageId)
       if (!node) return
 
       const block = options.block ?? "start"
       const peek = block === "start" ? scrollPreviousItemPeek : 0
       let top = node.offsetTop - peek
-      if (block === "center") top = node.offsetTop - (viewport.clientHeight - node.offsetHeight) / 2
-      if (block === "end") top = node.offsetTop - viewport.clientHeight + node.offsetHeight
+      if (block === "center") top = node.offsetTop - (viewportNode.clientHeight - node.offsetHeight) / 2
+      if (block === "end") top = node.offsetTop - viewportNode.clientHeight + node.offsetHeight
 
       markProgrammaticScroll()
       followEndRef.current = false
-      viewport.scrollTo({ top: Math.max(0, top), behavior: options.behavior ?? "smooth" })
+      viewportNode.scrollTo({ top: Math.max(0, top), behavior: options.behavior ?? "smooth" })
     },
-    [markProgrammaticScroll, scrollPreviousItemPeek, viewport]
+    [markProgrammaticScroll, scrollPreviousItemPeek]
   )
 
-  const registerItem = React.useCallback(
-    (messageId: string, node: HTMLElement | null) => {
-      if (!node) {
-        itemsRef.current.delete(messageId)
-        return
-      }
+  const registerItem = React.useCallback((messageId: string, node: HTMLElement | null) => {
+    if (!node) {
+      itemsRef.current.delete(messageId)
+      return
+    }
 
-      const isNew = !itemsRef.current.has(messageId)
-      itemsRef.current.set(messageId, node)
+    const isNew = !itemsRef.current.has(messageId)
+    itemsRef.current.set(messageId, node)
+    const viewportNode = viewportRef.current
 
-      // If history is prepended while the reader is away from the end, preserve
-      // the visible anchor by compensating for the newly inserted row height.
-      if (isNew && viewport && !followEndRef.current && viewport.scrollTop > 0 && node.offsetTop < viewport.scrollTop) {
-        viewport.scrollTop += node.offsetHeight
-      }
-    },
-    [viewport]
-  )
+    // If history is prepended while the reader is away from the end, preserve
+    // the visible anchor by compensating for the newly inserted row height.
+    if (isNew && viewportNode && !followEndRef.current && viewportNode.scrollTop > 0 && node.offsetTop < viewportNode.scrollTop) {
+      viewportNode.scrollTop += node.offsetHeight
+    }
+  }, [])
 
   const onUserScrollIntent = React.useCallback(() => {
     followEndRef.current = false
@@ -155,39 +168,38 @@ function MessageScrollerProvider({
   }, [])
 
   const onViewportScroll = React.useCallback(() => {
-    if (!viewport) return
+    const viewportNode = viewportRef.current
+    if (!viewportNode) return
     const tolerance = 3
-    const atEnd = viewport.scrollHeight - viewport.clientHeight - viewport.scrollTop <= tolerance
+    const atEnd = viewportNode.scrollHeight - viewportNode.clientHeight - viewportNode.scrollTop <= tolerance
     if (!programmaticRef.current && !atEnd) followEndRef.current = false
     updateMetrics()
-  }, [updateMetrics, viewport])
+  }, [updateMetrics])
 
   React.useLayoutEffect(() => {
-    if (!viewport || !content) return
+    const viewportNode = viewportRef.current
+    const contentNode = contentRef.current
+    if (!viewport || !content || !viewportNode || !contentNode) return
 
-    const scrollToEndNow = () => {
-      viewport.scrollTop = viewport.scrollHeight
-      followEndRef.current = true
-      updateMetrics()
-    }
-
-    scrollToEndNow()
-    previousHeightRef.current = content.scrollHeight
+    viewportNode.scrollTop = viewportNode.scrollHeight
+    followEndRef.current = true
+    updateMetrics()
+    previousHeightRef.current = contentNode.scrollHeight
 
     const observer = new ResizeObserver(() => {
-      const nextHeight = content.scrollHeight
+      const nextHeight = contentNode.scrollHeight
       const grew = nextHeight > previousHeightRef.current
       previousHeightRef.current = nextHeight
 
       if (autoScroll && grew && followEndRef.current) {
         markProgrammaticScroll()
-        viewport.scrollTo({ top: viewport.scrollHeight, behavior: "smooth" })
+        viewportNode.scrollTo({ top: viewportNode.scrollHeight, behavior: "smooth" })
       }
       window.requestAnimationFrame(updateMetrics)
     })
 
-    observer.observe(content)
-    observer.observe(viewport)
+    observer.observe(contentNode)
+    observer.observe(viewportNode)
     return () => observer.disconnect()
   }, [autoScroll, content, markProgrammaticScroll, updateMetrics, viewport])
 
@@ -345,14 +357,12 @@ function MessageScrollerItem({
   scrollAnchor = false,
   ...props
 }: MessageScrollerItemProps & { ref?: React.Ref<HTMLDivElement> }) {
-  const { registerItem, viewport, scrollPreviousItemPeek } = useMessageScrollerContext()
+  const { registerItem, scrollToMessage } = useMessageScrollerContext()
   const reactId = React.useId()
   const id = messageId ?? reactId
-  const localRef = React.useRef<HTMLDivElement | null>(null)
 
   const setRef = React.useCallback(
     (node: HTMLDivElement | null) => {
-      localRef.current = node
       registerItem(id, node)
       assignRef(ref, node)
     },
@@ -360,10 +370,9 @@ function MessageScrollerItem({
   )
 
   React.useLayoutEffect(() => {
-    if (!scrollAnchor || !localRef.current || !viewport) return
-    const top = Math.max(0, localRef.current.offsetTop - scrollPreviousItemPeek)
-    viewport.scrollTo({ top, behavior: "smooth" })
-  }, [scrollAnchor, scrollPreviousItemPeek, viewport])
+    if (!scrollAnchor) return
+    scrollToMessage(id, { block: "start", behavior: "smooth" })
+  }, [id, scrollAnchor, scrollToMessage])
 
   React.useEffect(() => () => registerItem(id, null), [id, registerItem])
 

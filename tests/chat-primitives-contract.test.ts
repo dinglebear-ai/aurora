@@ -29,8 +29,8 @@ test("Aurora publishes every shadcn chat primitive plus the interactive block", 
 
 test("interactive chat block composes all five primitive families and stays local-only", () => {
   const source = read("registry/aurora/blocks/ai/chat/chat.tsx")
-  for (const module of ["message-scroller", "message", "bubble", "attachment", "marker"]) {
-    assert.ok(source.includes("@/registry/aurora/ui/" + module), "chat block does not import " + module)
+  for (const primitiveModule of ["message-scroller", "message", "bubble", "attachment", "marker"]) {
+    assert.ok(source.includes("@/registry/aurora/ui/" + primitiveModule), "chat block does not import " + primitiveModule)
   }
   for (const interaction of ["setInterval", "navigator.clipboard", "retryMessage", "addMockAttachment", "toggleLike", "resetDemo"]) {
     assert.ok(source.includes(interaction), "chat block is missing " + interaction)
