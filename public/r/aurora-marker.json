@@ -1,0 +1,39 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "aurora-marker",
+  "title": "Aurora Marker",
+  "author": "jmagar <https://github.com/jmagar>",
+  "description": "Timeline and status marker primitive for chat separators, bordered events, icons, and accessible status content.",
+  "dependencies": [
+    "@radix-ui/react-slot@^1.3.0",
+    "class-variance-authority@^0.7.1"
+  ],
+  "registryDependencies": [
+    "@aurora/aurora-tokens",
+    "@aurora/aurora-components"
+  ],
+  "files": [
+    {
+      "path": "registry/aurora/ui/marker.tsx",
+      "content": "import * as React from \"react\"\nimport { Slot } from \"@radix-ui/react-slot\"\nimport { cva, type VariantProps } from \"class-variance-authority\"\n\nimport { cn } from \"@/lib/utils\"\n\nconst markerVariants = cva(\n  \"aurora-marker group/marker relative flex min-h-4 w-full items-center gap-2 text-left\",\n  {\n    variants: {\n      variant: {\n        default: \"aurora-marker--default\",\n        separator: \"aurora-marker--separator\",\n        border: \"aurora-marker--border\",\n      },\n    },\n    defaultVariants: {\n      variant: \"default\",\n    },\n  }\n)\n\nfunction Marker({\n  className,\n  variant = \"default\",\n  asChild = false,\n  ...props\n}: React.ComponentProps<\"div\"> &\n  VariantProps<typeof markerVariants> & { asChild?: boolean }) {\n  const Comp = asChild ? Slot : \"div\"\n\n  return (\n    <Comp\n      data-slot=\"marker\"\n      data-variant={variant}\n      className={cn(markerVariants({ variant, className }))}\n      {...props}\n    />\n  )\n}\n\nfunction MarkerIcon({ className, ...props }: React.ComponentProps<\"span\">) {\n  return (\n    <span\n      data-slot=\"marker-icon\"\n      aria-hidden=\"true\"\n      className={cn(\"aurora-marker__icon size-4 shrink-0\", className)}\n      {...props}\n    />\n  )\n}\n\nfunction MarkerContent({ className, ...props }: React.ComponentProps<\"span\">) {\n  return (\n    <span\n      data-slot=\"marker-content\"\n      className={cn(\n        \"min-w-0 break-words group-data-[variant=separator]/marker:flex-none group-data-[variant=separator]/marker:text-center\",\n        className\n      )}\n      {...props}\n    />\n  )\n}\n\nexport { Marker, MarkerIcon, MarkerContent, markerVariants }\n",
+      "type": "registry:ui",
+      "target": "@ui/aurora/marker.tsx"
+    }
+  ],
+  "meta": {
+    "namespace": "@aurora",
+    "style": "aurora",
+    "family": "ui",
+    "requiresTokens": true,
+    "sourcePath": "registry/aurora/ui/marker.tsx",
+    "installTarget": "@ui/aurora/marker.tsx"
+  },
+  "docs": "Aurora Marker primitive for conversation timeline state. Use the separator variant for temporal dividers, border for state transitions, and role=status when content announces live activity.\n\nRegistry dependencies: aurora-tokens, aurora-components.",
+  "categories": [
+    "aurora",
+    "ui",
+    "chat",
+    "ai"
+  ],
+  "type": "registry:ui"
+}

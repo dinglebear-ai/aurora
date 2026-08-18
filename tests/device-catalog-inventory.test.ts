@@ -53,5 +53,5 @@ test("device catalog aggregate counts match the generated items", () => {
   assert.equal(inventory.counts.galleryPreviews, inventory.items.filter((item) => item.demoModule).length)
   assert.equal(inventory.counts.sharedFixtures, inventory.items.filter((item) => item.fixtureId).length)
   assert.equal(inventory.counts.metadataOnly, inventory.items.filter((item) => item.mobileReadiness === "metadata-only").length)
-  assert.equal(inventory.counts.registryItems, 176)
+  assert.equal(inventory.counts.registryItems, 182)
 })

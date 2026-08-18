@@ -45,9 +45,9 @@ export const ProductPanel: Story = {
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-3 gap-3">
-          <Metric label="Items" value="176" />
-          <Metric label="UI" value="79" />
-          <Metric label="Blocks" value="73" />
+          <Metric label="Items" value="182" />
+          <Metric label="UI" value="84" />
+          <Metric label="Blocks" value="74" />
         </div>
         <StatusIndicator tone="automating" label="Registry build queued" />
       </CardContent>

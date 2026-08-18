@@ -108,6 +108,12 @@ export const SLUG_TO_REGISTRY: Record<string, string> = {
   "share-dialog": "aurora-share-dialog",
 
   // Chat & AI
+  bubble: "aurora-bubble",
+  "chat-attachment": "aurora-chat-attachment",
+  "chat-block": "aurora-chat-block",
+  marker: "aurora-marker",
+  "message-primitive": "aurora-message",
+  "message-scroller": "aurora-message-scroller",
   "prompt-input": "aurora-prompt-input",
   "ai-elements": "aurora-ai-elements",
   message: "aurora-ai-message",

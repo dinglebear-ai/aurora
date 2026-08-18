@@ -1,0 +1,41 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "aurora-chat-attachment",
+  "title": "Aurora Chat Attachment",
+  "author": "jmagar <https://github.com/jmagar>",
+  "description": "Composable conversation attachment primitive with upload and processing states, media, metadata, actions, full-card triggers, groups, sizes, and orientations.",
+  "dependencies": [
+    "@radix-ui/react-slot@^1.3.0",
+    "class-variance-authority@^0.7.1"
+  ],
+  "registryDependencies": [
+    "@aurora/aurora-tokens",
+    "@aurora/aurora-button",
+    "@aurora/aurora-components"
+  ],
+  "files": [
+    {
+      "path": "registry/aurora/ui/attachment.tsx",
+      "content": "import * as React from \"react\"\nimport { Slot } from \"@radix-ui/react-slot\"\nimport { cva, type VariantProps } from \"class-variance-authority\"\n\nimport { cn } from \"@/lib/utils\"\nimport { Button } from \"@/registry/aurora/ui/button\"\n\nexport type AttachmentState = \"idle\" | \"uploading\" | \"processing\" | \"error\" | \"done\"\nexport type AttachmentSize = \"default\" | \"sm\" | \"xs\"\nexport type AttachmentOrientation = \"horizontal\" | \"vertical\"\n\nconst attachmentVariants = cva(\n  \"aurora-chat-attachment group/attachment relative flex w-fit max-w-full min-w-0 shrink-0 flex-wrap\",\n  {\n    variants: {\n      size: {\n        default: \"aurora-chat-attachment--default\",\n        sm: \"aurora-chat-attachment--sm\",\n        xs: \"aurora-chat-attachment--xs\",\n      },\n      orientation: {\n        horizontal: \"aurora-chat-attachment--horizontal\",\n        vertical: \"aurora-chat-attachment--vertical\",\n      },\n    },\n    defaultVariants: {\n      size: \"default\",\n      orientation: \"horizontal\",\n    },\n  }\n)\n\nfunction Attachment({\n  className,\n  state = \"done\",\n  size = \"default\",\n  orientation = \"horizontal\",\n  ...props\n}: React.ComponentProps<\"div\"> &\n  VariantProps<typeof attachmentVariants> & { state?: AttachmentState }) {\n  return (\n    <div\n      data-slot=\"attachment\"\n      data-state={state}\n      data-size={size}\n      data-orientation={orientation}\n      className={cn(attachmentVariants({ size, orientation }), className)}\n      {...props}\n    />\n  )\n}\n\nconst attachmentMediaVariants = cva(\n  \"aurora-chat-attachment__media relative flex aspect-square shrink-0 items-center justify-center overflow-hidden\",\n  {\n    variants: {\n      variant: {\n        icon: \"\",\n        image: \"aurora-chat-attachment__media--image\",\n      },\n    },\n    defaultVariants: {\n      variant: \"icon\",\n    },\n  }\n)\n\nfunction AttachmentMedia({\n  className,\n  variant = \"icon\",\n  ...props\n}: React.ComponentProps<\"div\"> & VariantProps<typeof attachmentMediaVariants>) {\n  return (\n    <div\n      data-slot=\"attachment-media\"\n      data-variant={variant}\n      className={cn(attachmentMediaVariants({ variant }), className)}\n      {...props}\n    />\n  )\n}\n\nfunction AttachmentContent({ className, ...props }: React.ComponentProps<\"div\">) {\n  return (\n    <div\n      data-slot=\"attachment-content\"\n      className={cn(\"aurora-chat-attachment__content max-w-full min-w-0 flex-1\", className)}\n      {...props}\n    />\n  )\n}\n\nfunction AttachmentTitle({ className, ...props }: React.ComponentProps<\"span\">) {\n  return (\n    <span\n      data-slot=\"attachment-title\"\n      className={cn(\"aurora-chat-attachment__title block max-w-full min-w-0 truncate\", className)}\n      {...props}\n    />\n  )\n}\n\nfunction AttachmentDescription({ className, ...props }: React.ComponentProps<\"span\">) {\n  return (\n    <span\n      data-slot=\"attachment-description\"\n      className={cn(\"aurora-chat-attachment__description block max-w-full min-w-0 truncate\", className)}\n      {...props}\n    />\n  )\n}\n\nfunction AttachmentActions({ className, ...props }: React.ComponentProps<\"div\">) {\n  return (\n    <div\n      data-slot=\"attachment-actions\"\n      className={cn(\"aurora-chat-attachment__actions relative z-20 flex shrink-0 items-center\", className)}\n      {...props}\n    />\n  )\n}\n\nfunction AttachmentAction({\n  className,\n  variant = \"ghost\",\n  size = \"icon\",\n  ...props\n}: React.ComponentProps<typeof Button>) {\n  return (\n    <Button\n      data-slot=\"attachment-action\"\n      variant={variant}\n      size={size}\n      className={cn(\"size-7 rounded-[8px]\", className)}\n      {...props}\n    />\n  )\n}\n\nfunction AttachmentTrigger({\n  className,\n  asChild = false,\n  type,\n  ...props\n}: React.ComponentProps<\"button\"> & { asChild?: boolean }) {\n  const Comp = asChild ? Slot : \"button\"\n\n  return (\n    <Comp\n      data-slot=\"attachment-trigger\"\n      type={asChild ? undefined : (type ?? \"button\")}\n      className={cn(\"absolute inset-0 z-10 outline-none\", className)}\n      {...props}\n    />\n  )\n}\n\nfunction AttachmentGroup({ className, ...props }: React.ComponentProps<\"div\">) {\n  return (\n    <div\n      data-slot=\"attachment-group\"\n      className={cn(\n        \"aurora-chat-attachment-group flex min-w-0 gap-3 overflow-x-auto overscroll-x-contain py-1\",\n        \"snap-x snap-mandatory scroll-px-1 *:data-[slot=attachment]:flex-none *:data-[slot=attachment]:snap-start\",\n        className\n      )}\n      {...props}\n    />\n  )\n}\n\nexport {\n  Attachment,\n  AttachmentGroup,\n  AttachmentMedia,\n  AttachmentContent,\n  AttachmentTitle,\n  AttachmentDescription,\n  AttachmentActions,\n  AttachmentAction,\n  AttachmentTrigger,\n  attachmentVariants,\n}\n",
+      "type": "registry:ui",
+      "target": "@ui/aurora/attachment.tsx"
+    }
+  ],
+  "meta": {
+    "namespace": "@aurora",
+    "style": "aurora",
+    "family": "ui",
+    "requiresTokens": true,
+    "sourcePath": "registry/aurora/ui/attachment.tsx",
+    "installTarget": "@ui/aurora/attachment.tsx"
+  },
+  "docs": "Aurora chat Attachment primitive. This registry name intentionally differs from the existing aurora-attachment block so the legacy file-attachment showcase remains install-compatible.\n\nRegistry dependencies: aurora-tokens, aurora-button, aurora-components.",
+  "categories": [
+    "aurora",
+    "ui",
+    "chat",
+    "files",
+    "ai"
+  ],
+  "type": "registry:ui"
+}

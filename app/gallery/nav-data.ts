@@ -97,6 +97,14 @@ export const NAV: NavGroup[] = [
     { label: "Drawer", slug: "drawer" },
     { label: "Share Dialog", slug: "share-dialog" },
   ]},
+  { group: "Chat Primitives", items: [
+    { label: "Interactive Chat", slug: "chat-block" },
+    { label: "Message Scroller", slug: "message-scroller" },
+    { label: "Message", slug: "message-primitive" },
+    { label: "Bubble", slug: "bubble" },
+    { label: "Attachment", slug: "chat-attachment" },
+    { label: "Marker", slug: "marker" },
+  ]},
   { group: "Chat & AI", items: [
     { label: "Prompt Input", slug: "prompt-input" },
     { label: "AI Elements", slug: "ai-elements" },
