@@ -42,6 +42,7 @@ const InlineCitation = (
   ) => {
     const [open, setOpen] = React.useState(false)
     const resolvedHref = safeHttpUrl(href ?? url)
+    const sourceHost = resolvedHref ? new URL(resolvedHref).hostname.replace(/^www\./, "") : null
     const hasPreview = Boolean(title || description || url)
     const previewId = React.useId()
     const resolvedTarget = target ?? (resolvedHref ? "_blank" : undefined)
@@ -166,16 +167,9 @@ const InlineCitation = (
               {description}
             </span>
           ) : null}
-          {url ? (
-            <span
-              className="aurora-text-meta"
-              style={{
-                lineHeight: 1.4,
-                color: "var(--aurora-accent-pink)",
-                wordBreak: "break-all",
-              }}
-            >
-              {url}
+          {sourceHost ? (
+            <span className="aurora-text-meta inline-flex items-center gap-1" style={{ lineHeight: 1.4, color: "var(--aurora-accent-pink)" }}>
+              <span>{sourceHost}</span><span aria-hidden="true">↗</span>
             </span>
           ) : null}
         </span>

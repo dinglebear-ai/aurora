@@ -435,10 +435,24 @@
 }
 
 .aurora-chat-composer {
+  border-color: var(--aurora-border-strong);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--aurora-control-surface) 96%, var(--aurora-panel-strong)), var(--aurora-control-surface));
+  box-shadow: var(--aurora-highlight-medium);
   transition: border-color 150ms ease, box-shadow 150ms ease, background 150ms ease;
 }
 .aurora-chat-composer[data-streaming="true"] {
   border-color: color-mix(in srgb, var(--axon-orange) 28%, var(--aurora-border-strong));
+}
+.aurora-chat-composer[data-steering="true"] {
+  border-color: color-mix(in srgb, var(--aurora-accent-pink) 38%, var(--aurora-border-strong));
+  background: linear-gradient(180deg, color-mix(in srgb, var(--aurora-accent-pink) 3%, var(--aurora-control-surface)), var(--aurora-control-surface));
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--aurora-accent-pink) 10%, transparent), var(--aurora-highlight-medium);
+}
+.aurora-chat-response .aurora-response-block:first-child { margin-top: 0 !important; }
+.aurora-chat-response .aurora-response-block:last-child { margin-bottom: 0 !important; }
+.aurora-chat-response code {
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
 }
 .aurora-chat-composer:focus-within {
   border-color: color-mix(in srgb, var(--aurora-accent-primary) 48%, var(--aurora-border-strong));

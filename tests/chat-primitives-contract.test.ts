@@ -32,7 +32,7 @@ test("interactive chat block composes all five primitive families and stays loca
   for (const primitiveModule of ["message-scroller", "message", "bubble", "attachment", "marker"]) {
     assert.ok(source.includes("@/registry/aurora/ui/" + primitiveModule), "chat block does not import " + primitiveModule)
   }
-  for (const interaction of ["setInterval", "navigator.clipboard", "retryMessage", "addMockAttachment", "toggleLike", "editMessage", "stopResponse", "insertSlashCommand", "insertMention", "resetDemo"]) {
+  for (const interaction of ["setInterval", "navigator.clipboard", "retryMessage", "addMockAttachment", "toggleLike", "editMessage", "stopResponse", "insertSlashCommand", "insertMention", "resetDemo", "newChat"]) {
     assert.ok(source.includes(interaction), "chat block is missing " + interaction)
   }
   assert.equal(/\bfetch\s*\(/.test(source), false)
@@ -57,6 +57,7 @@ test("new chat surfaces preserve Aurora conversation ergonomics", () => {
   assert.ok(block.includes("h-[min(680px,78svh)]"), "mobile chat should use small-viewport units instead of desktop vh sizing")
   assert.ok(block.includes("max-w-[44%] flex-1"), "mobile model and reasoning selectors should share the composer footer without overflowing")
   assert.ok(block.includes("aurora-chat-composer"), "composer should retain the unified Aurora focus surface")
+  assert.ok(block.includes("data-steering={isResponding && hasComposerPayload"), "composer should expose a distinct steering state while a reply is active")
   assert.ok(block.includes('aria-label="Edit message"'), "user messages should expose edit actions")
   assert.ok(block.includes("<ThumbsUp"), "assistant actions should include thumbs up beside copy and retry")
   assert.equal(block.includes(">Retry</Button>"), false, "copy and retry controls should stay icon-only")
@@ -73,10 +74,26 @@ test("new chat surfaces preserve Aurora conversation ergonomics", () => {
   assert.ok(block.includes('Snippet density="compact"'), "assistant turns should demonstrate snippets")
   assert.ok(block.includes('CodeBlock density="compact"'), "assistant turns should demonstrate code blocks")
   assert.ok(block.includes('Sources density="compact"'), "assistant turns should demonstrate sources and references")
+  assert.ok(block.includes('<Response markdown={item.text}'), "assistant prose should use Aurora Response for markdown, citations, and streaming typography")
+  assert.ok(block.includes("responseSources?: ResponseSource[]"), "assistant turns should support inline citation metadata")
+  assert.ok(block.includes("[content-visibility:visible]"), "citation-rich turns should allow hover previews to escape paint containment")
+  assert.ok(block.includes("AttachmentPreviewPanel"), "attachments should expose a real compact preview surface")
+  assert.ok(block.includes('label: "/error"'), "slash commands should include the recoverable error-state demo")
+  assert.ok(block.includes("<EmptyState"), "new chats should render a deliberate empty state")
+  assert.ok(block.includes('<Callout variant="error"'), "recoverable failures should use the Aurora error callout")
   assert.ok(block.includes("absolute bottom-1 left-1"), "attachment control should live inside the input field")
   assert.ok(block.includes("absolute bottom-1 right-1"), "send or stop control should live inside the input field")
   assert.equal(/<Textarea[^>]*disabled=/.test(block), false, "the composer should remain editable while the assistant is replying")
   assert.equal(block.includes("aria-label={item.role === \"user\" ? \"You\" : \"Aurora\"}"), false, "user turns should not regain redundant identity avatars")
+})
+
+test("chat citations use concise hostname previews", () => {
+  const response = read("registry/aurora/blocks/ai/elements/response.tsx")
+  const inlineCitation = read("registry/aurora/blocks/ai/elements/inline-citation.tsx")
+  assert.ok(response.includes("const sourceHost = safeHref ? new URL(safeHref).hostname"))
+  assert.ok(inlineCitation.includes("const sourceHost = resolvedHref ? new URL(resolvedHref).hostname"))
+  assert.equal(response.includes("{source.href}"), false, "response citation previews should not dump raw URLs")
+  assert.equal(inlineCitation.includes("{url}"), false, "inline citation previews should not dump raw URLs")
 })
 
 test("chat developer surfaces keep scrollable code keyboard reachable", () => {

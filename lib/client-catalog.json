@@ -588,7 +588,7 @@
       "slug": "chat-block",
       "label": "Interactive Chat",
       "group": "Chat Primitives",
-      "description": "Interactive Aurora chat workspace combining the new conversation primitives with steerable streaming, editable user turns, hover actions, code and source surfaces, model/reasoning selection, slash-command skills, file mentions, and an in-field composer.",
+      "description": "Interactive Aurora chat workspace combining composable conversation primitives with steerable streaming, markdown and citation-rich assistant responses, editable user turns, code/source surfaces, attachment previews, empty/error states, model/reasoning selection, slash-command skills, file mentions, and an in-field composer.",
       "registry": "aurora-chat-block",
       "installUrl": "https://aurora.tootie.tv/r/aurora-chat-block.json"
     },

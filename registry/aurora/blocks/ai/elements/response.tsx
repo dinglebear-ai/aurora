@@ -201,6 +201,7 @@ function CitationChip({
 }) {
   const [open, setOpen] = React.useState(false)
   const safeHref = safeHttpUrl(source?.href)
+  const sourceHost = safeHref ? new URL(safeHref).hostname.replace(/^www\./, "") : null
   const hasPreview = Boolean(source?.title || source?.description || source?.href)
   const previewId = React.useId()
   const isLinked = Boolean(safeHref)
@@ -318,16 +319,9 @@ function CitationChip({
             {source.description}
           </span>
         ) : null}
-        {source?.href ? (
-          <span
-            className="aurora-text-meta"
-            style={{
-              lineHeight: 1.4,
-              color: "var(--aurora-accent-pink)",
-              wordBreak: "break-all",
-            }}
-          >
-            {source.href}
+        {sourceHost ? (
+          <span className="aurora-text-meta inline-flex items-center gap-1" style={{ lineHeight: 1.4, color: "var(--aurora-accent-pink)" }}>
+            <span>{sourceHost}</span><span aria-hidden="true">↗</span>
           </span>
         ) : null}
       </span>

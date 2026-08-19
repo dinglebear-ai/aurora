@@ -1,15 +1,18 @@
 "use client"
 
 import * as React from "react"
-import { Bot, Brain, Check, CheckCheck, Command, Copy, Cpu, FileCode2, FileText, Paperclip, Pencil, RefreshCw, RotateCcw, Send, Sparkles, Square, ThumbsUp, X } from "lucide-react"
+import { AlertTriangle, Bot, Brain, Check, CheckCheck, Command, Copy, Cpu, FileCode2, FileText, Paperclip, Pencil, Plus, RefreshCw, RotateCcw, Send, Sparkles, Square, ThumbsUp, X } from "lucide-react"
 
 import { Reasoning } from "@/registry/aurora/blocks/ai/elements/reasoning"
+import { Response, type ResponseSource } from "@/registry/aurora/blocks/ai/elements/response"
 import { Snippet } from "@/registry/aurora/blocks/ai/elements/snippet"
 import { Source, Sources } from "@/registry/aurora/blocks/ai/elements/sources"
 import { CodeBlock } from "@/registry/aurora/blocks/workspace/code-block/code-block"
 import { Attachment, AttachmentAction, AttachmentActions, AttachmentContent, AttachmentDescription, AttachmentGroup, AttachmentMedia, AttachmentTitle, AttachmentTrigger, type AttachmentState } from "@/registry/aurora/ui/attachment"
 import { Bubble, BubbleContent, BubbleGroup } from "@/registry/aurora/ui/bubble"
 import { Button } from "@/registry/aurora/ui/button"
+import { Callout } from "@/registry/aurora/ui/callout"
+import { EmptyState } from "@/registry/aurora/ui/empty-state"
 import { Marker, MarkerContent, MarkerIcon } from "@/registry/aurora/ui/marker"
 import { Message, MessageAvatar, MessageContent, MessageFooter, MessageGroup, MessageHeader } from "@/registry/aurora/ui/message"
 import { MessageScroller, MessageScrollerButton, MessageScrollerContent, MessageScrollerItem, MessageScrollerProvider, MessageScrollerViewport } from "@/registry/aurora/ui/message-scroller"
@@ -19,9 +22,10 @@ import { Textarea } from "@/registry/aurora/ui/textarea"
 
 type DemoAttachment = { id: string; title: string; description: string; state: AttachmentState }
 type ShowcaseKind = "code" | "sources" | "reasoning"
-type DemoMessage = { kind: "message"; id: string; role: "assistant" | "user"; text: string; time: string; streaming?: boolean; scrollAnchor?: boolean; attachments?: DemoAttachment[]; showcase?: ShowcaseKind }
+type DemoMessage = { kind: "message"; id: string; role: "assistant" | "user"; text: string; time: string; streaming?: boolean; scrollAnchor?: boolean; attachments?: DemoAttachment[]; responseSources?: ResponseSource[]; showcase?: ShowcaseKind }
 type DemoMarker = { kind: "marker"; id: string; label: string; variant?: "default" | "separator" | "border"; status?: "thinking" | "ready" | "synced" }
-type DemoThreadItem = DemoMessage | DemoMarker
+type DemoError = { kind: "error"; id: string; title: string; text: string }
+type DemoThreadItem = DemoMessage | DemoMarker | DemoError
 type Suggestion = { id: string; label: string; description: string; kind: "skill" | "file" }
 
 const DEMO_SNIPPET = [
@@ -42,6 +46,7 @@ const SLASH_COMMANDS: Suggestion[] = [
   { id: "docs", label: "/docs", description: "Run the documentation sweep skill", kind: "skill" },
   { id: "test", label: "/test", description: "Run validation and smoke tests", kind: "skill" },
   { id: "plan", label: "/plan", description: "Create an implementation plan", kind: "skill" },
+  { id: "error", label: "/error", description: "Simulate a recoverable response error", kind: "skill" },
 ]
 
 const FILE_MENTIONS: Suggestion[] = [
@@ -56,18 +61,18 @@ const REASONING_LEVELS = ["Auto", "Fast", "Balanced", "Deep"]
 
 const INITIAL_ITEMS: DemoThreadItem[] = [
   { kind: "marker", id: "marker-today", label: "Today", variant: "separator" },
-  { kind: "message", id: "assistant-welcome", role: "assistant", time: "9:31 PM", text: "The new conversation layer composes cleanly with Aurora's existing developer surfaces. Here's the lightweight snippet and the full steering helper.", showcase: "code", attachments: [{ id: "attachment-spec", title: "chat-primitives.md", description: "5 primitives · Aurora registry", state: "done" }] },
+  { kind: "message", id: "assistant-welcome", role: "assistant", time: "9:31 PM", text: "The new conversation layer composes cleanly with Aurora's existing `Response`, `Snippet`, and `CodeBlock` surfaces. Here's the lightweight snippet and the full steering helper.", showcase: "code", attachments: [{ id: "attachment-spec", title: "chat-primitives.md", description: "5 primitives · Aurora registry", state: "done" }] },
   { kind: "message", id: "user-compose", role: "user", time: "9:33 PM", text: "Show me the references too, and keep assistant replies out of bubbles." },
   { kind: "marker", id: "marker-context", label: "Conversation context synchronized", variant: "border", status: "synced" },
-  { kind: "message", id: "assistant-compose", role: "assistant", time: "9:34 PM", text: "Assistant content is now plain conversational prose. Sources stay attached to the turn as compact references instead of becoming another oversized card stack.", showcase: "sources" },
+  { kind: "message", id: "assistant-compose", role: "assistant", time: "9:34 PM", text: "Assistant content is plain conversational prose with inline citations. Sources stay attached to the turn as compact references [[1]], while local file context remains visible without becoming another oversized card stack [[2]].", responseSources: [{ title: "shadcn chat components", href: "https://ui.shadcn.com/docs/changelog/2026-06-chat-components", description: "The upstream chat primitive release notes." }, { title: "message-scroller.tsx", description: "Aurora viewport and streaming behavior." }], showcase: "sources" },
   { kind: "message", id: "user-streaming", role: "user", time: "9:36 PM", text: "Nice. Can I steer while you're still replying?" },
-  { kind: "message", id: "assistant-streaming", role: "assistant", time: "9:37 PM", text: "Yes. Keep typing while I stream. If the composer has text, Send steers the conversation. If it is empty, that same control becomes Stop.", showcase: "reasoning" },
+  { kind: "message", id: "assistant-streaming", role: "assistant", time: "9:37 PM", text: "Yes. Keep typing while I stream. If the composer has text, **Send** steers the conversation. If it is empty, that same control becomes `Stop`.", showcase: "reasoning" },
   { kind: "marker", id: "marker-live", label: "Interactive demo", variant: "separator", status: "ready" },
 ]
 
-const MOCK_REPLY = "Exactly. This response is streaming through the Aurora mock while MessageScroller watches whether you are pinned to the end. Type a steering message while this is still arriving and send it without waiting for the current response to finish."
-const STEER_REPLY = "Steering applied. I stopped the previous stream, preserved the partial response in the thread, and started a new response using your latest direction without locking the composer."
-const RETRY_REPLY = "Retried locally. The assistant response streams again with the same plain-message layout, compact actions, code surfaces, sources, and composer controls."
+const MOCK_REPLY = "Exactly. `MessageScroller` keeps the viewport stable while the composer stays live. Type a steering message while this is still arriving and **Send** it without waiting for the current response to finish."
+const STEER_REPLY = "Steering applied. `Stop` preserved the partial response, your steering turn was appended, and Aurora started a new response without locking the composer."
+const RETRY_REPLY = "Retried locally. The assistant response streams again with the same **plain-message layout**, compact actions, code surfaces, sources, and composer controls."
 
 function nextId(prefix: string) { return `${prefix}-${crypto.randomUUID()}` }
 function currentTime() { return new Intl.DateTimeFormat(undefined, { hour: "numeric", minute: "2-digit" }).format(new Date()) }
@@ -85,6 +90,24 @@ function AttachmentCard({ attachment, onOpen, onRemove, compact = false }: { att
       {onRemove ? <AttachmentActions><AttachmentAction type="button" className={compact ? "!size-5 rounded-[5px] [&_svg]:!size-3.5" : undefined} aria-label={"Remove " + attachment.title} onClick={() => onRemove(attachment)}><X data-icon="inline-start" aria-hidden="true" /></AttachmentAction></AttachmentActions> : null}
       <AttachmentTrigger aria-label={"Preview " + attachment.title} onClick={() => onOpen(attachment)} />
     </Attachment>
+  )
+}
+
+function AttachmentPreviewPanel({ attachment, onClose }: { attachment: DemoAttachment; onClose: () => void }) {
+  const json = attachment.title.endsWith(".json")
+  const preview = json
+    ? ['{', '  "gateway": "healthy",', '  "latencyMs": 24,', '  "providers": 18', '}'].join("\n")
+    : ["# Chat primitives", "", "MessageScroller · Message · Bubble · Attachment · Marker"].join("\n")
+  return (
+    <div className="mx-2 mb-1.5 shrink-0 overflow-hidden rounded-[10px] border sm:mx-3" role="region" aria-label="Attachment preview" style={{ borderColor: "color-mix(in srgb, var(--aurora-accent-primary) 30%, var(--aurora-border-default))", background: "color-mix(in srgb, var(--aurora-panel-strong) 96%, var(--aurora-accent-primary) 4%)", boxShadow: "var(--aurora-shadow-medium), var(--aurora-highlight-medium)" }}>
+      <div className="flex items-center gap-2 px-2 py-1.5">
+        <span className="flex size-6 shrink-0 items-center justify-center rounded-[6px] border" style={{ borderColor: "color-mix(in srgb, var(--aurora-accent-primary) 30%, var(--aurora-border-default))", background: "color-mix(in srgb, var(--aurora-accent-primary) 9%, transparent)", color: "var(--aurora-accent-primary)" }}><FileText className="size-3.5" aria-hidden="true" /></span>
+        <div className="min-w-0 flex-1"><p className="truncate" style={{ fontSize: "var(--aurora-type-label)", fontWeight: "var(--aurora-weight-ui)", lineHeight: "var(--aurora-line-dense)" }}>{attachment.title}</p><p className="truncate" style={{ color: "var(--aurora-text-muted)", fontSize: "10px", lineHeight: "var(--aurora-line-dense)" }}>{attachment.description} · Local preview</p></div>
+        <span className="hidden rounded-full border px-1.5 py-0.5 sm:inline" style={{ borderColor: "var(--aurora-border-default)", color: "var(--aurora-text-muted)", fontFamily: "var(--aurora-font-mono)", fontSize: "9px", lineHeight: 1 }}>{json ? "JSON" : "MD"}</span>
+        <Button type="button" variant="ghost" size="icon" className="!size-6 [&_svg]:!size-3.5" aria-label="Close preview" onClick={onClose}><X aria-hidden="true" /></Button>
+      </div>
+      <pre tabIndex={0} aria-label={"Preview of " + attachment.title} className="max-h-[84px] overflow-auto border-t px-2.5 py-2 outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--aurora-focus-ring)]" style={{ margin: 0, borderColor: "color-mix(in srgb, var(--aurora-border-default) 72%, transparent)", background: "color-mix(in srgb, var(--aurora-page-bg) 70%, transparent)", color: "var(--aurora-text-secondary)", fontFamily: "var(--aurora-font-mono)", fontSize: "10px", lineHeight: 1.5, whiteSpace: "pre-wrap" }}><code>{preview}</code></pre>
+    </div>
   )
 }
 
@@ -302,6 +325,14 @@ function AuroraChatBlock({ title = "Aurora Chat", subtitle = "Composable convers
     const steering = isResponding
     if (steering) stopResponse()
     const userId = nextId("user")
+    if (text === "/error") {
+      const message: DemoMessage = { kind: "message", id: userId, role: "user", time: currentTime(), text, scrollAnchor: true, attachments: composerAttachment ? [{ ...composerAttachment, state: "done" }] : undefined }
+      const error: DemoError = { kind: "error", id: nextId("error"), title: "Mock response failed", text: "Aurora stopped before generating a response. Your turn is preserved, and you can retry, edit, or send a new direction." }
+      setItems((current) => [...current, message, error])
+      setValue("")
+      setComposerAttachment(null)
+      return
+    }
     const markerId = nextId("thinking")
     const message: DemoMessage = { kind: "message", id: userId, role: "user", time: currentTime(), text: text || "Attached a file for context.", scrollAnchor: true, attachments: composerAttachment ? [{ ...composerAttachment, state: "done" }] : undefined }
     setItems((current) => [...current, message, { kind: "marker", id: markerId, label: steering ? "Steering the active response" : reasoning === "Auto" ? "Aurora is reasoning" : `Aurora is reasoning · ${reasoning}`, status: "thinking" }])
@@ -334,6 +365,7 @@ function AuroraChatBlock({ title = "Aurora Chat", subtitle = "Composable convers
   const toggleLike = React.useCallback((messageId: string) => setLikedIds((current) => { const next = new Set(current); if (next.has(messageId)) next.delete(messageId); else next.add(messageId); return next }), [])
   const editMessage = React.useCallback((message: DemoMessage) => { setEditingMessageId(message.id); setValue(message.text); window.requestAnimationFrame(() => textareaRef.current?.focus()) }, [])
   const resetDemo = React.useCallback(() => { clearTimers(); setItems(INITIAL_ITEMS); setValue(""); setComposerAttachment(null); setPreviewAttachment(null); setCopiedId(null); setLikedIds(new Set()); setEditingMessageId(null); setIsResponding(false); setActiveAssistantId(null); setModel(MODELS[0]); setReasoning(REASONING_LEVELS[0]); setSlashOpen(false); setMentionOpen(false) }, [clearTimers])
+  const newChat = React.useCallback(() => { clearTimers(); setItems([]); setValue(""); setComposerAttachment(null); setPreviewAttachment(null); setCopiedId(null); setLikedIds(new Set()); setEditingMessageId(null); setIsResponding(false); setActiveAssistantId(null); setSlashOpen(false); setMentionOpen(false) }, [clearTimers])
 
   const hasComposerPayload = Boolean(value.trim() || composerAttachment)
   const showStopButton = isResponding && !hasComposerPayload && !editingMessageId
@@ -349,6 +381,7 @@ function AuroraChatBlock({ title = "Aurora Chat", subtitle = "Composable convers
           <span className="hidden items-center gap-1.5 rounded-full border px-2 py-0.5 sm:inline-flex" style={{ borderColor: "color-mix(in srgb, var(--aurora-border-default) 78%, transparent)", background: "color-mix(in srgb, var(--aurora-control-surface) 42%, transparent)", color: "var(--aurora-text-muted)", fontSize: "var(--aurora-type-caption)" }}>
             <span className="aurora-status-dot" style={{ "--status-dot-color": "var(--aurora-success)" } as React.CSSProperties} />Local mock
           </span>
+          <Button variant="ghost" size="icon" type="button" aria-label="New chat" className="!size-6 [&_svg]:!size-3.5" onClick={newChat}><Plus aria-hidden="true" /></Button>
           <Button variant="ghost" size="sm" type="button" aria-label="Reset chat demo" className="!h-6 !px-1.5 sm:!px-2 [&_svg]:!size-3.5" onClick={resetDemo}><RefreshCw data-icon="inline-start" aria-hidden="true" /><span className="hidden sm:inline">Reset</span></Button>
         </div>
       </header>
@@ -358,9 +391,17 @@ function AuroraChatBlock({ title = "Aurora Chat", subtitle = "Composable convers
           <MessageScroller>
             <MessageScrollerViewport>
               <MessageScrollerContent className="gap-2.5 px-2.5 py-2.5 sm:gap-2 sm:px-4 sm:py-3">
-                {items.map((item) => (
-                  <MessageScrollerItem key={item.id} messageId={item.id} scrollAnchor={item.kind === "message" ? item.scrollAnchor : false} className={item.kind === "message" ? "sm:pb-[9px]" : undefined}>
-                    {item.kind === "marker" ? <ThreadMarker item={item} /> : (
+                {items.length === 0 ? (
+                  <div className="flex min-h-[360px] flex-1 items-center justify-center py-6">
+                    <EmptyState className="w-full max-w-[390px] gap-3 px-5 py-8" icon={<Sparkles className="size-5" />} title="Start a new conversation" description="Ask Aurora anything, attach a file, use / skills, or @mention local context." action={<Button type="button" variant="rose" size="sm" onClick={resetDemo}>Load demo thread</Button>} />
+                  </div>
+                ) : items.map((item) => (
+                  <MessageScrollerItem key={item.id} messageId={item.id} scrollAnchor={item.kind === "message" ? item.scrollAnchor : false} className={item.kind === "message" ? ["sm:pb-[9px]", item.responseSources?.length ? "[content-visibility:visible]" : ""].filter(Boolean).join(" ") : undefined}>
+                    {item.kind === "marker" ? <ThreadMarker item={item} /> : item.kind === "error" ? (
+                      <Callout variant="error" title={item.title} icon={<AlertTriangle className="size-3.5" />} className="mx-auto w-full max-w-[640px] !gap-2 !p-2.5">
+                        <div className="flex min-w-0 items-start justify-between gap-2"><span className="min-w-0 flex-1">{item.text}</span><Button type="button" variant="ghost" size="sm" className="!h-6 shrink-0 !px-1.5 text-[10px]" onClick={() => setItems((current) => current.filter((candidate) => candidate.id !== item.id))}>Dismiss</Button></div>
+                      </Callout>
+                    ) : (
                       <MessageGroup className="gap-1">
                         <Message align={item.role === "user" ? "end" : "start"}>
                           {item.role === "assistant" ? <MessageAvatar aria-label="Aurora" className="!size-5 !min-w-5 sm:!size-[22px] sm:!min-w-[22px] [&_svg]:size-[11px] sm:[&_svg]:size-3"><Bot aria-hidden="true" /></MessageAvatar> : null}
@@ -368,10 +409,7 @@ function AuroraChatBlock({ title = "Aurora Chat", subtitle = "Composable convers
                             {item.role === "assistant" ? <MessageHeader className="min-h-0 gap-1 px-0 sm:gap-1.5"><span style={{ color: "var(--aurora-text-primary)", fontSize: "var(--aurora-type-caption)", fontWeight: "var(--aurora-weight-ui)" }}>Aurora</span>{item.streaming ? <span className="aurora-chat-stream-status" role="status"><span className="aurora-chat-stream-dot" aria-hidden="true" />Streaming</span> : null}</MessageHeader> : null}
                             <BubbleGroup>
                               <Bubble variant={item.role === "user" ? "default" : "ghost"} align={item.role === "user" ? "end" : "start"} className={item.role === "assistant" ? "max-w-[64ch]" : "max-w-[86%] sm:max-w-[36ch]"}>
-                                <BubbleContent style={item.role === "user" ? { padding: "7px 10px", lineHeight: "1.45" } : { lineHeight: "1.55" }}>
-                                  {item.text}
-                                  {item.streaming ? <span aria-hidden="true" className="ml-1 inline-block h-[1em] w-[2px] translate-y-[2px] rounded-full" style={{ background: "var(--aurora-accent-pink)", animation: "aurora-msg-caret 1.1s steps(1) infinite" }} /> : null}
-                                </BubbleContent>
+                                {item.role === "assistant" ? <Response markdown={item.text} sources={item.responseSources} streaming={item.streaming} aria-live="off" className="aurora-chat-response max-w-[64ch]" style={{ fontSize: "var(--aurora-type-body-sm)", lineHeight: 1.55 }} /> : <BubbleContent style={{ padding: "7px 10px", lineHeight: "1.45" }}>{item.text}</BubbleContent>}
                               </Bubble>
                               {item.attachments?.length ? <AttachmentGroup className="gap-1.5 py-0.5">{item.attachments.map((attachment) => <AttachmentCard key={attachment.id} attachment={attachment} onOpen={setPreviewAttachment} compact />)}</AttachmentGroup> : null}
                             </BubbleGroup>
@@ -403,17 +441,13 @@ function AuroraChatBlock({ title = "Aurora Chat", subtitle = "Composable convers
         </MessageScrollerProvider>
       </div>
 
-      {previewAttachment ? <div className="mx-3 mb-1.5 flex shrink-0 items-center gap-2 rounded-[9px] border px-2 py-1.5" role="region" aria-label="Attachment preview" style={{ borderColor: "color-mix(in srgb, var(--aurora-accent-primary) 28%, var(--aurora-border-default))", background: "color-mix(in srgb, var(--aurora-accent-primary) 6%, var(--aurora-panel-medium))" }}>
-        <FileText className="size-3.5" aria-hidden="true" style={{ color: "var(--aurora-accent-primary)" }} />
-        <div className="min-w-0 flex-1"><p className="truncate" style={{ fontSize: "var(--aurora-type-label)", fontWeight: "var(--aurora-weight-ui)", lineHeight: "var(--aurora-line-dense)" }}>{previewAttachment.title}</p><p className="truncate" style={{ color: "var(--aurora-text-muted)", fontSize: "var(--aurora-type-caption)", lineHeight: "var(--aurora-line-dense)" }}>Mock preview · {previewAttachment.description}</p></div>
-        <Button type="button" variant="ghost" size="icon" className="!size-6 [&_svg]:!size-3.5" aria-label="Close preview" onClick={() => setPreviewAttachment(null)}><X aria-hidden="true" /></Button>
-      </div> : null}
+      {previewAttachment ? <AttachmentPreviewPanel attachment={previewAttachment} onClose={() => setPreviewAttachment(null)} /> : null}
 
       <form className="relative z-30 shrink-0 border-t p-1 sm:p-1.5" style={{ borderColor: "var(--aurora-border-default)", background: "color-mix(in srgb, var(--aurora-panel-strong) 94%, transparent)" }} onSubmit={(event) => { event.preventDefault(); if (!showStopButton) submitMessage() }}>
         <SuggestionPopup label="Skills and slash commands" items={slashOpen ? filteredSlash : []} activeIndex={slashActiveIndex} onSelect={insertSlashCommand} />
         <SuggestionPopup label="File mentions" items={mentionOpen ? filteredMentions : []} activeIndex={mentionActiveIndex} onSelect={insertMention} />
         {composerAttachment ? <AttachmentGroup className="mb-1.5 gap-1 py-0"><AttachmentCard attachment={composerAttachment} onOpen={setPreviewAttachment} onRemove={() => setComposerAttachment(null)} compact /></AttachmentGroup> : null}
-        <div className="aurora-chat-composer overflow-hidden rounded-[12px] border" data-streaming={isResponding ? "true" : undefined} style={{ borderColor: "var(--aurora-border-strong)", background: "linear-gradient(180deg, color-mix(in srgb, var(--aurora-control-surface) 96%, var(--aurora-panel-strong)), var(--aurora-control-surface))", boxShadow: "var(--aurora-highlight-medium)" }}>
+        <div className="aurora-chat-composer overflow-hidden rounded-[12px] border" data-streaming={isResponding ? "true" : undefined} data-steering={isResponding && hasComposerPayload && !editingMessageId ? "true" : undefined}>
           <div className="relative">
             <Button type="button" variant="ghost" size="icon" className="absolute bottom-1 left-1 z-10 !size-6 [&_svg]:!size-3.5" aria-label="Add mock attachment" disabled={Boolean(composerAttachment)} onClick={addMockAttachment}><Paperclip aria-hidden="true" /></Button>
             <Textarea ref={textareaRef} unstyled autoGrow rows={1} value={value} aria-label="Message" aria-autocomplete="list" placeholder={editingMessageId ? "Edit your message…" : isResponding ? "Steer the response…" : "Ask Aurora anything…"} className="max-h-[96px] min-h-[38px] w-full resize-none bg-transparent px-9 py-2 outline-none" style={{ color: "var(--aurora-text-primary)", fontFamily: "var(--aurora-font-sans)", fontSize: "var(--aurora-type-body-sm)", lineHeight: "var(--aurora-line-body)", caretColor: "var(--aurora-accent-primary)" }} onChange={handleComposerChange} onKeyDown={handleComposerKeyDown} />
