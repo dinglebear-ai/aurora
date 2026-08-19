@@ -3,7 +3,7 @@
 ## Symptom
 
 `Public synthetics` fails at the first request with HTTP 403 — but only from
-GitHub Actions. The same `ops/synthetic-check.sh` returns 200 from dookie and
+GitHub Actions. The same `ops/synthetic-check.sh` returns 200 from devhost and
 from a browser.
 
 ## Root cause (proven, not guessed)
@@ -24,7 +24,7 @@ diagnostic run from a GitHub runner captured:
 
 Cloudflare challenges the request because it comes from a hosting-provider ASN
 (Azure). `curl` cannot solve a JS challenge, so every HTTP check 403s.
-Residential IPs (dookie, a browser) are not challenged, which is why it passes
+Residential IPs (devhost, a browser) are not challenged, which is why it passes
 everywhere except CI.
 
 ## Fix — narrow, header-matched Skip rule
@@ -93,14 +93,14 @@ four HTTP checks need the header.
 ## Resolution (2026-07-29) — self-hosted runners instead of the Skip rule
 
 The workflow now runs on the org's self-hosted runner farm
-(`runs-on: [self-hosted, unraid]`, `tootie-ci-runner-1..4`). Their egress is
+(`runs-on: [self-hosted, unraid]`, `nashost-ci-runner-1..4`). Their egress is
 the residential ISP that Cloudflare already does not challenge, so no Skip
 rule is required and the workflow no longer sends the bypass header. This
-still tests the genuine public path: tootie resolves `aurora.tootie.tv` to
+still tests the genuine public path: nashost resolves `aurora.tootie.tv` to
 Cloudflare anycast IPs (`104.21.x` / `172.67.x`), not a LAN rewrite, so DNS,
 the Cloudflare edge, SWAG, TLS, and the app are all in the loop.
 
 The `AURORA_SYNTHETIC_TOKEN` repository secret exists (set 2026-07-28; value
-stashed in `~/.config/aurora/synthetic-token.txt` on dookie, mode 0600) but is
+stashed in `~/.config/aurora/synthetic-token.txt` on devhost, mode 0600) but is
 dormant. The header-matched Skip rule above remains the documented path if
 these checks ever move back to GitHub-hosted runners.

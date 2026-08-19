@@ -110,7 +110,7 @@ const TROUBLESHOOT_SESSION: ToolCall[] = [
     id: "ops-1",
     tool: "shell.exec",
     status: "completed",
-    args: { host: "tootie", command: "docker ps --filter name=sonarr --format '{{.Status}}'" },
+    args: { host: "nashost", command: "docker ps --filter name=sonarr --format '{{.Status}}'" },
     result: "Up 3 hours (unhealthy)",
     ...span(14000, 13400),
   },
@@ -118,7 +118,7 @@ const TROUBLESHOOT_SESSION: ToolCall[] = [
     id: "ops-2",
     tool: "arcane.container.inspect",
     status: "completed",
-    args: { host: "tootie", name: "sonarr" },
+    args: { host: "nashost", name: "sonarr" },
     result: "State.Health.FailingStreak = 6 · last probe: connection refused :8989",
     ...span(13300, 12600),
   },
@@ -126,7 +126,7 @@ const TROUBLESHOOT_SESSION: ToolCall[] = [
     id: "ops-3",
     tool: "arcane.container.inspect",
     status: "completed",
-    args: { host: "tootie", name: "prowlarr" },
+    args: { host: "nashost", name: "prowlarr" },
     result: "State.Health = healthy · 4 indexers online",
     ...span(12500, 11900),
   },
@@ -134,15 +134,15 @@ const TROUBLESHOOT_SESSION: ToolCall[] = [
     id: "ops-4",
     tool: "sonarr.api.get",
     status: "error",
-    args: { endpoint: "/api/v3/health", host: "tootie", port: 8989 },
-    result: "FetchError: ECONNREFUSED 100.120.242.29:8989 — API not accepting connections",
+    args: { endpoint: "/api/v3/health", host: "nashost", port: 8989 },
+    result: "FetchError: ECONNREFUSED 198.51.100.2:8989 — API not accepting connections",
     ...span(11800, 11500),
   },
   {
     id: "ops-5",
     tool: "cortex.logs.search",
     status: "completed",
-    args: { host: "tootie", container: "sonarr", query: "level:error", since: "15m" },
+    args: { host: "nashost", container: "sonarr", query: "level:error", since: "15m" },
     result: "3 matches · 'System.Data.SQLite.SQLiteException: database is locked'",
     ...span(11400, 10200),
   },
@@ -150,7 +150,7 @@ const TROUBLESHOOT_SESSION: ToolCall[] = [
     id: "ops-6",
     tool: "arcane.container.restart",
     status: "running",
-    args: { host: "tootie", name: "sonarr", timeout_s: 30 },
+    args: { host: "nashost", name: "sonarr", timeout_s: 30 },
     ...since(2600),
   },
 ]
@@ -220,7 +220,7 @@ export default function ToolCallsDemo() {
       <section style={sectionStyle}>
         <span style={lbl}>Homelab ops · mixed tools, one failure, live recovery</span>
         <p style={captionStyle}>
-          A gateway agent diagnosing an unhealthy Sonarr container on tootie: a
+          A gateway agent diagnosing an unhealthy Sonarr container on nashost: a
           shell probe, a repeated container inspect (grouped), a failed API fetch
           rendered in rose, a log search that finds the root cause, and a restart
           still in flight.

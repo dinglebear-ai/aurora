@@ -13,14 +13,14 @@ beads: aurora-design-system-bsam
 # Homelab MOTD dashboard, Aurora theme merge, and dependency security fix
 
 ## User Request
-Started with "ssh dookie … Can we make it show useful info in the motd", then iterated:
+Started with "ssh devhost … Can we make it show useful info in the motd", then iterated:
 add Docker info, make it adhere to Aurora design tokens, suppress the Ubuntu ESM
 nag, track it all with chezmoi, then `/vibin:quick-push` + "merge back into main",
 delete the merged branch, and fix the flagged Dependabot advisory.
 
 ## Session Overview
 Three threads of work in one session:
-1. Built a homelab MOTD dashboard for `dookie` (`/etc/update-motd.d/20-homelab-dashboard`),
+1. Built a homelab MOTD dashboard for `devhost` (`/etc/update-motd.d/20-homelab-dashboard`),
    colored with exact Aurora dark tokens as 24-bit truecolor, and silenced Ubuntu's
    ESM/Pro advertising. Captured the whole system change in the chezmoi dotfiles repo
    as an idempotent `run_onchange_` script.
@@ -31,7 +31,7 @@ Three threads of work in one session:
    override block was dead. Migrated it to `pnpm-workspace.yaml`.
 
 ## Sequence of Events
-1. Probed `dookie` data sources (docker, nvidia-smi, zpool, tailscale, df, free); all readable without sudo, passwordless sudo confirmed.
+1. Probed `devhost` data sources (docker, nvidia-smi, zpool, tailscale, df, free); all readable without sudo, passwordless sudo confirmed.
 2. Wrote `/etc/update-motd.d/20-homelab-dashboard`; disabled `10-help-text`, `50-motd-news`, `91-contract-ua-esm-status` and the `motd-news.timer`.
 3. Added richer Docker info (image/volume counts, wrapped running-container list); hardened the tailscale status read (post-boot JSON-empty fallback).
 4. Invoked the `vibin:aurora-design-system` skill; read exact dark token hex from `registry/aurora/styles/aurora.css`; remapped all colors to Aurora tokens as truecolor; replaced the `⚠` emoji with a `●` glow-dot and sentence-cased `ONLINE`→`Online`.
@@ -63,8 +63,8 @@ Three threads of work in one session:
 | modified | `package.json` | removed the now-ignored `pnpm` field (−24 lines) | commit 7aa883e |
 | modified | `pnpm-lock.yaml` | `tmp` 0.2.5 → 0.2.6; overrides recorded | commit 7aa883e |
 | created | `docs/sessions/2026-05-31-motd-dashboard-theme-merge-dependency-fix.md` | this session log | this commit |
-| created | `/etc/update-motd.d/20-homelab-dashboard` (dookie, system) | Aurora-tokenized homelab dashboard | rendered via run-parts |
-| modified | `/etc/update-motd.d/{10-help-text,50-motd-news,90-updates-available,91-contract-ua-esm-status}` (dookie) | `chmod -x` to silence ad/nag scripts | `ls -la /etc/update-motd.d` |
+| created | `/etc/update-motd.d/20-homelab-dashboard` (devhost, system) | Aurora-tokenized homelab dashboard | rendered via run-parts |
+| modified | `/etc/update-motd.d/{10-help-text,50-motd-news,90-updates-available,91-contract-ua-esm-status}` (devhost) | `chmod -x` to silence ad/nag scripts | `ls -la /etc/update-motd.d` |
 | created | `~/.local/share/chezmoi/run_onchange_after_60-motd.sh` (dotfiles repo) | idempotent MOTD provisioning | commit e8e5873 |
 | created | `~/.claude/.../memory/reference_pnpm10_overrides_moved.md` (+ MEMORY.md index) | global memory: pnpm 10 overrides gotcha | Write tool |
 
@@ -105,7 +105,7 @@ Three threads of work in one session:
 ## Behavior Changes (Before/After)
 | area | before | after |
 |---|---|---|
-| dookie MOTD | Ubuntu default banner + ESM/Pro advertising | Aurora-tokenized dashboard (cpu/mem/disk/pkg/gpu/zfs/docker/net), no ESM nag |
+| devhost MOTD | Ubuntu default banner + ESM/Pro advertising | Aurora-tokenized dashboard (cpu/mem/disk/pkg/gpu/zfs/docker/net), no ESM nag |
 | aurora `main` | at `ca4bd62`, no editor themes | editor/terminal themes v0.2.0 merged; tmp vuln fixed |
 | pnpm overrides | dead in ignored `package.json` field | active in `pnpm-workspace.yaml` |
 
@@ -120,7 +120,7 @@ Three threads of work in one session:
 
 ## Risks and Rollback
 - Re-activating the override pins could in principle shift transitive versions, but observed lockfile churn was just the `tmp` bump; lint + build pass. Rollback: `git revert 7aa883e` and `pnpm install`.
-- MOTD/system changes on dookie are reproducible from chezmoi `e8e5873`; ESM service masks reversible via `systemctl unmask` and re-enabling the disabled motd scripts.
+- MOTD/system changes on devhost are reproducible from chezmoi `e8e5873`; ESM service masks reversible via `systemctl unmask` and re-enabling the disabled motd scripts.
 
 ## Decisions Not Taken
 - A `tmp`-only override in a new `pnpm-workspace.yaml` while leaving the dead block in `package.json` — rejected; would split config across two locations and leave other pins inactive.
@@ -135,4 +135,4 @@ Three threads of work in one session:
 1. Confirm Dependabot alert #49 auto-closes after GitHub re-scans `main` (bead `-bsam`).
 2. Sweep `~/workspace` pnpm-10 repos (ghbd, etc.) for a stale `pnpm.overrides` in `package.json` with no `pnpm-workspace.yaml` — same silent security-pin regression.
 3. Optional: add a one-line note to `CLAUDE.md` that overrides live in `pnpm-workspace.yaml`.
-4. Optional: roll the MOTD dashboard out to tootie/squirts/shart (the chezmoi `run_onchange` script is host-portable; GPU/ZFS blocks self-skip).
+4. Optional: roll the MOTD dashboard out to nashost/edgehost/backuphost (the chezmoi `run_onchange` script is host-portable; GPU/ZFS blocks self-skip).

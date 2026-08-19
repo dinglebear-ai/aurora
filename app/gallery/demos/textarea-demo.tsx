@@ -69,7 +69,7 @@ export default function TextareaDemo() {
 
   // Character-count field, controlled so the counter tracks live edits.
   const [summary, setSummary] = React.useState(
-    "Restart the qdrant container on dookie and re-run the health check."
+    "Restart the qdrant container on devhost and re-run the health check."
   )
 
   return (
@@ -177,7 +177,7 @@ export default function TextareaDemo() {
               error
               showCount
               maxLength={72}
-              defaultValue="fix: the qdrant container on dookie kept dropping its collection after a restart because the volume mount drifted"
+              defaultValue="fix: the qdrant container on devhost kept dropping its collection after a restart because the volume mount drifted"
             />
           </Field>
         </div>

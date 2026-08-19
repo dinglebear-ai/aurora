@@ -1,4 +1,4 @@
-# Custom labels for the org's self-hosted runner farm (tootie-ci-runner-1..4),
+# Custom labels for the org's self-hosted runner farm (nashost-ci-runner-1..4),
 # so actionlint (run by the Workflow and dependency policy check) accepts
 # runs-on entries like [self-hosted, unraid].
 self-hosted-runner:

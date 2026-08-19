@@ -12,9 +12,9 @@ const config: StorybookConfig = {
     allowedHosts: [
       "localhost",
       "127.0.0.1",
-      "dookie",
-      "dookie.manatee-triceratops.ts.net",
-      "100.88.16.79",
+      "devhost",
+      "devhost.example.ts.net",
+      "198.51.100.1",
     ],
   },
 }
