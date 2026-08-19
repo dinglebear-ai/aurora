@@ -148,14 +148,19 @@ test("rich chat turns keep hover actions inside paint-contained message items", 
     const message = item.locator('[data-slot="message"]')
     await message.hover()
     const itemBox = await item.boundingBox()
+    const messageBox = await message.boundingBox()
     const rail = item.locator(".aurora-chat-action-rail")
+    const railBox = await rail.boundingBox()
     const timestampBox = await rail.locator("span").first().boundingBox()
     const buttonBoxes = await rail.locator("button").evaluateAll((buttons) => buttons.map((button) => {
       const rect = button.getBoundingClientRect()
       return { y: rect.y, bottom: rect.bottom }
     }))
     expect(itemBox).not.toBeNull()
+    expect(messageBox).not.toBeNull()
+    expect(railBox).not.toBeNull()
     expect(timestampBox).not.toBeNull()
+    if (messageBox && railBox) expect(railBox.y - (messageBox.y + messageBox.height)).toBeCloseTo(3, 0)
     if (itemBox && timestampBox) expect(timestampBox.y + timestampBox.height).toBeLessThanOrEqual(itemBox.y + itemBox.height + 0.5)
     if (itemBox) for (const box of buttonBoxes) expect(box.bottom).toBeLessThanOrEqual(itemBox.y + itemBox.height + 0.5)
   }
