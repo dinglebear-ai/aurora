@@ -88,6 +88,36 @@ test("chat autocomplete popovers accept real pointer clicks above the transcript
   await expect(input).toHaveValue("@chat.tsx ")
 })
 
+test("chat content states remain interactive across browsers", async ({ page }) => {
+  await page.goto("/gallery/chat-block")
+
+  const citation = page.getByRole("link", { name: /Citation 1:/i })
+  await citation.focus()
+  const tooltip = page.getByRole("tooltip").first()
+  await expect(tooltip).toBeVisible()
+  await expect(tooltip).toContainText("ui.shadcn.com")
+  const citationItem = citation.locator('xpath=ancestor::*[@data-slot="message-scroller-item"][1]')
+  await expect(citationItem).toHaveCSS("content-visibility", "visible")
+
+  await page.getByRole("button", { name: "Preview chat-primitives.md" }).click()
+  const preview = page.getByRole("region", { name: "Attachment preview" })
+  await expect(preview).toBeVisible()
+  await expect(preview).toContainText("# Chat primitives")
+  await preview.getByRole("button", { name: "Close preview" }).click()
+
+  await page.getByRole("button", { name: "New chat" }).click()
+  await expect(page.getByText("Start a new conversation")).toBeVisible()
+  await page.getByRole("button", { name: "Load demo thread" }).click()
+
+  const input = page.getByRole("textbox", { name: "Message" })
+  await input.fill("/error")
+  await page.getByRole("button", { name: "Send message" }).click()
+  const alert = page.getByRole("alert", { name: "Mock response failed" })
+  await expect(alert).toContainText("Your turn is preserved")
+  await alert.getByRole("button", { name: "Dismiss" }).click()
+  await expect(alert).toHaveCount(0)
+})
+
 test("chat has a dedicated unclipped mobile layout on touch viewports", async ({ page }, testInfo) => {
   test.skip(!testInfo.project.name.includes("mobile"))
   await page.goto("/gallery/chat-block")

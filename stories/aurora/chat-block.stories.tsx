@@ -54,6 +54,7 @@ export const InteractiveFlow: Story = {
     await expect(canvas.getByRole("button", { name: "Stop response" })).toBeInTheDocument()
 
     await userEvent.type(input, "Keep it concise.")
+    await expect(canvasElement.querySelector(".aurora-chat-composer")).toHaveAttribute("data-steering", "true")
     await userEvent.click(canvas.getByRole("button", { name: "Send steering message" }))
     await expect(canvas.getByText("Keep it concise.")).toBeInTheDocument()
 
@@ -61,6 +62,33 @@ export const InteractiveFlow: Story = {
       () => expect(canvas.getByText(/Steering applied\./)).toBeInTheDocument(),
       { timeout: 3000 }
     )
+  },
+}
+
+export const ContentStates: Story = {
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const citation = canvas.getByRole("link", { name: /Citation 1:/i })
+    await userEvent.hover(citation)
+    await expect(canvas.getByRole("tooltip")).toHaveTextContent("ui.shadcn.com")
+    await userEvent.unhover(citation)
+
+    await userEvent.click(canvas.getByRole("button", { name: "Preview chat-primitives.md" }))
+    const preview = canvas.getByRole("region", { name: "Attachment preview" })
+    await expect(preview).toHaveTextContent("# Chat primitives")
+    await userEvent.click(within(preview).getByRole("button", { name: "Close preview" }))
+
+    await userEvent.click(canvas.getByRole("button", { name: "New chat" }))
+    await expect(canvas.getByText("Start a new conversation")).toBeInTheDocument()
+    await userEvent.click(canvas.getByRole("button", { name: "Load demo thread" }))
+
+    const input = canvas.getByRole("textbox", { name: "Message" })
+    await userEvent.type(input, "/error")
+    await userEvent.click(canvas.getByRole("button", { name: "Send message" }))
+    const alert = canvas.getByRole("alert", { name: "Mock response failed" })
+    await expect(alert).toHaveTextContent("Your turn is preserved")
+    await userEvent.click(within(alert).getByRole("button", { name: "Dismiss" }))
+    await expect(canvas.queryByRole("alert", { name: "Mock response failed" })).not.toBeInTheDocument()
   },
 }
 

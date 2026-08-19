@@ -5456,7 +5456,7 @@
     {
       "id": "aurora-chat-block",
       "title": "Aurora Interactive Chat",
-      "description": "Interactive Aurora chat workspace combining the new conversation primitives with steerable streaming, editable user turns, hover actions, code and source surfaces, model/reasoning selection, slash-command skills, file mentions, and an in-field composer.",
+      "description": "Interactive Aurora chat workspace combining composable conversation primitives with steerable streaming, markdown and citation-rich assistant responses, editable user turns, code/source surfaces, attachment previews, empty/error states, model/reasoning selection, slash-command skills, file mentions, and an in-field composer.",
       "registryType": "registry:block",
       "group": "Chat Primitives",
       "categories": [
@@ -5487,10 +5487,13 @@
         "@aurora/aurora-bubble",
         "@aurora/aurora-chat-attachment",
         "@aurora/aurora-marker",
+        "@aurora/aurora-callout",
+        "@aurora/aurora-empty-state",
         "@aurora/aurora-code-block",
         "@aurora/aurora-ai-snippet",
         "@aurora/aurora-ai-sources",
-        "@aurora/aurora-ai-reasoning"
+        "@aurora/aurora-ai-reasoning",
+        "@aurora/aurora-ai-response"
       ],
       "fixtureId": null,
       "previewSlug": "chat-block",
