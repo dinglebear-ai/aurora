@@ -148,8 +148,8 @@ function CompactSelect({ label, value, options, onValueChange, icon }: { label: 
   const tone = label === "Model" ? "model" : "reasoning"
   return (
     <Select value={value} onValueChange={onValueChange}>
-      <SelectTrigger aria-label={label} title={`${label}: ${value}`} data-chat-select={tone} className="aurora-chat-select !h-6 !w-auto min-w-0 max-w-[44%] flex-1 gap-1 rounded-full !px-1.5 !py-0 sm:min-w-[94px] sm:max-w-none sm:flex-none sm:!px-2 [&>svg]:!size-3">
-        <span className="flex min-w-0 items-center gap-1 overflow-hidden sm:gap-1.5">{icon}<SelectValue className="truncate" /></span>
+      <SelectTrigger aria-label={label} title={`${label}: ${value}`} data-chat-select={tone} className="aurora-chat-select !h-[22px] !w-auto min-w-0 max-w-[44%] flex-1 gap-0.5 rounded-full !px-1.5 !py-0 sm:min-w-[88px] sm:max-w-none sm:flex-none [&>svg]:!size-[11px]">
+        <span className="flex min-w-0 items-center gap-1 overflow-hidden">{icon}<SelectValue className="truncate" /></span>
       </SelectTrigger>
       <SelectContent className="min-w-[160px]">
         <SelectGroup>
@@ -413,21 +413,21 @@ function AuroraChatBlock({ title = "Aurora Chat", subtitle = "Composable convers
         <SuggestionPopup label="Skills and slash commands" items={slashOpen ? filteredSlash : []} activeIndex={slashActiveIndex} onSelect={insertSlashCommand} />
         <SuggestionPopup label="File mentions" items={mentionOpen ? filteredMentions : []} activeIndex={mentionActiveIndex} onSelect={insertMention} />
         {composerAttachment ? <AttachmentGroup className="mb-1.5 gap-1 py-0"><AttachmentCard attachment={composerAttachment} onOpen={setPreviewAttachment} onRemove={() => setComposerAttachment(null)} compact /></AttachmentGroup> : null}
-        <div className="aurora-chat-composer overflow-hidden rounded-[12px] border" data-streaming={isResponding ? "true" : undefined} style={{ borderColor: "var(--aurora-border-strong)", background: "linear-gradient(180deg, color-mix(in srgb, var(--aurora-control-surface) 96%, var(--aurora-panel-strong)), var(--aurora-control-surface))", boxShadow: "var(--aurora-highlight-medium)" }}>
-          <div className="relative">
-            <Button type="button" variant="ghost" size="icon" className="absolute bottom-1 left-1 z-10 !size-6 [&_svg]:!size-3.5" aria-label="Add mock attachment" disabled={Boolean(composerAttachment)} onClick={addMockAttachment}><Paperclip aria-hidden="true" /></Button>
-            <Textarea ref={textareaRef} unstyled autoGrow rows={1} value={value} aria-label="Message" aria-autocomplete="list" placeholder={editingMessageId ? "Edit your message…" : isResponding ? "Steer the response…" : "Ask Aurora anything…"} className="max-h-[96px] min-h-[38px] w-full resize-none bg-transparent px-9 py-2 outline-none" style={{ color: "var(--aurora-text-primary)", fontFamily: "var(--aurora-font-sans)", fontSize: "var(--aurora-type-body-sm)", lineHeight: "var(--aurora-line-body)", caretColor: "var(--aurora-accent-primary)" }} onChange={handleComposerChange} onKeyDown={handleComposerKeyDown} />
+        <div className="aurora-chat-composer overflow-hidden rounded-[13px] border" data-streaming={isResponding ? "true" : undefined} data-active={hasComposerPayload ? "true" : undefined} data-editing={editingMessageId ? "true" : undefined}>
+          <div className="aurora-chat-composer__input relative">
+            <Button type="button" variant="ghost" size="icon" className="absolute inset-y-0 left-1.5 z-10 my-auto !size-7 rounded-[8px] [&_svg]:!size-[15px]" aria-label="Add mock attachment" disabled={Boolean(composerAttachment)} onClick={addMockAttachment}><Paperclip aria-hidden="true" /></Button>
+            <Textarea ref={textareaRef} unstyled autoGrow rows={1} value={value} aria-label="Message" aria-autocomplete="list" placeholder={editingMessageId ? "Edit your message…" : isResponding ? "Steer the response…" : "Ask Aurora anything…"} className="max-h-[112px] min-h-[44px] w-full resize-none bg-transparent px-10 py-[10px] outline-none" style={{ color: "var(--aurora-text-primary)", fontFamily: "var(--aurora-font-sans)", fontSize: "var(--aurora-type-body-sm)", lineHeight: "var(--aurora-line-body)", caretColor: "var(--aurora-accent-primary)" }} onChange={handleComposerChange} onKeyDown={handleComposerKeyDown} />
             {showStopButton ? (
-              <Button type="button" variant="destructive" size="icon" className="absolute bottom-1 right-1 z-10 !size-6 rounded-[7px] [&_svg]:!size-3" aria-label="Stop response" onClick={stopResponse}><Square fill="currentColor" aria-hidden="true" /></Button>
+              <Button type="button" variant="destructive" size="icon" filled className="aurora-chat-send absolute inset-y-0 right-1.5 z-10 my-auto !size-7 rounded-[8px] [&_svg]:!size-[13px]" aria-label="Stop response" onClick={stopResponse}><Square fill="currentColor" aria-hidden="true" /></Button>
             ) : (
-              <Button type="submit" variant="rose" size="icon" filled className="absolute bottom-1 right-1 z-10 !size-6 rounded-[7px] [&_svg]:!size-3.5" aria-label={editingMessageId ? "Save edited message" : isResponding ? "Send steering message" : "Send message"} disabled={!hasComposerPayload}><Send aria-hidden="true" /></Button>
+              <Button type="submit" variant="rose" size="icon" filled={hasComposerPayload} data-active={hasComposerPayload ? "true" : "false"} className="aurora-chat-send absolute inset-y-0 right-1.5 z-10 my-auto !size-7 rounded-[8px] [&_svg]:!size-[15px]" aria-label={editingMessageId ? "Save edited message" : isResponding ? "Send steering message" : "Send message"} disabled={!hasComposerPayload}><Send aria-hidden="true" /></Button>
             )}
           </div>
-          <div className="flex min-w-0 items-center gap-1 overflow-hidden border-t px-1 py-0.5 sm:px-1.5" style={{ borderColor: "color-mix(in srgb, var(--aurora-border-default) 68%, transparent)", background: "linear-gradient(180deg, color-mix(in srgb, var(--aurora-panel-medium) 30%, transparent), color-mix(in srgb, var(--aurora-control-surface) 58%, transparent))" }}>
+          <div className="aurora-chat-composer__toolbar flex min-w-0 items-center gap-1 overflow-hidden px-1.5 pb-1.5 pt-0.5">
             <CompactSelect label="Model" value={model} options={MODELS} onValueChange={setModel} icon={<Cpu className="size-3 shrink-0" aria-hidden style={{ color: "var(--axon-orange)" }} />} />
             <CompactSelect label="Reasoning" value={reasoning} options={REASONING_LEVELS} onValueChange={setReasoning} icon={<Brain className="size-3 shrink-0" aria-hidden style={{ color: "var(--aurora-accent-pink)" }} />} />
-            <span className="hidden min-w-0 items-center gap-1.5 sm:flex" style={{ color: "var(--aurora-text-muted)", fontSize: "10px" }}><span className="inline-flex items-center gap-1"><kbd className="aurora-chat-kbd">@</kbd>files</span><span aria-hidden="true">·</span><span className="inline-flex items-center gap-1"><kbd className="aurora-chat-kbd">/</kbd>skills</span></span>
             <span className="flex-1" />
+            <span className="aurora-chat-hints hidden min-w-0 items-center gap-1.5 sm:flex" style={{ color: "var(--aurora-text-muted)", fontSize: "10px" }}><span className="inline-flex items-center gap-1"><kbd className="aurora-chat-kbd">@</kbd>files</span><span aria-hidden="true">·</span><span className="inline-flex items-center gap-1"><kbd className="aurora-chat-kbd">/</kbd>skills</span></span>
             {editingMessageId ? <Button type="button" variant="plain" size="unstyled" className="flex items-center gap-1 rounded-[6px] px-1.5 py-0.5 [&_svg]:size-3" onClick={() => { setEditingMessageId(null); setValue("") }} style={{ color: "var(--aurora-text-muted)", fontSize: "10px" }}><X aria-hidden="true" />Cancel edit</Button> : null}
             {isResponding && !activeAssistantId ? <span aria-live="polite" className="aurora-chat-thinking-label"><span className="aurora-chat-thinking-dots" aria-hidden="true"><span /><span /><span /></span>{reasoning === "Auto" ? "Thinking" : `Thinking · ${reasoning}`}</span> : null}
           </div>
