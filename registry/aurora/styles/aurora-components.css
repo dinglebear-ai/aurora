@@ -435,27 +435,61 @@
 }
 
 .aurora-chat-composer {
+  border-color: color-mix(in srgb, var(--aurora-border-strong) 76%, transparent);
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--aurora-control-surface) 97%, var(--aurora-panel-strong)),
+    color-mix(in srgb, var(--aurora-control-surface) 92%, var(--aurora-panel-medium)));
+  box-shadow: inset 0 1px color-mix(in srgb, white 3%, transparent), var(--aurora-highlight-medium);
   transition: border-color 150ms ease, box-shadow 150ms ease, background 150ms ease;
 }
+.aurora-chat-composer__input {
+  background: color-mix(in srgb, var(--aurora-control-surface) 42%, transparent);
+}
+.aurora-chat-composer__toolbar {
+  background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--aurora-panel-medium) 24%, transparent));
+  box-shadow: inset 0 1px color-mix(in srgb, white 2.5%, transparent);
+}
 .aurora-chat-composer[data-streaming="true"] {
-  border-color: color-mix(in srgb, var(--axon-orange) 28%, var(--aurora-border-strong));
+  border-color: color-mix(in srgb, var(--axon-orange) 22%, var(--aurora-border-strong));
 }
 .aurora-chat-composer:focus-within {
-  border-color: color-mix(in srgb, var(--aurora-accent-primary) 48%, var(--aurora-border-strong));
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--aurora-accent-primary) 18%, transparent),
-    0 10px 28px color-mix(in srgb, var(--aurora-accent-primary) 6%, transparent),
+  border-color: color-mix(in srgb, var(--aurora-accent-primary) 52%, var(--aurora-border-strong));
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--aurora-accent-primary) 13%, transparent),
+    0 10px 30px color-mix(in srgb, var(--aurora-accent-primary) 7%, transparent),
+    inset 0 1px color-mix(in srgb, white 4%, transparent),
     var(--aurora-highlight-medium);
 }
+.aurora-chat-select {
+  color: var(--aurora-text-secondary);
+  box-shadow: none !important;
+  transition: border-color 140ms ease, background 140ms ease, color 140ms ease;
+}
 .aurora-chat-select[data-chat-select="model"] {
-  border-color: color-mix(in srgb, var(--axon-orange) 22%, var(--aurora-border-strong));
-  background: color-mix(in srgb, var(--axon-orange) 4%, var(--aurora-control-surface));
+  border-color: color-mix(in srgb, var(--axon-orange) 12%, var(--aurora-border-default));
+  background: color-mix(in srgb, var(--axon-orange) 2.5%, transparent);
 }
 .aurora-chat-select[data-chat-select="reasoning"] {
-  border-color: color-mix(in srgb, var(--aurora-accent-pink) 22%, var(--aurora-border-strong));
-  background: color-mix(in srgb, var(--aurora-accent-pink) 4%, var(--aurora-control-surface));
+  border-color: color-mix(in srgb, var(--aurora-accent-pink) 12%, var(--aurora-border-default));
+  background: color-mix(in srgb, var(--aurora-accent-pink) 2.5%, transparent);
 }
-.aurora-chat-select:hover {
-  border-color: color-mix(in srgb, var(--aurora-accent-primary) 34%, var(--aurora-border-strong));
+.aurora-chat-select:hover,
+.aurora-chat-select:focus {
+  color: var(--aurora-text-primary);
+  border-color: color-mix(in srgb, var(--aurora-accent-primary) 24%, var(--aurora-border-default));
+  background: color-mix(in srgb, var(--aurora-accent-primary) 4%, transparent);
+}
+.aurora-chat-hints {
+  opacity: .38;
+  transition: opacity 140ms ease;
+}
+.aurora-chat-composer:focus-within .aurora-chat-hints { opacity: .7; }
+.aurora-chat-composer[data-streaming="true"] .aurora-chat-hints { opacity: .22; }
+.aurora-chat-send {
+  transition: transform 140ms ease, opacity 140ms ease, box-shadow 140ms ease, filter 140ms ease;
+}
+.aurora-chat-send[data-active="true"] {
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--aurora-accent-pink) 18%, transparent),
+    0 4px 14px color-mix(in srgb, var(--aurora-accent-pink) 12%, transparent);
 }
 .aurora-chat-stream-status,
 .aurora-chat-thinking-label {

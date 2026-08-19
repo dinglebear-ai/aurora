@@ -139,6 +139,52 @@ test("chat has a dedicated unclipped mobile layout on touch viewports", async ({
   }
 })
 
+test("chat composer presents one progressive responsive control surface", async ({ page }, testInfo) => {
+  await page.goto("/gallery/chat-block")
+  const composer = page.locator(".aurora-chat-composer")
+  const input = page.getByRole("textbox", { name: "Message" })
+  const attach = page.getByRole("button", { name: "Add mock attachment" })
+  const send = page.getByRole("button", { name: "Send message" })
+  const model = page.getByRole("combobox", { name: "Model" })
+  const reasoning = page.getByRole("combobox", { name: "Reasoning" })
+
+  const idleBorder = await composer.evaluate((element) => getComputedStyle(element).borderColor)
+  await input.focus()
+  const focusedBorder = await composer.evaluate((element) => getComputedStyle(element).borderColor)
+  expect(focusedBorder).not.toBe(idleBorder)
+
+  const inputBox = await input.boundingBox()
+  const attachBox = await attach.boundingBox()
+  const sendBox = await send.boundingBox()
+  expect(inputBox).not.toBeNull()
+  expect(attachBox).not.toBeNull()
+  expect(sendBox).not.toBeNull()
+  if (inputBox && attachBox && sendBox) {
+    expect(Math.abs((attachBox.y + attachBox.height / 2) - (inputBox.y + inputBox.height / 2))).toBeLessThanOrEqual(1)
+    expect(Math.abs((sendBox.y + sendBox.height / 2) - (inputBox.y + inputBox.height / 2))).toBeLessThanOrEqual(1)
+  }
+
+  await expect(send).not.toHaveClass(/aurora-btn--filled/)
+  await input.fill("Steer this conversation")
+  await expect(send).toHaveClass(/aurora-btn--filled/)
+
+  const composerBox = await composer.boundingBox()
+  const modelBox = await model.boundingBox()
+  const reasoningBox = await reasoning.boundingBox()
+  if (composerBox && modelBox && reasoningBox) {
+    expect(modelBox.x).toBeGreaterThanOrEqual(composerBox.x)
+    expect(reasoningBox.x + reasoningBox.width).toBeLessThanOrEqual(composerBox.x + composerBox.width + 0.5)
+  }
+
+  const hints = page.locator(".aurora-chat-hints")
+  if (testInfo.project.name.includes("mobile")) await expect(hints).toBeHidden()
+  else {
+    await expect(hints).toBeVisible()
+    const hintsBox = await hints.boundingBox()
+    if (hintsBox && reasoningBox) expect(hintsBox.x).toBeGreaterThan(reasoningBox.x + reasoningBox.width)
+  }
+})
+
 test("rich chat turns keep hover actions inside paint-contained message items", async ({ page }, testInfo) => {
   test.skip(testInfo.project.name.includes("mobile"))
   await page.goto("/gallery/chat-block")
