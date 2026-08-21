@@ -1,6 +1,12 @@
-# Custom labels for the org's self-hosted runner farm (tootie-ci-runner-1..4),
-# so actionlint (run by the Workflow and dependency policy check) accepts
-# runs-on entries like [self-hosted, unraid].
+# GitHub runner scale-set selectors managed by the distributed runner farm.
+# Keep this list aligned with the organization pool catalog so actionlint can
+# validate workflows that use a single scale-set routing label.
 self-hosted-runner:
   labels:
-    - unraid
+    - ci-pool-rust
+    - ci-pool-python
+    - ci-pool-typescript
+    - ci-pool-go
+    - ci-pool-ops
+    - ci-pool-system
+    - ci-pool-residential-egress
