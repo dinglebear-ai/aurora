@@ -63,6 +63,23 @@ breaking changes and will be listed here.
 
 - Relicense Dinglebear-owned original work under AGPL-3.0-only and document separate commercial licensing; third-party material retains its original terms.
 
+## [0.6.0](https://github.com/dinglebear-ai/aurora/compare/v0.5.1...v0.6.0) (2026-08-21)
+
+
+### Added
+
+* add Aurora chat primitives and interactive chat block ([#131](https://github.com/dinglebear-ai/aurora/issues/131)) ([c6ca692](https://github.com/dinglebear-ai/aurora/commit/c6ca692d827f0f3ed27d1811d3b2527aed9d31a1))
+* polish Aurora chat workspace interactions ([#136](https://github.com/dinglebear-ai/aurora/issues/136)) ([2644999](https://github.com/dinglebear-ai/aurora/commit/264499993c050d618db1a80126c4d00364242f8e))
+
+
+### Fixed
+
+* **deps:** pin js-yaml to 4.3.1 for GHSA-5p4m-2wfm-xmqj ([#127](https://github.com/dinglebear-ai/aurora/issues/127)) ([69a891b](https://github.com/dinglebear-ai/aurora/commit/69a891bc900d0405c83431e2b828ee5ee45b3c9e))
+* keep chat action rails inside paint bounds ([#141](https://github.com/dinglebear-ai/aurora/issues/141)) ([e54a4aa](https://github.com/dinglebear-ai/aurora/commit/e54a4aaac5218fa030103991089681fa86eb11e3))
+* layer chat autocomplete above transcript ([#137](https://github.com/dinglebear-ai/aurora/issues/137)) ([3ac8469](https://github.com/dinglebear-ai/aurora/commit/3ac8469e13cdd24708ca3848d83af37a8fc2311d))
+* **ops:** give the aurora cache tmpfs the container's uid/gid ([#126](https://github.com/dinglebear-ai/aurora/issues/126)) ([c005a22](https://github.com/dinglebear-ai/aurora/commit/c005a229e88cb18f93e7a7b3d0181c968614c084))
+* optimize chat layout for mobile ([#140](https://github.com/dinglebear-ai/aurora/issues/140)) ([b38eb17](https://github.com/dinglebear-ai/aurora/commit/b38eb17392ee09f11377df9bab61764bae83e52d))
+
 ## [0.5.1](https://github.com/dinglebear-ai/aurora/compare/v0.5.0...v0.5.1) (2026-07-29)
 
 
