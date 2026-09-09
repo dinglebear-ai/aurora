@@ -1,0 +1,18 @@
+[package]
+name = "aurora-gpui-registry"
+version = "0.1.0"
+description = "Typed component catalog, validation, and install planning for Aurora GPUI"
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+rustix = { version = "1.1.4", features = ["fs"] }
+
+[[bin]]
+name = "aurora-gpui"
+path = "src/main.rs"
+
+[lints]
+workspace = true

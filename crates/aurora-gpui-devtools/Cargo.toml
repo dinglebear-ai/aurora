@@ -1,0 +1,17 @@
+[package]
+name = "aurora-gpui-devtools"
+version = "0.1.0"
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+aurora-gpui-core = { path = "../aurora-gpui-core" }
+aurora-gpui-editor = { path = "../aurora-gpui-editor" }
+aurora-gpui-ui = { path = "../aurora-gpui-ui" }
+aurora-gpui-workspace = { path = "../aurora-gpui-workspace" }
+gpui.workspace = true
+
+[lints]
+workspace = true

@@ -1,0 +1,16 @@
+[package]
+name = "aurora-gpui-ui"
+version = "0.1.0"
+description = "Reusable Aurora components for GPUI applications"
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+publish = false
+
+[dependencies]
+aurora-gpui-core = { path = "../aurora-gpui-core" }
+gpui.workspace = true
+
+[lints]
+workspace = true

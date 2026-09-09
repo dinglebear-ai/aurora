@@ -1,0 +1,31 @@
+[workspace]
+resolver = "2"
+members = [
+  "crates/aurora-gpui-agent",
+  "crates/aurora-gpui-core",
+  "crates/aurora-gpui-devtools",
+  "crates/aurora-gpui-editor",
+  "crates/aurora-gpui-gallery",
+  "crates/aurora-gpui-registry",
+  "crates/aurora-gpui-ui",
+  "crates/aurora-gpui-workspace",
+]
+
+[workspace.package]
+edition = "2024"
+license = "AGPL-3.0-only"
+repository = "https://github.com/dinglebear-ai/aurora"
+rust-version = "1.98"
+
+[workspace.dependencies]
+gpui = { git = "https://github.com/zed-industries/zed", rev = "5a9b9558db01a6b906cec2fb70a797affdc58cdd", default-features = false }
+gpui_platform = { git = "https://github.com/zed-industries/zed", rev = "5a9b9558db01a6b906cec2fb70a797affdc58cdd", features = ["font-kit"] }
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+
+[workspace.lints.clippy]
+all = { level = "warn", priority = -1 }
+pedantic = { level = "warn", priority = -1 }
+module_name_repetitions = "allow"
+must_use_candidate = "allow"

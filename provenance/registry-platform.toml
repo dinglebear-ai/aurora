@@ -1,0 +1,11 @@
+component = "aurora-gpui-registry"
+upstream_repository = "https://github.com/zed-industries/zed"
+upstream_revision = "5a9b9558db01a6b906cec2fb70a797affdc58cdd"
+upstream_paths = [
+  "crates/extension/src/extension_manifest.rs",
+  "crates/extension_api/src/extension_api.rs",
+  "crates/project/src/project.rs",
+]
+upstream_license = "GPL-3.0-or-later"
+strategy = "behavioral-reference"
+notes = "Aurora-native typed metadata, canonical manifests, complete file planning, and containment-checked atomic staged installation informed by Zed extension and project dependency behavior; no source copied verbatim."

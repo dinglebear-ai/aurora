@@ -1,0 +1,29 @@
+[package]
+name = "aurora-gpui-gallery"
+version = "0.1.0"
+description = "Native component gallery and integration proof for Aurora GPUI"
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+aurora-gpui-agent = { path = "../aurora-gpui-agent" }
+aurora-gpui-core = { path = "../aurora-gpui-core" }
+aurora-gpui-devtools = { path = "../aurora-gpui-devtools" }
+aurora-gpui-editor = { path = "../aurora-gpui-editor" }
+aurora-gpui-registry = { path = "../aurora-gpui-registry" }
+aurora-gpui-ui = { path = "../aurora-gpui-ui" }
+aurora-gpui-workspace = { path = "../aurora-gpui-workspace" }
+gpui.workspace = true
+gpui_platform = { workspace = true, optional = true }
+
+[features]
+native-app = ["dep:gpui_platform"]
+
+[[example]]
+name = "native_gallery"
+required-features = ["native-app"]
+
+[lints]
+workspace = true

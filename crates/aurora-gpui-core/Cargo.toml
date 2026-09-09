@@ -1,0 +1,15 @@
+[package]
+name = "aurora-gpui-core"
+version = "0.1.0"
+description = "Aurora design tokens and shared foundations for GPUI applications"
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+publish = false
+
+[dependencies]
+gpui.workspace = true
+
+[lints]
+workspace = true
