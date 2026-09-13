@@ -48,7 +48,8 @@
     "catalog:device:android": "pnpm --dir apps/device-catalog tauri:android:dev",
     "catalog:device:android:build": "pnpm --dir apps/device-catalog tauri:android:build",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "oauth:build": "node scripts/build-oauth-document.mjs"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.16",
