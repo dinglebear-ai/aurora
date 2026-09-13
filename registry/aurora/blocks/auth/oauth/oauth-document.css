@@ -1,0 +1,16 @@
+/* Layout for the server-renderable OAuthDocument; primitives stay canonical. */
+html { color-scheme: dark; }
+html.light { color-scheme: light; }
+body { margin: 0; }
+* { box-sizing: border-box; }
+.aurora-oauth-document { display: grid; place-items: center; padding: 24px; min-height: 100svh; }
+.aurora-oauth-document-panel { width: 100%; max-width: 440px; padding: 32px; background: var(--aurora-panel-strong); border: 1px solid var(--aurora-border-strong); border-radius: var(--aurora-radius-3); box-shadow: var(--aurora-shadow-strong), var(--aurora-highlight-strong); overflow-wrap: anywhere; }
+.aurora-oauth-document-heading { display: flex; align-items: center; gap: 10px; color: var(--aurora-accent-primary); }
+.aurora-oauth-document-heading span { color: inherit; }
+.aurora-oauth-document h1 { margin: 20px 0 12px; }
+.aurora-oauth-document p { margin: 0 0 24px; color: var(--aurora-text-muted); }
+.aurora-oauth-document[data-state="success"] .aurora-oauth-document-heading { color: var(--aurora-success); }
+.aurora-oauth-document[data-state="error"] .aurora-oauth-document-heading { color: var(--aurora-error); }
+.aurora-oauth-document[data-state="expired"] .aurora-oauth-document-heading { color: var(--aurora-warn); }
+@media (max-width: 480px) { .aurora-oauth-document { padding: 16px; } .aurora-oauth-document-panel { padding: 24px; } }
+@media (prefers-color-scheme: light) { html:not(.dark) { color-scheme: light; } }

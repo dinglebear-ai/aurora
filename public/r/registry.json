@@ -2312,6 +2312,16 @@
           "path": "registry/aurora/blocks/auth/oauth/oauth.tsx",
           "type": "registry:component",
           "target": "@components/aurora/oauth.tsx"
+        },
+        {
+          "path": "registry/aurora/blocks/auth/oauth/oauth-document.tsx",
+          "type": "registry:component",
+          "target": "@components/aurora/oauth-document.tsx"
+        },
+        {
+          "path": "registry/aurora/blocks/auth/oauth/oauth-document.css",
+          "type": "registry:style",
+          "target": "@components/aurora/oauth-document.css"
         }
       ],
       "author": "jmagar <https://github.com/jmagar>",

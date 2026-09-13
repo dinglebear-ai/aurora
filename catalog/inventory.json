@@ -2144,7 +2144,9 @@
       "installTarget": "@components/aurora/oauth.tsx",
       "installUrl": "https://aurora.tootie.tv/r/aurora-oauth.json",
       "files": [
-        "registry/aurora/blocks/auth/oauth/oauth.tsx"
+        "registry/aurora/blocks/auth/oauth/oauth.tsx",
+        "registry/aurora/blocks/auth/oauth/oauth-document.tsx",
+        "registry/aurora/blocks/auth/oauth/oauth-document.css"
       ],
       "dependencies": [
         "lucide-react@^1.21.0"
