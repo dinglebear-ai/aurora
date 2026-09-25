@@ -1,30 +1,8 @@
-Workspace cleanup archive for dinglebear-ai/aurora
-Date: 2026-09-25
+Workspace cleanup archive 2026-09-25
+Repo: aurora
 Default: main
-
-STALE_BRANCHES 18
-STALE	bd-work/aurora-gpui-component-platform	35388b8e168521ea51cbc2d3b6a84a06575095ae
-STALE	ci/fleet-operational-20260801	b2babcebe12ad7e018adc9ee625eaf9d688398b5
-STALE	codex/fleet-alignment-reviewable-20260730	7e6e78fc399096873ff60551e8829f10c0fce362
-STALE	codex/oauth-document	958f6da638c6475574245d692196e89c1a7dcd88
-STALE	feat/chat-primitives	d8ba1141444f757f2dd07c8d9290f7fed6b51ebf
-STALE	feat/chat-workspace-polish	7a45680c81997b5527ab8437c4d1c941742a1b54
-STALE	fix/chat-action-rail-offset	1f3d99b0fe20a74ba36e336d1414b9249a5ba354
-STALE	fix/chat-mobile-expanded-reasoning	19b24ee80c380a26885baaf93a8cb53e3374cca9
-STALE	fix/chat-mobile-layout	9f416eb30b966886147bae519f3c33d6965d4ea5
-STALE	fix/chat-popup-layering	5f14d3b9a99fd52f21e535eddd4924fd4348d41b
-STALE	polish/chat-composer-hierarchy	fcd0cec8286d2b687a2ef070c3c8ccd85f30bdda
-STALE	polish/chat-content-hierarchy	6411a0f828b55b7863aa07477dce1c223a9e5ab9
-STALE	polish/chat-state-choreography	43df0aa3b754b5282ade8db4a58ca5aeaa1d1bd2
-STALE	polish/chat-visual-refinement	4719cde9146b1c81239da9f5406c9546059deacc
-STALE	polish/gallery-unification	6411a0f828b55b7863aa07477dce1c223a9e5ab9
-STALE	tweak/chat-control-density	67949e20eee83b90b035c910c04c2b3ad47bdb59
-STALE	tweak/chat-density	a979efb47d55187f69cedd9272b7851f9875422b
-STALE	tweak/chat-ultra-compact	851eaa0d937cb9fe19fbd4a848c4cee3df0e00cf
-
-LOCAL_ONLY_BRANCHES 0
-
-STALE_WORKTREES 1
-WORKTREE	/Users/jmagar/workspace/aurora	branch=bd-work/aurora-gpui-component-platform	head=35388b8e168521ea51cbc2d3b6a84a06575095ae
-
-WIP_SNAPSHOTS 0
+STALE_BRANCH chore/production-lan-bind 64f86e17a7ce0461e7fbd04102c7a02ab82cb88a
+STALE_BRANCH chore/scrub-internal-identifiers-20260805 96fe233fe73ba2cdc5fb0eb122b37c632a6197d2
+STALE_BRANCH codex/catalog-verification-system 9fc3c518adc92c1cc8efe088875a0d232c1fd30b
+STALE_BRANCH codex/fleet-alignment-20260730 5d50166698460d244ccb4f8556ad8ccb69269783
+STALE_BRANCH polish/chat-content-states c1ab0c9f346af16478b2d438b9f433ac4b7951c1
