@@ -1,4 +1,0 @@
-interface:
-  display_name: "Aurora Design System"
-  short_description: "Build, modify, review, or debug Aurora UI, registry, Android, CLI, and editor theme surfaces."
-  default_prompt: "Use $aurora for Aurora/Labby UI, @aurora shadcn registry items, Android Compose theme work, CLI/editor palettes, and downstream surfaces that must use Aurora tokens."
