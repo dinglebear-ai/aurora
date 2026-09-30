@@ -74,3 +74,4 @@ storybook-static
 /.design-sync/
 /.ds-sync/
 /ds-bundle/
+worktrees/
