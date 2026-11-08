@@ -11,6 +11,9 @@ const eslintConfig = [...nextCoreWebVitals, ...nextTypescript, {
     ".next/**",
     "out/**",
     "storybook-static/**",
+    // Playwright HTML reports contain bundled third-party JavaScript, not source.
+    "playwright-report/**",
+    "test-results/**",
     "public/r/**",
     "public/dinglebear/**",
     "android/**/build/**",
