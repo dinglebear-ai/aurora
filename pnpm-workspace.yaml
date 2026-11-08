@@ -1,5 +1,6 @@
 packages:
   - "apps/*"
+  - "packages/*"
 
 engineStrict: true
 
@@ -13,54 +14,62 @@ onlyBuiltDependencies:
 # field in package.json (that field is silently ignored as of pnpm 10). See
 # https://pnpm.io/settings. Migrated from package.json on 2026-05-31.
 overrides:
-  "@humanfs/node@<0.16.8": "0.16.8"
-  "baseline-browser-mapping@<2.11.0": "2.11.0"
-  "browserslist@<4.28.7": "4.28.7"
+  # Replace both vulnerable implementations, including the bundled mirror.
   "@babel/core@<7.29.6": "7.29.6"
-  "@eslint/config-array>minimatch": "10.2.5"
+  "@bundled-es-modules/deepmerge": "file:./packages/safe-deepmerge"
+  "@eslint/config-array>minimatch": "11.0.1"
   # @eslint/eslintrc uses only the long-lived Minimatch class API; move it
   # off minimatch 3 / brace-expansion 1 without upgrading ESLint past plugin support.
-  "@eslint/eslintrc>minimatch": "10.2.5"
+  "@eslint/eslintrc>minimatch": "11.0.1"
   # transitive dev/build-tooling vulns pulled via shadcn → MCP SDK, and sharp
   "@hono/node-server@<2.1.3": "2.1.3"
+  "@humanfs/node@<0.16.8": "0.16.8"
   "@modelcontextprotocol/sdk": "1.32.0"
   "@types/react": "19.1.2"
   "@types/react-dom": "19.1.2"
   "ajv@<6.14.0": "6.15.0"
+  "baseline-browser-mapping@<2.11.0": "2.11.0"
+  # Patched transitive tooling dependencies flagged by the full-lockfile OSV gate.
+  "body-parser@<2.4.0": "2.4.0"
   # GHSA-mh99-v99m-4gvg; keep the override within the compatible 5.x API
   "brace-expansion@>=5.0.0 <5.0.12": "5.0.12"
+  "browserslist@<4.28.7": "4.28.7"
+  "deepmerge": "file:./packages/safe-deepmerge"
   "diff@>=6.0.0 <8.0.3": "8.0.3"
-  "eslint-plugin-import>minimatch": "10.2.5"
-  "eslint-plugin-jsx-a11y>minimatch": "10.2.5"
-  "eslint-plugin-react>minimatch": "10.2.5"
-  "eslint>minimatch": "10.2.5"
+  "eslint-plugin-import>minimatch": "11.0.1"
+  "eslint-plugin-jsx-a11y>minimatch": "11.0.1"
+  "eslint-plugin-react>minimatch": "11.0.1"
+  "eslint>minimatch": "11.0.1"
   "fast-uri@<3.1.9": "3.1.9"
   "flatted@<=3.4.1": "3.4.2"
+  # Reviewed major security upgrades; exercised by registry and tooling contracts.
+  "glob@>=13 <14.0.2": "14.0.2"
   # GHSA-88fw-hqm2-52qc / hvrm / w62v / xgm2 — hono vulns via shadcn's MCP SDK dependency (dev/build tooling only)
   "hono@<4.13.11": "4.13.11"
   "ip-address": "10.7.4"
   "js-yaml@>=4.0.0 <4.3.2": "4.3.2"
-  # GHSA-2v37-7h3g-55p8 — PostCSS accepts ^3.3.16; force the patched nanoid release.
-  "postcss>nanoid": "3.3.18"
+  "minimatch@>=7 <11.0.1": "11.0.1"
   "path-to-regexp@>=8.0.0 <8.4.0": "8.4.0"
   "picomatch@<3": "2.3.2"
   "picomatch@>=4.0.0 <4.0.4": "4.0.4"
+  "postcss-selector-parser@>=7 <7.1.6": "7.1.6"
+  # GHSA-2v37-7h3g-55p8 — PostCSS accepts ^3.3.16; force the patched nanoid release.
+  "postcss>nanoid": "3.3.18"
   # GHSA-r28c-9q8g-f849 and earlier source-map advisories
   "postcss@<8.5.23": "8.5.23"
+  "proxy-addr@<2.0.8": "2.0.8"
   "qs@<6.16.1": "6.16.1"
   # GHSA-wq5f-xc86-pv6w: patched bundled librsvg.
   "sharp@<0.35.5": "0.35.5"
+  "source-map-js@<1.2.2": "1.2.2"
+  "systeminformation@<5.33.16": "5.33.16"
   # GHSA-7c78-jf6q-g5cm — tmp path traversal via non-string prefix/postfix/template
   "tmp@<0.2.7": "0.2.7"
   "undici": "7.30.1"
-  # Patched transitive tooling dependencies flagged by the full-lockfile OSV gate.
-  "body-parser@<2.4.0": "2.4.0"
-  "postcss-selector-parser@>=7 <7.1.6": "7.1.6"
-  "proxy-addr@<2.0.8": "2.0.8"
-  "source-map-js@<1.2.2": "1.2.2"
-  "systeminformation@<5.33.16": "5.33.16"
   "vite@>=8 <8.1.6": "8.1.6"
+  "zod@<4.6.6": "4.6.6"
 patchedDependencies:
+  '@fastify/deepmerge@3.2.4': patches/@fastify__deepmerge@3.2.4.patch
   eslint-plugin-import@2.32.0: patches/eslint-plugin-import@2.32.0.patch
   eslint-plugin-jsx-a11y@6.10.2: patches/eslint-plugin-jsx-a11y@6.10.2.patch
   eslint-plugin-react@7.37.5: patches/eslint-plugin-react@7.37.5.patch

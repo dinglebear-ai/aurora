@@ -27,6 +27,8 @@ USER node
 # the sources — so this layer still caches on dependency changes alone.
 COPY --chown=node:node package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY --chown=node:node patches ./patches
+# Local maintained-engine adapter is part of the locked tooling dependency graph.
+COPY --chown=node:node packages/safe-deepmerge ./packages/safe-deepmerge
 RUN pnpm install --frozen-lockfile
 
 FROM deps AS dev

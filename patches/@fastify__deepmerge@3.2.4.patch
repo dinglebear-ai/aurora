@@ -1,0 +1,32 @@
+diff --git a/index.js b/index.js
+index b2d5020e41db8df2db695f4d9327faf5ba7d959e..5333df03822bb53deabb97ab6605bb75341fa146 100644
+--- a/index.js
++++ b/index.js
+@@ -122,7 +122,9 @@ function deepmergeConstructor (options) {
+           if (cloneProtoObject && isMergeableObject(source[key]) && Object.getPrototypeOf(source[key]) !== JSON_PROTO) {
+             result[key] = cloneProtoObject(source[key])
+           } else {
+-            result[key] = _deepmerge(target[key], source[key])
++            result[key] = isMergeableObject(source[key])
++              ? _deepmerge(target[key], source[key])
++              : source[key]
+           }
+         }
+       } else {
+@@ -143,12 +145,13 @@ function deepmergeConstructor (options) {
+     const sourceIsArray = Array.isArray(source)
+     const targetIsArray = Array.isArray(target)
+ 
+-    if (isPrimitive(source)) {
++    if (sourceIsArray && targetIsArray) {
++      // Top-level arrays honor arrayMerge even if the predicate excludes arrays.
++      return mergeArray(target, source)
++    } else if (isPrimitive(source) || !isMergeableObject(source)) {
+       return source
+     } else if (!isMergeableObject(target)) {
+       return clone(source)
+-    } else if (sourceIsArray && targetIsArray) {
+-      return mergeArray(target, source)
+     } else if (sourceIsArray !== targetIsArray) {
+       return clone(source)
+     } else {
