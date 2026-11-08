@@ -244,8 +244,10 @@ test("chat composer presents one progressive responsive control surface", async 
 
   const idleBorder = await composer.evaluate((element) => getComputedStyle(element).borderColor)
   await input.focus()
-  const focusedBorder = await composer.evaluate((element) => getComputedStyle(element).borderColor)
-  expect(focusedBorder).not.toBe(idleBorder)
+  await expect(input).toBeFocused()
+  // Focus styles transition asynchronously; wait for the visible state, not a single frame.
+  await expect.poll(() => composer.evaluate((element) => getComputedStyle(element).borderColor))
+    .not.toBe(idleBorder)
 
   const inputBox = await input.boundingBox()
   const attachBox = await attach.boundingBox()

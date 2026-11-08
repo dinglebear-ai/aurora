@@ -1,6 +1,6 @@
 # Pin by digest so builds are reproducible; bump with `docker pull node:24-alpine`
 # then update the digest here and in the runner stage.
-FROM node:24-alpine@sha256:a0b9bf06e4e6193cf7a0f58816cc935ff8c2a908f81e6f1a95432d679c54fbfd AS base
+FROM node:24-alpine@sha256:a34ab6d7f6f4813f4d0c5469d74685604b962fbdbf5793a7bc7b4998ecb867c8 AS base
 
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
@@ -27,6 +27,8 @@ USER node
 # the sources — so this layer still caches on dependency changes alone.
 COPY --chown=node:node package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY --chown=node:node patches ./patches
+# Local maintained-engine adapter is part of the locked tooling dependency graph.
+COPY --chown=node:node packages/safe-deepmerge ./packages/safe-deepmerge
 RUN pnpm install --frozen-lockfile
 
 FROM deps AS dev
@@ -60,7 +62,7 @@ ENV AURORA_BUILD_SHA=$AURORA_BUILD_SHA
 
 RUN pnpm build
 
-FROM node:24-alpine@sha256:a0b9bf06e4e6193cf7a0f58816cc935ff8c2a908f81e6f1a95432d679c54fbfd AS runner
+FROM node:24-alpine@sha256:a34ab6d7f6f4813f4d0c5469d74685604b962fbdbf5793a7bc7b4998ecb867c8 AS runner
 
 ARG AURORA_BUILD_SHA=development
 
