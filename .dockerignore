@@ -30,3 +30,7 @@ ops/rendered-swag
 Dockerfile
 docker-compose.yaml
 .dockerignore
+
+# Private checkout guidance and nested worktrees are never build inputs.
+AGENTS.override.md
+worktrees

@@ -48,7 +48,8 @@ overrides:
   # GHSA-r28c-9q8g-f849 and earlier source-map advisories
   "postcss@<8.5.23": "8.5.23"
   "qs@<6.16.0": "6.16.0"
-  "sharp@<0.35.4": "0.35.4"
+  # GHSA-wq5f-xc86-pv6w: patched bundled librsvg.
+  "sharp@<0.35.5": "0.35.5"
   # GHSA-7c78-jf6q-g5cm — tmp path traversal via non-string prefix/postfix/template
   "tmp@<0.2.7": "0.2.7"
   "undici": "7.29.1"

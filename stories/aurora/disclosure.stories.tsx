@@ -102,7 +102,7 @@ export const ActionMenu: Story = {
     const canvas = within(canvasElement)
     const body = within(canvasElement.ownerDocument.body)
     await userEvent.click(canvas.getByRole("button", { name: "Component actions" }))
-    await expect(body.getByRole("menuitem", { name: /Open preview/ })).toBeVisible()
+    await waitFor(() => expect(body.getByRole("menuitem", { name: /Open preview/ })).toBeVisible())
   },
 }
 

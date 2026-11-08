@@ -290,6 +290,7 @@ function LiveDrawer({
   kotlin,
   onPick,
   onClose,
+  onRestoreFocus,
 }: {
   item: CatalogItem
   list: CatalogItem[]
@@ -297,6 +298,7 @@ function LiveDrawer({
   kotlin?: string
   onPick: (item: CatalogItem) => void
   onClose: () => void
+  onRestoreFocus: () => void
 }) {
   const Demo = DEMOS[item.slug]
   // Overlay demos (Select, DropdownMenu, Popover, …) portal their content, and
@@ -341,6 +343,11 @@ function LiveDrawer({
         onOpenAutoFocus={(event) => {
           event.preventDefault()
           titleRef.current?.focus()
+        }}
+        onCloseAutoFocus={(event) => {
+          // Restore after the focus trap unmounts, not on a competing animation frame.
+          event.preventDefault()
+          onRestoreFocus()
         }}
         className="aurora-catalog-drawer-backdrop !max-w-[min(880px,calc(100vw-24px))] flex-row items-stretch justify-center border-0 bg-transparent p-0"
         style={{
@@ -561,9 +568,6 @@ function CatalogInner({ heading = "The Catalog", headingLevel = 2, kotlinMap, sy
       if (item && !open) drawerReturnFocusRef.current = document.activeElement as HTMLElement | null
       setOpen(item)
       updateUrl({ c: item?.slug ?? null })
-      if (!item) {
-        window.requestAnimationFrame(() => drawerReturnFocusRef.current?.focus())
-      }
     },
     [open, updateUrl],
   )
@@ -893,6 +897,7 @@ function CatalogInner({ heading = "The Catalog", headingLevel = 2, kotlinMap, sy
           kotlin={android && open.registry ? kotlinMap?.[open.registry] : undefined}
           onPick={pick}
           onClose={() => pick(null)}
+          onRestoreFocus={() => drawerReturnFocusRef.current?.focus()}
         />
       ) : null}
     </section>
